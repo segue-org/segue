@@ -1,3 +1,5 @@
+import flask
+
 class ProposalService(object):
     def __init__(self, db=None):
         pass
@@ -5,4 +7,10 @@ class ProposalService(object):
     def get_one(self, proposal_id):
         return { "proposal_id": proposal_id }
 
-service = ProposalService()
+
+class ProposalController(object):
+    def __init__(self, service=None):
+        self.service = service or ProposalService()
+
+    def get_one(self, proposal_id):
+        return flask.jsonify(self.service.get_one(proposal_id))
