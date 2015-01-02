@@ -1,0 +1,6 @@
+---
+
+webhost: 192.168.33.90.xip.io
+app_path: /opt/gateway
+port: 9001
+jwt_secret: sshh

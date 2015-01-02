@@ -1,0 +1,7 @@
+---
+
+- apt: update_cache=yes
+       cache_valid_time=3600
+
+- name: Install python-keyczar so that we can have faster connections
+  apt: pkg=python-keyczar

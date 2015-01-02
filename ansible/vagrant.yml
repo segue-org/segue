@@ -1,0 +1,12 @@
+---
+
+- hosts: vagrant
+  sudo: True
+  roles:
+    - accelerate
+
+- hosts: vagrant
+  sudo: true
+  accelerate: true
+  vars:
+    backup: false
