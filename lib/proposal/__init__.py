@@ -1,6 +1,8 @@
+import sys
+
 import flask
 
-from ..core import db
+from ..core import db, log
 from ..helpers import jsoned
 from models import Proposal
 

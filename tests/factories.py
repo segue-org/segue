@@ -15,6 +15,5 @@ class ProposalFactory(SegueFactory):
     title       = Sequence(lambda n: 'Proposal Title #{0}'.format(n))
     abstract    = Sequence(lambda n: 'abstract #{0}'.format(n))
     description = Sequence(lambda n: 'description #{0}'.format(n))
-    video_authorization = True
-    language = 'en'
-    level = 'pro'
+    language    = 'en'
+    level       = 'pro'
