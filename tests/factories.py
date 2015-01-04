@@ -1,16 +1,12 @@
-from factory import Factory, Sequence, LazyAttribute
+from factory import Sequence, LazyAttribute
+from factory.alchemy import SQLAlchemyModelFactory
 
 from lib.core import db
 from lib.proposal.models import *
 
-class SegueFactory(Factory):
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        entity = model_class(*args, **kwargs)
-        db.session.add(entity)
-        db.session.commit()
-        return entity
+class SegueFactory(SQLAlchemyModelFactory):
+    class Meta:
+        sqlalchemy_session = db.session
 
 class ProposalFactory(SegueFactory):
     class Meta:
