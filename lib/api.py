@@ -8,7 +8,6 @@ class ProposalBlueprint(flask.Blueprint):
         self.controller = ProposalController()
         self.add_url_rule('/<proposal_id>', methods=['GET'], view_func=self.controller.get_one)
 
-
 blueprints = [
     ProposalBlueprint()
 ]

@@ -5,8 +5,9 @@ from werkzeug.serving import run_simple
 import lib
 
 backend = lib.Application()
+null = lib.NullApplication()
 
-application = DispatcherMiddleware(None, {
+application = DispatcherMiddleware(null, {
     '/api': backend
 })
 
