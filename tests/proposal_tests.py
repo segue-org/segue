@@ -53,7 +53,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         mockito.when(self.service).get_one(123).thenReturn(mock_proposal)
 
         response = self.client.get('/proposal/123')
-        content = json.loads(response.data)['data']
+        content = json.loads(response.data)['resource']
 
         self.assertEquals(content['title'],       mock_proposal.title)
         self.assertEquals(content['description'], mock_proposal.description)

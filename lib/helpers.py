@@ -6,7 +6,10 @@ def jsoned(f):
         result = f(*args, **kwargs)
         if isinstance(result, tuple):
             result, status = result
-        return flask.jsonify(dict(data=result)), status
+        if isinstance(result, list):
+            return flask.jsoned(dict(items=result)), status
+        else:
+            return flask.jsonify(dict(resource=result)), status
     return decorated
 
 
