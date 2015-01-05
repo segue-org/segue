@@ -1,9 +1,8 @@
 import unittest
 
 import lib, lib.core
-import settings
 
-from factories import SegueFactory
+import settings
 
 class SegueApiTestCase(unittest.TestCase):
     def setUp(self):

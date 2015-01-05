@@ -7,8 +7,8 @@ from lib.proposal import ProposalService, ProposalController
 
 from lib.core import log
 
-from .factories import ProposalFactory
-from . import SegueApiTestCase
+from .support.factories import ProposalFactory
+from .support import SegueApiTestCase
 
 class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):
