@@ -1,10 +1,12 @@
 import sys
 
 import flask
+from flask import request
 
 from ..core import db, log
 from ..helpers import jsoned
 from models import Proposal
+from forms import NewProposalForm
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
@@ -22,6 +24,13 @@ class ProposalService(object):
 class ProposalController(object):
     def __init__(self, service=None):
         self.service = service or ProposalService()
+
+    def create(self):
+        form = NewProposalForm(request.get_json())
+        if form.validate():
+            return '', 201
+        else:
+            return form, 422
 
     @jsoned
     def get_one(self, proposal_id):

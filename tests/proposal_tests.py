@@ -33,6 +33,14 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.service = mockito.Mock()
         self.app.blueprints['proposals'].controller.service = self.service
 
+    def test_valid_forms_gets_created(self):
+        mock_proposal = ProposalFactory.build()
+        raw_json = json.dumps(mock_proposal.to_json())
+
+        response = self.client.post('/proposal', data=raw_json, content_type='application/json')
+
+        self.assertEquals(response.status_code, 208)
+
     def test_404s_on_non_existing_entity(self):
         mockito.when(self.service).get_one(456).thenReturn(None)
 

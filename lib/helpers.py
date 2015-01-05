@@ -54,4 +54,7 @@ class JsonSerializer(object):
             rv[key] = modifier(value, self)
         for key in hidden:
             rv.pop(key, None)
+        for key in rv.keys():
+            if rv.get(key) == None:
+                rv.pop(key)
         return rv
