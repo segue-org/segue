@@ -1,12 +1,14 @@
 import sys
-
+import jsonschema, jsonschema.exceptions
 import flask
+
 from flask import request
 
 from ..core import db, log
 from ..helpers import jsoned
+
 from models import Proposal
-from forms import NewProposalForm
+from schema import new_proposal_schema
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
@@ -25,12 +27,16 @@ class ProposalController(object):
     def __init__(self, service=None):
         self.service = service or ProposalService()
 
+    @jsoned
     def create(self):
-        form = NewProposalForm(request.get_json())
-        if form.validate():
-            return '', 201
-        else:
-            return form, 422
+        try:
+            data = request.get_json()
+            jsonschema.validate(data, new_proposal_schema)
+            self.service.create(data)
+            return data, 201
+        except jsonschema.exceptions.ValidationError, e:
+            print e.message
+            return e.context.iter_errors, 422
 
     @jsoned
     def get_one(self, proposal_id):

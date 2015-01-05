@@ -16,4 +16,4 @@ class ProposalFactory(SegueFactory):
     abstract    = Sequence(lambda n: 'abstract #{0}'.format(n))
     description = Sequence(lambda n: 'description #{0}'.format(n))
     language    = 'en'
-    level       = 'pro'
+    level       = 'advanced'

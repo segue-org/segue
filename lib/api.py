@@ -1,5 +1,7 @@
 import flask
 
+from core import log
+
 from proposal import ProposalController
 
 class ProposalBlueprint(flask.Blueprint):

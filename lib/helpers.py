@@ -1,7 +1,9 @@
+from functools import wraps
 import flask
 
 def jsoned(f):
-    def decorated(*args, **kwargs):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
         status = 200
         result = f(*args, **kwargs)
         if isinstance(result, tuple):
@@ -10,7 +12,7 @@ def jsoned(f):
             return flask.jsoned(dict(items=result)), status
         else:
             return flask.jsonify(dict(resource=result)), status
-    return decorated
+    return wrapper
 
 
 class JSONEncoder(flask.json.JSONEncoder):
