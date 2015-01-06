@@ -6,7 +6,7 @@ from werkzeug.exceptions import NotFound
 from segue.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
 from segue.errors import SegueValidationError
 
-from support import SegueApiTestCase, ValidProposalFactory, InvalidProposalFactory
+from support import SegueApiTestCase, ValidProposalFactory, InvalidProposalFactory, hashie
 
 class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):
@@ -36,14 +36,20 @@ class ProposalControllerTestCases(SegueApiTestCase):
         super(ProposalControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('proposals', 'service')
 
+    def _build_validation_error_from_list(self, *args):
+        return SegueValidationError([ hashie(message=m) for m in args ])
+
     def test_invalid_entities_become_400_error(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        mockito.when(self.mock_service).create(data).thenRaise(SegueValidationError([]))
+        validation_error = self._build_validation_error_from_list("a","b")
+        mockito.when(self.mock_service).create(data).thenRaise(validation_error)
 
         response = self.jpost('/proposal', data=raw_json)
 
+        self.assertEquals(json.loads(response.data)['errors'], ["a","b"])
         self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.content_type, 'application/json')
 
     def test_json_input_is_sent_to_service_for_creation(self):
         data = { "arbitrary": "json that will be mocked out anyway" }

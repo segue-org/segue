@@ -6,6 +6,7 @@ import segue, segue.core
 import settings
 
 from factories import *
+from hashie import hashie
 
 class SegueApiTestCase(unittest.TestCase):
     def setUp(self):
