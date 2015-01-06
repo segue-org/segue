@@ -5,7 +5,7 @@ from werkzeug.exceptions import NotFound
 
 from lib.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
 
-from lib.core import log
+from lib.core import log, SegueValidationError
 
 from support import SegueApiTestCase, ValidProposalFactory, InvalidProposalFactory
 
@@ -17,7 +17,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
     def test_invalid_proposal_raises_validation_error(self):
         proposal = InvalidProposalFactory().to_json()
 
-        with self.assertRaises(ProposalFactory.ValidationError):
+        with self.assertRaises(SegueValidationError):
             self.service.create(proposal)
 
     def test_create_and_retrieve_of_valid_proposal(self):

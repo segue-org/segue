@@ -1,25 +1,16 @@
 import sys
-import jsonschema, jsonschema.exceptions
 import flask
 
 from flask import request
 
-from ..core import db, log, SegueValidationError
+from ..core import db, log, Factory, SegueValidationError
 from ..helpers import jsoned
 
 from models import Proposal
 from schema import new_proposal_schema
 
-class ProposalFactory(object):
-    class ValidationError(SegueValidationError): pass
-
-    @classmethod
-    def from_json(cls, data, schema):
-        validator = jsonschema.Draft4Validator(schema)
-        errors = list(validator.iter_errors(data))
-        if errors:
-            raise ProposalFactory.ValidationError(errors)
-        return Proposal(**data)
+class ProposalFactory(Factory):
+    model = Proposal
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
