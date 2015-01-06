@@ -1,8 +1,10 @@
+import factory
+
 from factory import Sequence, LazyAttribute
 from factory.alchemy import SQLAlchemyModelFactory
 
-from lib.core import db
-from lib.proposal.models import *
+from segue.core import db
+from segue.proposal.models import *
 
 class SegueFactory(SQLAlchemyModelFactory):
     class Meta:

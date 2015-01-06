@@ -3,8 +3,10 @@ import flask
 
 from flask import request
 
-from ..core import db, log, Factory, SegueValidationError
+from ..core import db
 from ..helpers import jsoned
+from ..factory import Factory
+from ..errors import SegueValidationError
 
 from models import Proposal
 from schema import new_proposal_schema

@@ -2,10 +2,10 @@ from werkzeug.debug import DebuggedApplication
 from werkzeug.wsgi import DispatcherMiddleware
 from werkzeug.serving import run_simple
 
-import lib
+import segue
 
-backend = lib.Application()
-null = lib.NullApplication()
+backend = segue.Application()
+null    = segue.NullApplication()
 
 application = DispatcherMiddleware(null, {
     '/api': backend

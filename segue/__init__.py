@@ -3,6 +3,7 @@ import flask
 import core
 import api
 import helpers
+import errors
 
 class NullApplication(flask.Flask):
     def __init__(self):
@@ -21,10 +22,10 @@ class Application(flask.Flask):
     def _register_error_handlers(self):
         def handler(e):
             return flask.jsonify(dict(errors=e.args)), getattr(e, 'code', 400)
-        self.errorhandler(core.SegueError)(handler)
+        self.errorhandler(errors.SegueError)(handler)
 
     def _load_configs(self, settings_override):
-        self.config.from_object('lib.settings')
+        self.config.from_object('segue.settings')
         self.config.from_object(settings_override)
 
     def _set_debug(self):

@@ -3,9 +3,8 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from lib.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
-
-from lib.core import log, SegueValidationError
+from segue.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
+from segue.errors import SegueValidationError
 
 from support import SegueApiTestCase, ValidProposalFactory, InvalidProposalFactory
 
