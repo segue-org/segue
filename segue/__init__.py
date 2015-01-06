@@ -2,7 +2,7 @@ import flask
 
 import core
 import api
-import helpers
+import json
 import errors
 
 class NullApplication(flask.Flask):
@@ -21,7 +21,7 @@ class Application(flask.Flask):
 
     def _register_error_handlers(self):
         def handler(e):
-            return flask.jsonify(dict(errors=e.args)), getattr(e, 'code', 400)
+            return flask.jsonify(dict(errors=e)), getattr(e, 'code', 400)
         self.errorhandler(errors.SegueError)(handler)
 
     def _load_configs(self, settings_override):
@@ -39,5 +39,4 @@ class Application(flask.Flask):
         core.db.init_app(self)
 
     def _set_json_encoder(self):
-        self.json_encoder = helpers.JSONEncoder
-
+        self.json_encoder = json.JSONEncoder

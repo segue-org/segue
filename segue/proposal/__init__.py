@@ -4,7 +4,7 @@ import flask
 from flask import request
 
 from ..core import db
-from ..helpers import jsoned
+from ..json import jsoned
 from ..factory import Factory
 from ..errors import SegueValidationError
 
