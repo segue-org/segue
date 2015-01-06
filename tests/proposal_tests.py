@@ -36,6 +36,15 @@ class ProposalControllerTestCases(SegueApiTestCase):
         super(ProposalControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('proposals', 'service')
 
+    def test_invalid_entities_become_400_error(self):
+        data = { "arbitrary": "json that will be mocked out anyway" }
+        raw_json = json.dumps(data)
+        mockito.when(self.mock_service).create(data).thenRaise(SegueValidationError([]))
+
+        response = self.jpost('/proposal', data=raw_json)
+
+        self.assertEquals(response.status_code, 400)
+
     def test_json_input_is_sent_to_service_for_creation(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
