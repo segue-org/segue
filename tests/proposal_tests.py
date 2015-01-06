@@ -51,10 +51,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
         response = self.jpost('/proposal', data=raw_json)
         errors = json.loads(response.data)['errors']
 
-        self.assertEquals(errors[0]['message'], 'm1')
-        self.assertEquals(errors[1]['message'], 'm2')
-        self.assertEquals(errors[0]['path'], '1.2')
-        self.assertEquals(errors[1]['path'], '3.4')
+        self.assertEquals(errors['1.2'], 'm1')
+        self.assertEquals(errors['3.4'], 'm2')
         self.assertEquals(response.status_code, 400)
         self.assertEquals(response.content_type, 'application/json')
 

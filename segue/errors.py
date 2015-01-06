@@ -5,19 +5,14 @@ class SegueError(JsonSerializer, Exception):
     pass
 
 class SegueValidationError(SegueError):
-    __json__public__ = [ 'errors']
     def __init__(self, errors):
-        self.errors = map(self._build_error, errors)
+        self.errors = errors
         super(SegueValidationError, self).__init__()
 
     def to_json(self):
-        return self.errors
-
-    def _build_error(self, error):
-        message = re.sub("u('.*?')",r"\1",error.message)
-        path = ".".join(error.schema_path)
-        return dict(message=message, path=path)
-
-
-
-
+        result = {}
+        for error in self.errors:
+            message = re.sub("u('.*?')",r"\1",error.message)
+            path = ".".join(error.schema_path)
+            result[path] = message
+        return result

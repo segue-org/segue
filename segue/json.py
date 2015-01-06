@@ -16,12 +16,7 @@ def jsoned(f):
 
 
 class JSONEncoder(flask.json.JSONEncoder):
-    def encode(self, *args, **kw):
-        print "on encode", args
-        return super(JSONEncoder, self).encode(*args, **kw)
-
     def default(self, obj):
-        print "default"
         if isinstance(obj, JsonSerializer):
             return obj.to_json()
         return super(JSONEncoder, self).default(obj)
@@ -35,7 +30,6 @@ class JsonSerializer(object):
         return []
 
     def to_json(self):
-        print "to_json called"
         field_names = self.get_field_names()
 
         public = self.__json_public__ or field_names
