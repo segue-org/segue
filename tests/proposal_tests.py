@@ -3,19 +3,25 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from lib.proposal import ProposalService, ProposalController, Proposal
+from lib.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
 
 from lib.core import log
 
-from support import SegueApiTestCase, ProposalFactory
+from support import SegueApiTestCase, ValidProposalFactory, InvalidProposalFactory
 
 class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(ProposalServiceTestCases, self).setUp()
         self.service = ProposalService()
 
-    def test_create_and_retrieve(self):
-        proposal = ProposalFactory()
+    def test_invalid_proposal_raises_validation_error(self):
+        proposal = InvalidProposalFactory().to_json()
+
+        with self.assertRaises(ProposalFactory.ValidationError):
+            self.service.create(proposal)
+
+    def test_create_and_retrieve_of_valid_proposal(self):
+        proposal = ValidProposalFactory().to_json()
 
         saved = self.service.create(proposal)
         retrieved = self.service.get_one(saved.id)
@@ -31,15 +37,10 @@ class ProposalControllerTestCases(SegueApiTestCase):
         super(ProposalControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('proposals', 'service')
 
-    def test_valid_input_gets_created(self):
-        data = {
-            "title": "Proposal Title",
-            "abstract": "abstract",
-            "description": "description",
-            "language": "en",
-            "level": "advanced",
-        }
+    def test_json_input_is_sent_to_service_for_creation(self):
+        data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
+        mockito.when(self.mock_service).create(data).thenReturn('bla')
 
         response = self.jpost('/proposal', data=raw_json)
 
@@ -54,7 +55,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_200_on_existing_entity(self):
-        mock_proposal = ProposalFactory.build()
+        mock_proposal = ValidProposalFactory.build()
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
         response = self.jget('/proposal/123')
@@ -62,7 +63,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_response_is_json(self):
-        mock_proposal = ProposalFactory.build()
+        mock_proposal = ValidProposalFactory.build()
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
         response = self.jget('/proposal/123')

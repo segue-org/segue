@@ -8,7 +8,7 @@ class SegueFactory(SQLAlchemyModelFactory):
     class Meta:
         sqlalchemy_session = db.session
 
-class ProposalFactory(SegueFactory):
+class ValidProposalFactory(SegueFactory):
     class Meta:
         model = Proposal
 
@@ -17,3 +17,11 @@ class ProposalFactory(SegueFactory):
     description = Sequence(lambda n: 'description #{0}'.format(n))
     language    = 'en'
     level       = 'advanced'
+
+class InvalidProposalFactory(ValidProposalFactory):
+    # all fields fail some validation
+    title       = "x"
+    abstract    = "a"
+    description = "d"
+    language    = "xunga"
+    level       = "professional"

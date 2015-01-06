@@ -4,17 +4,29 @@ import flask
 
 from flask import request
 
-from ..core import db, log
+from ..core import db, log, SegueValidationError
 from ..helpers import jsoned
 
 from models import Proposal
 from schema import new_proposal_schema
 
+class ProposalFactory(object):
+    class ValidationError(SegueValidationError): pass
+
+    @classmethod
+    def from_json(cls, data, schema):
+        validator = jsonschema.Draft4Validator(schema)
+        errors = list(validator.iter_errors(data))
+        if errors:
+            raise ProposalFactory.ValidationError(errors)
+        return Proposal(**data)
+
 class ProposalService(object):
     def __init__(self, db_impl=None):
         self.db = db_impl or db
 
-    def create(self, proposal):
+    def create(self, data):
+        proposal = ProposalFactory.from_json(data, new_proposal_schema)
         db.session.add(proposal)
         db.session.commit()
         return proposal
@@ -29,14 +41,8 @@ class ProposalController(object):
 
     @jsoned
     def create(self):
-        try:
-            data = request.get_json()
-            jsonschema.validate(data, new_proposal_schema)
-            self.service.create(data)
-            return data, 201
-        except jsonschema.exceptions.ValidationError, e:
-            print e.message
-            return e.context.iter_errors, 422
+        data = request.get_json()
+        return self.service.create(data), 201
 
     @jsoned
     def get_one(self, proposal_id):

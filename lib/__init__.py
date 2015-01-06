@@ -12,10 +12,16 @@ class Application(flask.Flask):
     def __init__(self, settings_override=None):
         super(Application, self).__init__(__name__)
         self._set_json_encoder()
-        self._load_configs(settings_override)
         self._set_debug()
+        self._load_configs(settings_override)
         self._register_blueprints()
+        self._register_error_handlers()
         self._init_deps()
+
+    def _register_error_handlers(self):
+        def handler(e):
+            return flask.jsonify(dict(errors=e.args)), getattr(e, 'code', 400)
+        self.errorhandler(core.SegueError)(handler)
 
     def _load_configs(self, settings_override):
         self.config.from_object('lib.settings')
