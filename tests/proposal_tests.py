@@ -36,18 +36,25 @@ class ProposalControllerTestCases(SegueApiTestCase):
         super(ProposalControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('proposals', 'service')
 
-    def _build_validation_error_from_list(self, *args):
-        return SegueValidationError([ hashie(message=m) for m in args ])
+    def _build_validation_error(self):
+        error_1 = hashie(message="m1", schema_path=["1","2"])
+        error_2 = hashie(message="m2", schema_path=["3","4"])
+
+        return SegueValidationError([error_1, error_2])
 
     def test_invalid_entities_become_400_error(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        validation_error = self._build_validation_error_from_list("a","b")
+        validation_error = self._build_validation_error()
         mockito.when(self.mock_service).create(data).thenRaise(validation_error)
 
         response = self.jpost('/proposal', data=raw_json)
+        errors = json.loads(response.data)['errors']
 
-        self.assertEquals(json.loads(response.data)['errors'], ["a","b"])
+        self.assertEquals(errors[0]['message'], 'm1')
+        self.assertEquals(errors[1]['message'], 'm2')
+        self.assertEquals(errors[0]['path'], '1.2')
+        self.assertEquals(errors[1]['path'], '3.4')
         self.assertEquals(response.status_code, 400)
         self.assertEquals(response.content_type, 'application/json')
 
