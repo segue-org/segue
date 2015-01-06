@@ -3,6 +3,7 @@ CONFIG_FILE = 'ansible/group_vars/vagrant.yml'
 parms = YAML::load File.open(CONFIG_FILE)
 
 Vagrant.configure("2") do |config|
+  # TODO: use ubuntu VM to better match production env
   config.vm.box     = 'debian7'
   config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vbox4210.box'
 
