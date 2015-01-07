@@ -88,8 +88,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
         response = self.jget('/proposal/123')
         content = json.loads(response.data)['resource']
 
-        self.assertEquals(content['title'],       mock_proposal.title)
-        self.assertEquals(content['description'], mock_proposal.description)
-        self.assertEquals(content['abstract'],    mock_proposal.abstract)
-        self.assertEquals(content['language'],    mock_proposal.language)
-        self.assertEquals(content['level'],       mock_proposal.level)
+        self.assertEquals(content['title'],    mock_proposal.title)
+        self.assertEquals(content['full'],     mock_proposal.full)
+        self.assertEquals(content['summary'],  mock_proposal.summary)
+        self.assertEquals(content['language'], mock_proposal.language)
+        self.assertEquals(content['level'],    mock_proposal.level)

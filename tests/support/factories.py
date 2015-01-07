@@ -15,15 +15,15 @@ class ValidProposalFactory(SegueFactory):
         model = Proposal
 
     title       = Sequence(lambda n: 'Proposal Title #{0}'.format(n))
-    abstract    = Sequence(lambda n: 'abstract #{0}'.format(n))
-    description = Sequence(lambda n: 'description #{0}'.format(n))
+    summary     = Sequence(lambda n: 'abstract #{0}'.format(n))
+    full        = Sequence(lambda n: 'description #{0}'.format(n))
     language    = 'en'
     level       = 'advanced'
 
 class InvalidProposalFactory(ValidProposalFactory):
     # all fields fail some validation
     title       = "x"
-    abstract    = "a"
-    description = "d"
+    summary     = "a"
+    full        = "d"
     language    = "xunga"
     level       = "professional"
