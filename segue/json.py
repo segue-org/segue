@@ -9,7 +9,9 @@ def jsoned(f):
         if isinstance(result, tuple):
             result, status = result
         if isinstance(result, list):
-            return flask.jsoned(dict(items=result)), status
+            return flask.jsonify(dict(items=result)), status
+        elif isinstance(result, dict) and result.get('$schema'):
+            return flask.jsonify(dict(**result)), status
         else:
             return flask.jsonify(dict(resource=result)), status
     return wrapper

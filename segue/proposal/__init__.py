@@ -8,8 +8,8 @@ from ..json import jsoned
 from ..factory import Factory
 from ..errors import SegueValidationError
 
+import schema
 from models import Proposal
-from schema import new_proposal_schema
 
 class ProposalFactory(Factory):
     model = Proposal
@@ -19,7 +19,7 @@ class ProposalService(object):
         self.db = db_impl or db
 
     def create(self, data):
-        proposal = ProposalFactory.from_json(data, new_proposal_schema)
+        proposal = ProposalFactory.from_json(data, schema.new_proposal)
         db.session.add(proposal)
         db.session.commit()
         return proposal
@@ -41,3 +41,7 @@ class ProposalController(object):
     def get_one(self, proposal_id):
         result = self.service.get_one(proposal_id) or flask.abort(404)
         return result, 200
+
+    @jsoned
+    def schema(self, name):
+        return schema.whitelist[name], 200

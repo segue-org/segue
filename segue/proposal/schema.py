@@ -1,6 +1,6 @@
 PROPOSAL_LEVELS = ['beginner','advanced']
 
-new_proposal_schema = {
+new_proposal = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
@@ -13,3 +13,7 @@ new_proposal_schema = {
     "additionalProperties": False,
     "required": [ "title", "summary", "full", "language", "level" ]
 }
+
+whitelist = dict(
+    new_proposal=new_proposal
+)
