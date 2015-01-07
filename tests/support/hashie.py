@@ -1,3 +1,5 @@
+# shamelessly lifted from https://raw.githubusercontent.com/Fewbytes/hashie/master/hashie.py
+# MIT license
 class hashie(dict):
     def __getattr__(self, name):
         return self.__getitem__(name)
