@@ -1,9 +1,11 @@
 import flask
+from flask.ext.cors import CORS
 
 import core
 import api
 import json
 import errors
+
 
 class NullApplication(flask.Flask):
     def __init__(self):
@@ -18,6 +20,10 @@ class Application(flask.Flask):
         self._register_blueprints()
         self._register_error_handlers()
         self._init_deps()
+        self._load_cors()
+
+    def _load_cors(self):
+        self.cors = CORS(self)
 
     def _register_error_handlers(self):
         def handler(e):
