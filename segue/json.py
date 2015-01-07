@@ -22,12 +22,16 @@ class JSONEncoder(flask.json.JSONEncoder):
         return super(JSONEncoder, self).default(obj)
 
 class JsonSerializer(object):
+    def to_json(self):
+        raise NotImplemented()
+
+class PropertyJsonSerializer(JsonSerializer):
     __json_public__ = None
     __json_hidden__ = None
     __json_modifiers__ = None
 
     def get_field_names(self):
-        return []
+        return NotImplemented()
 
     def to_json(self):
         field_names = self.get_field_names()
@@ -49,7 +53,7 @@ class JsonSerializer(object):
                 rv.pop(key)
         return rv
 
-class SQLAlchemyJsonSerializer(JsonSerializer):
+class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
     def get_field_names(self):
         for p in self.__mapper__.iterate_properties:
             yield p.key
