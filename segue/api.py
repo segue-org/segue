@@ -15,7 +15,7 @@ class ProposalBlueprint(flask.Blueprint):
 
 class AccountBlueprint(flask.Blueprint):
     def __init__(self):
-        super(AccountBlueprint, self).__init__('auth', __name__, url_prefix='/account')
+        super(AccountBlueprint, self).__init__('accounts', __name__, url_prefix='/account')
         self.controller = AccountController()
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
