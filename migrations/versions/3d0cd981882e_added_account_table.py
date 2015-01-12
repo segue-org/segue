@@ -1,13 +1,13 @@
 """added account table
 
-Revision ID: 2df5b5dca94e
+Revision ID: 3d0cd981882e
 Revises: 564d391c174c
-Create Date: 2015-01-12 15:15:00.531712
+Create Date: 2015-01-12 16:17:25.396272
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '2df5b5dca94e'
+revision = '3d0cd981882e'
 down_revision = '564d391c174c'
 
 from alembic import op
@@ -19,6 +19,7 @@ def upgrade():
     op.create_table('account',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.Text(), nullable=True),
+    sa.Column('name', sa.Text(), nullable=True),
     sa.Column('password', sa.Text(), nullable=True),
     sa.Column('role', sa.Enum('user', 'operator', 'admin'), nullable=True),
     sa.PrimaryKeyConstraint('id')

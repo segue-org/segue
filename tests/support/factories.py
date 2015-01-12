@@ -4,7 +4,14 @@ from factory import Sequence, LazyAttribute
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.proposal.models import *
+from segue.models import *
+
+def _Sequence(pattern):
+    return Sequence(lambda counter: pattern.format(counter))
+
+def encrypt_password(v):
+    # TODO proper encryption
+    return v
 
 class SegueFactory(SQLAlchemyModelFactory):
     class Meta:
@@ -14,9 +21,9 @@ class ValidProposalFactory(SegueFactory):
     class Meta:
         model = Proposal
 
-    title       = Sequence(lambda n: 'Proposal Title #{0}'.format(n))
-    summary     = Sequence(lambda n: 'abstract #{0}'.format(n))
-    full        = Sequence(lambda n: 'description #{0}'.format(n))
+    title       = _Sequence('Proposal Title #{0}')
+    summary     = _Sequence('abstract #{0}')
+    full        = _Sequence('description #{0}')
     language    = 'en'
     level       = 'advanced'
 
@@ -27,3 +34,16 @@ class InvalidProposalFactory(ValidProposalFactory):
     full        = "d"
     language    = "xunga"
     level       = "professional"
+
+class ValidAccountFactory(SegueFactory):
+    class Meta:
+        model = Account
+
+    email    = _Sequence('email_#{0}@example.com')
+    name     = _Sequence('Joaozinho #{0}')
+    password = LazyAttribute(lambda a: encrypt_password('password'))
+
+class InvalidAccountFactory(ValidAccountFactory):
+    email    = "email"
+    name     = "nam"
+    password = "1"
