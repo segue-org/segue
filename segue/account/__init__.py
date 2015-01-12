@@ -34,5 +34,4 @@ class AccountController(object):
     @jsoned
     def create(self):
         data = request.get_json()
-        result = self.service.create(data)
-        return data, 201
+        return self.service.create(data), 201

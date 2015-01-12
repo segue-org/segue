@@ -6,7 +6,6 @@ from flask import request
 from ..core import db
 from ..json import jsoned
 from ..factory import Factory
-from ..errors import SegueValidationError
 
 import schema
 from models import Proposal

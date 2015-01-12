@@ -14,13 +14,13 @@ class AccountServiceTestCases(SegueApiTestCase):
         self.service = AccountService()
 
     def test_invalid_account_raises_validation_error(self):
-        account = InvalidAccountFactory().to_json()
+        account = InvalidAccountFactory().to_json(all_fields=True)
 
         with self.assertRaises(SegueValidationError):
             self.service.create(account)
 
     def test_create_and_retrieve_of_valid_account(self):
-        account = ValidAccountFactory().to_json()
+        account = ValidAccountFactory().to_json(all_fields=True)
 
         saved = self.service.create(account)
         retrieved = self.service.get_one(saved.id)

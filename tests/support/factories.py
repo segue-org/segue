@@ -39,11 +39,13 @@ class ValidAccountFactory(SegueFactory):
     class Meta:
         model = Account
 
-    email    = _Sequence('email_#{0}@example.com')
-    name     = _Sequence('Joaozinho #{0}')
-    password = LazyAttribute(lambda a: encrypt_password('password'))
+    email    = _Sequence('email_{0}@example.com')
+    name     = _Sequence('Joaozinho {0}')
+    password = "password"
+    role     = "user"
 
 class InvalidAccountFactory(ValidAccountFactory):
     email    = "email"
     name     = "nam"
     password = "1"
+    role     = "luser"

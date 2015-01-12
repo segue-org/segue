@@ -35,11 +35,16 @@ class PropertyJsonSerializer(JsonSerializer):
     def get_field_names(self):
         return NotImplemented()
 
-    def to_json(self):
+    def to_json(self, **kw):
         field_names = self.get_field_names()
 
-        public = self.__json_public__ or field_names
-        hidden = self.__json_hidden__ or []
+        if kw.pop('all_fields',False):
+            public = field_names
+            hidden = []
+        else:
+            public = self.__json_public__ or field_names
+            hidden = self.__json_hidden__ or []
+
         modifiers = self.__json_modifiers__ or dict()
 
         rv = dict()
