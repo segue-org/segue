@@ -12,6 +12,11 @@ class ProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>',    methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
+class AccountBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AccountBlueprint, self).__init__('auth', __name__, url_prefix='/account')
+
 blueprints = [
-    ProposalBlueprint()
+    ProposalBlueprint(),
+    AccountBlueprint()
 ]

@@ -1,4 +1,4 @@
-"""empty message
+"""added proposal table
 
 Revision ID: 564d391c174c
 Revises: None
