@@ -6,6 +6,7 @@ from werkzeug.local import LocalProxy
 from ..core import db
 from ..factory import Factory
 from ..json import jsoned
+from ..errors import InvalidLogin
 
 from models import Account
 import schema
@@ -44,9 +45,9 @@ class AccountService(object):
             account = Account.query.filter(Account.email == email).one()
             if account.password == password:
                 return self.signer.sign(account)
-            raise NoResultFound()
+            raise InvalidLogin()
         except NoResultFound, e:
-            print e
+            raise InvalidLogin()
 
 class AccountController(object):
     def __init__(self, service=None):

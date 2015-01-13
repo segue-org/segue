@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError
+from segue.errors import SegueValidationError, InvalidLogin
 
 from support import SegueApiTestCase, ValidAccountFactory, InvalidAccountFactory, hashie
 
@@ -51,6 +51,13 @@ class AccountServiceTestCases(SegueApiTestCase):
         result = self.service.login(email=account['email'], password="password")
 
         mockito.verify(self.mock_signer).sign(account)
+
+    def test_login_raises_given_invalid_credentials(self):
+        account = ValidAccountFactory.build().to_json(all_fields=True)
+        account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
+
+        with self.assertRaises(InvalidLogin):
+            self.service.login(email=account['email'], password="password")
 
 class AccountControllerTestCases(SegueApiTestCase):
     def setUp(self):
@@ -100,3 +107,17 @@ class AccountControllerTestCases(SegueApiTestCase):
         mockito.verify(self.mock_service).login(**data)
         self.assertEquals(parsed_response, auth_response)
         self.assertEquals(response.status_code, 200)
+
+    def test_bad_login_returns_401(self):
+        data = { "email": "email@example.com", "password": "12345" }
+        raw_json = json.dumps(data)
+        mockito.when(self.mock_service).login(**data).thenRaise(InvalidLogin);
+
+        response = self.jpost('/session', data=raw_json)
+        errors   = json.loads(response.data)['errors']
+
+        mockito.verify(self.mock_service).login(**data)
+        self.assertEquals(errors, [ "bad login" ])
+        self.assertEquals(response.status_code, 401)
+
+

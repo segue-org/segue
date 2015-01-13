@@ -2,7 +2,11 @@ import re
 from json import JsonSerializer
 
 class SegueError(JsonSerializer, Exception):
-    pass
+    code = 400
+
+    def __init__(self):
+        self.code   = self.__class__.code
+        super(SegueError, self).__init__()
 
 class SegueValidationError(SegueError):
     def __init__(self, errors):
@@ -16,3 +20,10 @@ class SegueValidationError(SegueError):
             path = ".".join(error.schema_path)
             result[path] = message
         return result
+
+class InvalidLogin(SegueError):
+    code = 401
+
+    def to_json(self):
+        return [ 'bad login' ]
+
