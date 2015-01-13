@@ -14,11 +14,3 @@ class Account(AccountJsonSerializer, db.Model):
     name     = db.Column(db.Text)
     password = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
     role     = db.Column(db.Enum(*schema.ACCOUNT_ROLES))
-
-class AuthEnvelope(PropertyJsonSerializer):
-    def get_field_names(self):
-        return ['account', 'token']
-
-    def __init__(self, account, jwt=None):
-        self.account = account.to_json()
-        self.token   = jwt.encode_callback(self.account)

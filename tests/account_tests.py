@@ -3,15 +3,29 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from segue.account import AccountController, AccountService, Account
+from segue.account import AccountController, AccountService, Account, Signer
 from segue.errors import SegueValidationError
 
 from support import SegueApiTestCase, ValidAccountFactory, InvalidAccountFactory, hashie
 
+class SignerTestsCases(SegueApiTestCase):
+    def test_wraps_account_with_jwt(self):
+        mock_account = ValidAccountFactory.build()
+        mock_token   = "token"
+        mock_jwt = mockito.Mock()
+        mockito.when(mock_jwt).encode_callback(mock_account.to_json()).thenReturn(mock_token)
+
+        signer = Signer(jwt=mock_jwt)
+        result = signer.sign(mock_account)
+
+        self.assertEquals(result['account'], mock_account)
+        self.assertEquals(result['token'],   mock_token)
+
 class AccountServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(AccountServiceTestCases, self).setUp()
-        self.service = AccountService()
+        self.mock_signer = mockito.Mock()
+        self.service = AccountService(signer=self.mock_signer)
 
     def test_invalid_account_raises_validation_error(self):
         account = InvalidAccountFactory.build().to_json(all_fields=True)
@@ -31,12 +45,12 @@ class AccountServiceTestCases(SegueApiTestCase):
     def test_login_given_valid_credential(self):
         account = ValidAccountFactory.build().to_json(all_fields=True)
         account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
+        mockito.when(self.mock_signer).sign(account).thenReturn()
         saved = self.service.create(account)
 
         result = self.service.login(email=account['email'], password="password")
 
-        self.assertEquals(result.token[0:2], 'ey')
-        self.assertEquals(result.account, saved.to_json())
+        mockito.verify(self.mock_signer).sign(account)
 
 class AccountControllerTestCases(SegueApiTestCase):
     def setUp(self):

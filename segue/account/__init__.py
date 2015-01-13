@@ -7,7 +7,7 @@ from ..core import db
 from ..factory import Factory
 from ..json import jsoned
 
-from models import Account, AuthEnvelope
+from models import Account
 import schema
 
 local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
@@ -15,9 +15,20 @@ local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
 class AccountFactory(Factory):
     model = Account
 
+class Signer(object):
+    def __init__(self, jwt=local_jwt):
+        self.jwt = jwt
+
+    def sign(self, account):
+        return {
+            "account": account,
+            "token":   self.jwt.encode_callback(account.to_json())
+        }
+
 class AccountService(object):
-    def __init__(self, db_impl=None):
-        self.db = db_impl or db
+    def __init__(self, db_impl=None, signer=None):
+        self.db     = db_impl or db
+        self.signer = signer or Signer()
 
     def get_one(self, id):
         return Account.query.get(id)
@@ -32,7 +43,7 @@ class AccountService(object):
         try:
             account = Account.query.filter(Account.email == email).one()
             if account.password == password:
-                return AuthEnvelope(account, jwt=local_jwt)
+                return self.signer.sign(account)
             raise NoResultFound()
         except NoResultFound, e:
             print e
