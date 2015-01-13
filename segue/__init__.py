@@ -43,6 +43,7 @@ class Application(flask.Flask):
 
     def _init_deps(self):
         core.db.init_app(self)
+        core.jwt.init_app(self)
 
     def _set_json_encoder(self):
         self.json_encoder = json.JSONEncoder

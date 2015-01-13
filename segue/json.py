@@ -10,7 +10,7 @@ def jsoned(f):
             result, status = result
         if isinstance(result, list):
             return flask.jsonify(dict(items=result)), status
-        elif isinstance(result, dict) and result.get('$schema'):
+        elif isinstance(result, dict):
             return flask.jsonify(dict(**result)), status
         else:
             return flask.jsonify(dict(resource=result)), status

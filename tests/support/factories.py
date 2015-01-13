@@ -9,10 +9,6 @@ from segue.models import *
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
 
-def encrypt_password(v):
-    # TODO proper encryption
-    return v
-
 class SegueFactory(SQLAlchemyModelFactory):
     class Meta:
         sqlalchemy_session = db.session
@@ -28,7 +24,6 @@ class ValidProposalFactory(SegueFactory):
     level       = 'advanced'
 
 class InvalidProposalFactory(ValidProposalFactory):
-    # all fields fail some validation
     title       = "x"
     summary     = "a"
     full        = "d"
@@ -41,11 +36,11 @@ class ValidAccountFactory(SegueFactory):
 
     email    = _Sequence('email_{0}@example.com')
     name     = _Sequence('Joaozinho {0}')
-    password = "password"
     role     = "user"
+    password = "password"
 
 class InvalidAccountFactory(ValidAccountFactory):
     email    = "email"
     name     = "nam"
-    password = "1"
     role     = "luser"
+    password = "p"

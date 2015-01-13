@@ -20,7 +20,16 @@ class AccountBlueprint(flask.Blueprint):
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
+class SessionBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(SessionBlueprint, self).__init__('sessions', __name__, url_prefix='/session')
+        self.controller = AccountController()
+        self.add_url_rule('', methods=['POST'], view_func=self.controller.login)
+
+
+
 blueprints = [
     ProposalBlueprint(),
-    AccountBlueprint()
+    AccountBlueprint(),
+    SessionBlueprint()
 ]

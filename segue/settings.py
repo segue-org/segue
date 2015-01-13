@@ -6,4 +6,14 @@ SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None
 SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/segue.db'
 
+SECRET_KEY = 'shhh'
+
+JWT_DEFAULT_REALM = 'Login Required'
+JWT_AUTH_URL_RULE = None
+JWT_AUTH_ENDPOINT = None
+JWT_ALGORITHM     = 'HS256'
+JWT_VERIFY        = True
+JWT_LEEWAY        = 0
+JWT_VERIFY_EXPIRATION =  True
+
 CORS_HEADERS = 'Content-Type,Authorization'
