@@ -8,5 +8,7 @@
 - hosts: vagrant
   sudo: true
   accelerate: true
-  vars:
-    backup: false
+  roles:
+    - database
+    - segue
+

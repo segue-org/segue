@@ -1,0 +1,8 @@
+---
+
+- include: install.yml
+  sudo: yes
+
+- include: setup.yml
+  sudo: yes
+  sudo_user: postgres

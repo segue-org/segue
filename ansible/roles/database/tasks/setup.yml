@@ -1,0 +1,7 @@
+---
+
+- postgresql_user: name={{ dbuser }}
+                   password={{ dbpass }}
+
+- postgresql_db: name={{ dbname }}
+                 owner={{ dbuser }}

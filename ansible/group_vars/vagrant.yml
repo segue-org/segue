@@ -1,6 +1,11 @@
 ---
 
+app_path: /opt/segue
+app_virtualenv: "{{app_path}}/env"
 webhost: 192.168.33.90.xip.io
-app_path: /opt/gateway
 port: 9001
 jwt_secret: sshh
+
+dbuser: segue
+dbname: segue
+dbpass: segue

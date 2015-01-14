@@ -3,9 +3,8 @@ CONFIG_FILE = 'ansible/group_vars/vagrant.yml'
 parms = YAML::load File.open(CONFIG_FILE)
 
 Vagrant.configure("2") do |config|
-  # TODO: use ubuntu VM to better match production env
-  config.vm.box     = 'debian7'
-  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vbox4210.box'
+  config.vm.box     = 'ubuntu14'
+  config.vm.box_url = 'https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box'
 
   config.vm.provider "virtualbox" do |v|
     v.customize ["modifyvm", :id, "--memory", 1024]
@@ -22,5 +21,6 @@ Vagrant.configure("2") do |config|
     ansible.host_key_checking = false
     ansible.sudo = true
     ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+    ansible.verbose = 'v'
   end
 end

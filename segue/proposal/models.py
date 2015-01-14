@@ -9,4 +9,4 @@ class Proposal(SQLAlchemyJsonSerializer, db.Model):
   summary     = db.Column(db.Text)
   full        = db.Column(db.Text)
   language    = db.Column(db.String(100))
-  level       = db.Column(db.Enum(*schema.PROPOSAL_LEVELS))
+  level       = db.Column(db.Enum(*schema.PROPOSAL_LEVELS, name="proposal_levels"))

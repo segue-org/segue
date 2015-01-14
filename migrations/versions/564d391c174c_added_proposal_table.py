@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('summary', sa.Text(), nullable=True),
     sa.Column('full', sa.Text(), nullable=True),
     sa.Column('language', sa.String(length=100), nullable=True),
-    sa.Column('level', sa.String(length=100), nullable=True),
+    sa.Column('level', sa.Enum('beginner', 'advanced', name='proposal_levels'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###

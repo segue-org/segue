@@ -4,7 +4,7 @@ TESTING = False
 SQLALCHEMY_POOL_SIZE = None
 SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/segue.db'
+SQLALCHEMY_DATABASE_URI = 'postgresql://segue:segue@localhost/segue'
 
 SECRET_KEY = 'shhh'
 

@@ -1,0 +1,15 @@
+---
+
+- apt: update_cache=yes
+       cache_valid_time=3600
+
+- apt: pkg={{ item }}
+       state=installed
+  tags: dependencies
+  with_items:
+    - python-pip
+    - python-virtualenv
+
+- pip: requirements={{ app_path }}/requirements.txt
+       virtualenv={{ app_virtualenv }}
+  tags: dependencies
