@@ -12,6 +12,7 @@ down_revision = '564d391c174c'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy_utils.types.password import PasswordType
 
 
 def upgrade():
@@ -20,7 +21,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.Text(), nullable=True),
     sa.Column('name', sa.Text(), nullable=True),
-    sa.Column('password', sa.Text(), nullable=True),
+    sa.Column('password', PasswordType(schemes=['pbkdf2_sha512']), nullable=True),
     sa.Column('role', sa.Enum('user', 'operator', 'admin', name="account_roles"), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
