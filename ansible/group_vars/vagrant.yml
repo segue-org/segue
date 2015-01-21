@@ -1,7 +1,7 @@
 ---
 
 app_path: /opt/segue
-app_virtualenv: "{{app_path}}/env"
+app_virtualenv: /home/vagrant/.venv/segue
 webhost: 192.168.33.90.xip.io
 port: 9001
 jwt_secret: sshh

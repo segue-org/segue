@@ -9,6 +9,7 @@
   with_items:
     - python-pip
     - python-virtualenv
+    - virtualenvwrapper
 
 - pip: requirements={{ app_path }}/requirements.txt
        virtualenv={{ app_virtualenv }}
