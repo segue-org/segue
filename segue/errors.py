@@ -22,7 +22,7 @@ class SegueValidationError(SegueError):
         return result
 
 class InvalidLogin(SegueError):
-    code = 401
+    code = 400
 
     def to_json(self):
         return [ 'bad login' ]

@@ -6,7 +6,7 @@ from ..core import db
 import schema
 
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
-    __json_public__ = [ 'id', 'email', 'role' ]
+    __json_public__ = [ 'id', 'email', 'name', 'role' ]
 
 class Account(AccountJsonSerializer, db.Model):
     id       = db.Column(db.Integer, primary_key=True)
