@@ -38,17 +38,6 @@ class JsonSerializer(object):
     def to_json(self, **kw):
         return self.target.to_json(**kw)
 
-class JsonSerializable(object):
-    _serializer = JsonSerializer
-
-    def serialize(self, **kw):
-        serializer = self._serializer(self)
-        serializer.override_children()
-        return serializer.to_json(**kw)
-
-    def to_json(self, **kw):
-        return self.serialize(**kw)
-
 class PropertyJsonSerializer(JsonSerializer):
     __json_public__ = None
     __json_hidden__ = None
@@ -83,4 +72,16 @@ class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
     def get_field_names(self):
         for p in self.target.__mapper__.iterate_properties:
             yield p.key
+
+class JsonSerializable(object):
+    _serializer = JsonSerializer
+
+    def serialize(self, **kw):
+        serializer = self._serializer(self)
+        serializer.override_children()
+        return serializer.to_json(**kw)
+
+    def to_json(self, **kw):
+        return self.serialize(**kw)
+
 
