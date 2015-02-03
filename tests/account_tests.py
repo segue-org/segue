@@ -108,7 +108,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         self.assertEquals(parsed_response, auth_response)
         self.assertEquals(response.status_code, 200)
 
-    def test_bad_login_returns_401(self):
+    def test_bad_login_returns_400(self):
         data = { "email": "email@example.com", "password": "12345" }
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).login(**data).thenRaise(InvalidLogin);
@@ -118,6 +118,6 @@ class AccountControllerTestCases(SegueApiTestCase):
 
         mockito.verify(self.mock_service).login(**data)
         self.assertEquals(errors, [ "bad login" ])
-        self.assertEquals(response.status_code, 401)
+        self.assertEquals(response.status_code, 400)
 
 
