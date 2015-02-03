@@ -101,3 +101,16 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['level'],    mock_proposal.level)
         self.assertNotIn('email', content['owner'].keys())
         self.assertNotIn('role',  content['owner'].keys())
+
+    def test_list_proposals(self):
+        prop1 = ValidProposalFactory.build()
+        prop2 = ValidProposalFactory.build()
+
+        mockito.when(self.mock_service).query().thenReturn([prop1, prop2])
+
+        response = self.jget('/proposals')
+        items = json.loads(response.data)['items']
+
+        self.assertEquals(len(items), 2)
+        self.assertEquals(items[0]['title'], prop1.title)
+        self.assertEquals(items[1]['title'], prop2.title)
