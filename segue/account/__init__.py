@@ -1,35 +1,18 @@
+from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import request, current_app
-from werkzeug.local import LocalProxy
-
-from ..core import db, jwt
+from ..core import db
 from ..factory import Factory
 from ..json import jsoned
 from ..errors import InvalidLogin
 
+from jwt import Signer
+
 from models import Account
 import schema
 
-local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
-
-@jwt.user_handler
-def load_user(payload):
-    if payload["id"]:
-        return AccountService().get_one(payload["id"])
-
 class AccountFactory(Factory):
     model = Account
-
-class Signer(object):
-    def __init__(self, jwt=local_jwt):
-        self.jwt = jwt
-
-    def sign(self, account):
-        return {
-            "account": account,
-            "token":   self.jwt.encode_callback(account.to_json())
-        }
 
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None):
