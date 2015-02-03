@@ -9,6 +9,8 @@ class SegueError(JsonSerializable, Exception):
         super(SegueError, self).__init__()
 
 class SegueValidationError(SegueError):
+    code = 422
+
     def __init__(self, errors):
         self.errors = errors
         super(SegueValidationError, self).__init__()

@@ -48,7 +48,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
 
         return SegueValidationError([error_1, error_2])
 
-    def test_invalid_entities_become_400_error(self):
+    def test_invalid_entities_become_422_error(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
         validation_error = self._build_validation_error()
@@ -59,7 +59,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
 
         self.assertEquals(errors['1.2'], 'm1')
         self.assertEquals(errors['3.4'], 'm2')
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 422)
         self.assertEquals(response.content_type, 'application/json')
 
     def test_json_input_is_sent_to_service_for_creation(self):
