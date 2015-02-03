@@ -1,7 +1,7 @@
 import re
-from json import JsonSerializer
+from json import JsonSerializable, PropertyJsonSerializer
 
-class SegueError(JsonSerializer, Exception):
+class SegueError(JsonSerializable, Exception):
     code = 400
 
     def __init__(self):
@@ -22,8 +22,6 @@ class SegueValidationError(SegueError):
         return result
 
 class InvalidLogin(SegueError):
-    code = 400
-
     def to_json(self):
         return [ 'bad login' ]
 

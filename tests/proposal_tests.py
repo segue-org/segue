@@ -7,7 +7,7 @@ from segue.proposal import ProposalService, ProposalController, ProposalFactory,
 from segue.errors import SegueValidationError
 
 from support import SegueApiTestCase
-from support import ValidProposalFactory, InvalidProposalFactory, ValidAccountFactory
+from support import ValidProposalFactory, ValidProposalWithOwnerFactory, InvalidProposalFactory, ValidAccountFactory
 from support import hashie
 
 class ProposalServiceTestCases(SegueApiTestCase):
@@ -88,7 +88,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_response_is_json(self):
-        mock_proposal = ValidProposalFactory.build()
+        mock_proposal = ValidProposalWithOwnerFactory.create()
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
         response = self.jget('/proposal/123')
@@ -99,3 +99,5 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['summary'],  mock_proposal.summary)
         self.assertEquals(content['language'], mock_proposal.language)
         self.assertEquals(content['level'],    mock_proposal.level)
+        self.assertNotIn('email', content['owner'].keys())
+        self.assertNotIn('role',  content['owner'].keys())

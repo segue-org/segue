@@ -19,21 +19,45 @@ def jsoned(f):
 
 class JSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, JsonSerializer):
-            return obj.to_json()
+        if isinstance(obj, JsonSerializable):
+            return obj.serialize()
         return super(JSONEncoder, self).default(obj)
 
 class JsonSerializer(object):
-    def to_json(self):
-        raise NotImplemented()
+    def __init__(self, target):
+        self.target = target
+
+    def override_child(self, field_name, replacement):
+        field = getattr(self.target, field_name)
+        if field is not None:
+            field._serializer = replacement
+
+    def override_children(self):
+        pass
+
+    def to_json(self, **kw):
+        return self.target.to_json(**kw)
+
+class JsonSerializable(object):
+    _serializer = JsonSerializer
+
+    def serialize(self, **kw):
+        serializer = self._serializer(self)
+        serializer.override_children()
+        return serializer.to_json(**kw)
+
+    def to_json(self, **kw):
+        return self.serialize(**kw)
 
 class PropertyJsonSerializer(JsonSerializer):
     __json_public__ = None
     __json_hidden__ = None
-    __json_modifiers__ = None
 
     def get_field_names(self):
         return NotImplemented()
+
+    def override_field_serializer(self):
+        pass
 
     def to_json(self, **kw):
         field_names = self.get_field_names()
@@ -45,14 +69,9 @@ class PropertyJsonSerializer(JsonSerializer):
             public = self.__json_public__ or field_names
             hidden = self.__json_hidden__ or []
 
-        modifiers = self.__json_modifiers__ or dict()
-
         rv = dict()
         for key in public:
-            rv[key] = getattr(self, key)
-        for key, modifier in modifiers.items():
-            value = getattr(self, key)
-            rv[key] = modifier(value, self)
+            rv[key] = getattr(self.target, key)
         for key in hidden:
             rv.pop(key, None)
         for key in rv.keys():
@@ -62,6 +81,6 @@ class PropertyJsonSerializer(JsonSerializer):
 
 class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
     def get_field_names(self):
-        for p in self.__mapper__.iterate_properties:
+        for p in self.target.__mapper__.iterate_properties:
             yield p.key
 

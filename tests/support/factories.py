@@ -1,10 +1,10 @@
 import factory
 
-from factory import Sequence, LazyAttribute
+from factory import Sequence, LazyAttribute, SubFactory
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import *
+from segue.models import Account, Proposal
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
@@ -22,6 +22,7 @@ class ValidProposalFactory(SegueFactory):
     full        = _Sequence('description #{0}')
     language    = 'en'
     level       = 'advanced'
+
 
 class InvalidProposalFactory(ValidProposalFactory):
     title       = "x"
@@ -44,3 +45,6 @@ class InvalidAccountFactory(ValidAccountFactory):
     name     = "nam"
     role     = "luser"
     password = "p"
+
+class ValidProposalWithOwnerFactory(ValidProposalFactory):
+    owner = SubFactory(ValidAccountFactory)

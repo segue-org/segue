@@ -1,6 +1,6 @@
 from sqlalchemy_utils.types.password import PasswordType
 
-from ..json import SQLAlchemyJsonSerializer, PropertyJsonSerializer
+from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
 import schema
@@ -8,7 +8,12 @@ import schema
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
     __json_public__ = [ 'id', 'email', 'name', 'role' ]
 
-class Account(AccountJsonSerializer, db.Model):
+class SafeAccountJsonSerializer(SQLAlchemyJsonSerializer):
+    __json_public__ = [ 'id', 'name' ]
+
+class Account(JsonSerializable, db.Model):
+    _serializer = AccountJsonSerializer
+
     id           = db.Column(db.Integer, primary_key=True)
     email        = db.Column(db.Text, unique=True)
     name         = db.Column(db.Text)

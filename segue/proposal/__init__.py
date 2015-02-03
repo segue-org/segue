@@ -42,6 +42,7 @@ class ProposalController(object):
 
     @jsoned
     def get_one(self, proposal_id):
+
         result = self.service.get_one(proposal_id) or flask.abort(404)
         return result, 200
 
