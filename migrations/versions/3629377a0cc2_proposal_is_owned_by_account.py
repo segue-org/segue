@@ -1,4 +1,4 @@
-"""empty message
+"""proposal is owned by account
 
 Revision ID: 3629377a0cc2
 Revises: 24576c9505ad
