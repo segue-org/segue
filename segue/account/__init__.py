@@ -3,7 +3,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import request, current_app
 from werkzeug.local import LocalProxy
 
-from ..core import db
+from ..core import db, jwt
 from ..factory import Factory
 from ..json import jsoned
 from ..errors import InvalidLogin
@@ -12,6 +12,11 @@ from models import Account
 import schema
 
 local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
+
+@jwt.user_handler
+def load_user(payload):
+    if payload["id"]:
+        return AccountService().get_one(payload["id"])
 
 class AccountFactory(Factory):
     model = Account

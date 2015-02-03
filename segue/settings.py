@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 DEBUG = True
 TESTING = False
 
@@ -15,5 +17,6 @@ JWT_ALGORITHM     = 'HS256'
 JWT_VERIFY        = True
 JWT_LEEWAY        = 0
 JWT_VERIFY_EXPIRATION =  True
+JWT_EXPIRATION_DELTA = timedelta(days=30)
 
 CORS_HEADERS = 'Content-Type,Authorization'

@@ -2,8 +2,9 @@ import sys
 import flask
 
 from flask import request
+from flask.ext.jwt import current_user
 
-from ..core import db
+from ..core import db, jwt_required
 from ..json import jsoned
 from ..factory import Factory
 
@@ -17,8 +18,9 @@ class ProposalService(object):
     def __init__(self, db_impl=None):
         self.db = db_impl or db
 
-    def create(self, data):
+    def create(self, data, owner):
         proposal = ProposalFactory.from_json(data, schema.new_proposal)
+        proposal.owner = owner
         db.session.add(proposal)
         db.session.commit()
         return proposal
@@ -30,11 +32,13 @@ class ProposalService(object):
 class ProposalController(object):
     def __init__(self, service=None):
         self.service = service or ProposalService()
+        self.current_user = current_user
 
+    @jwt_required()
     @jsoned
     def create(self):
         data = request.get_json()
-        return self.service.create(data), 201
+        return self.service.create(data, self.current_user), 201
 
     @jsoned
     def get_one(self, proposal_id):

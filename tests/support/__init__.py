@@ -29,6 +29,10 @@ class SegueApiTestCase(unittest.TestCase):
         setattr(self.app.blueprints[blueprint].controller, prop, replacement)
         return replacement
 
+    def mock_jwt(self, returned_mock):
+        segue.core.jwt.decode_handler(lambda token: returned_mock.to_json())
+        segue.core.jwt.user_handler(lambda payload: returned_mock)
+
     def jpost(self, *args, **kw):
         return self.jrequest(self.client.post, *args, **kw)
 
@@ -37,4 +41,9 @@ class SegueApiTestCase(unittest.TestCase):
 
     def jrequest(self, method, *args, **kw):
         kw.setdefault('content_type', 'application/json')
+
+        if 'headers' not in kw:
+            kw['headers'] = {}
+        kw['headers']['Authorization'] = 'Bearer bear.bear.bear'
+
         return method(*args, **kw)
