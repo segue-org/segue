@@ -77,7 +77,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         validation_error = self._build_validation_error()
         mockito.when(self.mock_service).create(data).thenRaise(validation_error)
 
-        response = self.jpost('/account', data=raw_json)
+        response = self.jpost('/accounts', data=raw_json)
         errors = json.loads(response.data)['errors']
 
         self.assertEquals(errors['1.2'], 'm1')
@@ -90,7 +90,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).create(data).thenReturn('bla')
 
-        response = self.jpost('/account', data=raw_json)
+        response = self.jpost('/accounts', data=raw_json)
 
         mockito.verify(self.mock_service).create(data)
         self.assertEquals(response.status_code, 201)
@@ -101,7 +101,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).login(**data).thenReturn(auth_response);
 
-        response = self.jpost('/session', data=raw_json)
+        response = self.jpost('/sessions', data=raw_json)
         parsed_response = json.loads(response.data)
 
         mockito.verify(self.mock_service).login(**data)
@@ -113,7 +113,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).login(**data).thenRaise(InvalidLogin);
 
-        response = self.jpost('/session', data=raw_json)
+        response = self.jpost('/sessions', data=raw_json)
         errors   = json.loads(response.data)['errors']
 
         mockito.verify(self.mock_service).login(**data)

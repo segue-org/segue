@@ -7,7 +7,7 @@ from account import AccountController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
-        super(ProposalBlueprint, self).__init__('proposals', __name__, url_prefix='/proposal')
+        super(ProposalBlueprint, self).__init__('proposals', __name__, url_prefix='/proposals')
         self.controller = ProposalController()
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<int:proposal_id>',    methods=['GET'],  view_func=self.controller.get_one)
@@ -15,14 +15,14 @@ class ProposalBlueprint(flask.Blueprint):
 
 class AccountBlueprint(flask.Blueprint):
     def __init__(self):
-        super(AccountBlueprint, self).__init__('accounts', __name__, url_prefix='/account')
+        super(AccountBlueprint, self).__init__('accounts', __name__, url_prefix='/accounts')
         self.controller = AccountController()
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
 class SessionBlueprint(flask.Blueprint):
     def __init__(self):
-        super(SessionBlueprint, self).__init__('sessions', __name__, url_prefix='/session')
+        super(SessionBlueprint, self).__init__('sessions', __name__, url_prefix='/sessions')
         self.controller = AccountController()
         self.add_url_rule('', methods=['POST'], view_func=self.controller.login)
 

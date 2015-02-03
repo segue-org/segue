@@ -54,7 +54,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         validation_error = self._build_validation_error()
         mockito.when(self.mock_service).create(data, self.mock_owner).thenRaise(validation_error)
 
-        response = self.jpost('/proposal', data=raw_json)
+        response = self.jpost('/proposals', data=raw_json)
         errors = json.loads(response.data)['errors']
 
         self.assertEquals(errors['1.2'], 'm1')
@@ -67,7 +67,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).create(data, self.mock_owner).thenReturn('bla')
 
-        response = self.jpost('/proposal', data=raw_json)
+        response = self.jpost('/proposals', data=raw_json)
 
         mockito.verify(self.mock_service).create(data, self.mock_owner)
         self.assertEquals(response.status_code, 201)
@@ -75,7 +75,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
     def test_404s_on_non_existing_entity(self):
         mockito.when(self.mock_service).get_one(456).thenReturn(None)
 
-        response = self.jget('/proposal/456')
+        response = self.jget('/proposals/456')
 
         self.assertEquals(response.status_code, 404)
 
@@ -83,7 +83,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         mock_proposal = ValidProposalFactory.build()
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
-        response = self.jget('/proposal/123')
+        response = self.jget('/proposals/123')
 
         self.assertEquals(response.status_code, 200)
 
@@ -91,7 +91,7 @@ class ProposalControllerTestCases(SegueApiTestCase):
         mock_proposal = ValidProposalWithOwnerFactory.create()
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
-        response = self.jget('/proposal/123')
+        response = self.jget('/proposals/123')
         content = json.loads(response.data)['resource']
 
         self.assertEquals(content['title'],    mock_proposal.title)
