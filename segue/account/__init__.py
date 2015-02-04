@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, url_for, redirect
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..core import db
@@ -54,3 +54,7 @@ class AccountController(object):
     def login(self):
         data = request.get_json()
         return self.service.login(**data), 200
+
+    def list_proposals(self, account_id):
+        query_string = "?owner_id={}".format(account_id)
+        return redirect(url_for('proposals.list') + query_string)
