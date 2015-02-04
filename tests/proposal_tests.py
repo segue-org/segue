@@ -114,3 +114,14 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(len(items), 2)
         self.assertEquals(items[0]['title'], prop1.title)
         self.assertEquals(items[1]['title'], prop2.title)
+
+    def test_list_proposals_with_whitelisted_columns_as_filters(self):
+        prop1 = ValidProposalFactory.build()
+
+        mockito.when(self.mock_service).query(owner_id=u'123').thenReturn([prop1])
+
+        response = self.jget('/proposals', query_string={'xonga': u'123', 'owner_id': u'123'})
+        items = json.loads(response.data)['items']
+
+        self.assertEquals(len(items), 1)
+        self.assertEquals(items[0]['title'], prop1.title)
