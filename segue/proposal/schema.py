@@ -10,10 +10,11 @@ new_proposal = {
         "language": { "type": "string", "minLength": 2, "maxLenght": 2 },
         "level":    { "enum": PROPOSAL_LEVELS },
     },
-    "additionalProperties": False,
     "required": [ "title", "summary", "full", "language", "level" ]
 }
+edit_proposal = new_proposal.copy()
 
 whitelist = dict(
-    new_proposal=new_proposal
+    new_proposal  = new_proposal,
+    edit_proposal = edit_proposal
 )

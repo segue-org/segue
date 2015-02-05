@@ -12,6 +12,7 @@ class ProposalBlueprint(flask.Blueprint):
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('',                      methods=['GET'], view_func=self.controller.list)
         self.add_url_rule('/<int:proposal_id>',    methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:proposal_id>',    methods=['PUT'],  view_func=self.controller.modify)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
 class AccountBlueprint(flask.Blueprint):

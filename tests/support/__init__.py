@@ -33,6 +33,9 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.jwt.decode_handler(lambda token: returned_mock.to_json())
         segue.core.jwt.user_handler(lambda payload: returned_mock)
 
+    def jput(self, *args, **kw):
+        return self.jrequest(self.client.put, *args, **kw)
+
     def jpost(self, *args, **kw):
         return self.jrequest(self.client.post, *args, **kw)
 

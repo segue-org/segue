@@ -1,3 +1,5 @@
+import sys;
+
 import json
 import mockito
 
@@ -33,6 +35,30 @@ class ProposalServiceTestCases(SegueApiTestCase):
     def test_non_existing_entity_is_none(self):
         retrieved = self.service.get_one(1234)
         self.assertEquals(retrieved, None)
+
+    def test_modify_proposal(self):
+        data = ValidProposalFactory().to_json()
+        existing = self.service.create(data, self.mock_owner)
+
+        new_data = data.copy()
+        new_data['title']    = 'ma new title'
+        new_data['full']     = 'ma new full'
+        new_data['summary']  = 'ma new summ'
+        new_data['level']    = 'beginner'
+        new_data['language'] = 'pt'
+        self.service.modify(existing.id, new_data)
+
+        retrieved = self.service.get_one(existing.id)
+        self.assertEquals(retrieved.title,    'ma new title')
+        self.assertEquals(retrieved.full,     'ma new full')
+        self.assertEquals(retrieved.summary,  'ma new summ')
+        self.assertEquals(retrieved.level,    'beginner')
+        self.assertEquals(retrieved.language, 'pt')
+
+        # changing owner is a special case, and can't be done by mass update
+        self.assertEquals(retrieved.owner, existing.owner)
+        # id should never change
+        self.assertEquals(retrieved.id,    existing.id)
 
 class ProposalControllerTestCases(SegueApiTestCase):
     def setUp(self):
@@ -101,6 +127,18 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['level'],    mock_proposal.level)
         self.assertNotIn('email', content['owner'].keys())
         self.assertNotIn('role',  content['owner'].keys())
+
+    def test_modify_proposal(self):
+        data = { "arbitrary": "json that will be mocked out anyway" }
+        raw_json = json.dumps(data)
+        existing = ValidProposalWithOwnerFactory.build()
+        resulting = ValidProposalWithOwnerFactory.build()
+        mockito.when(self.mock_service).modify(123, data).thenReturn(resulting)
+
+        response = self.jput('/proposals/123', data=raw_json)
+        content = json.loads(response.data)['resource']
+
+        mockito.verify(self.mock_service).modify(123, data)
 
     def test_list_proposals(self):
         prop1 = ValidProposalFactory.build()
