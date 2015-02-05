@@ -36,6 +36,18 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(1234)
         self.assertEquals(retrieved, None)
 
+    def test_check_ownership(self):
+        data = ValidProposalFactory().to_json()
+        existing = self.service.create(data, self.mock_owner)
+        other_owner = ValidAccountFactory.create()
+
+        positive_case = self.service.check_ownership(existing.id, self.mock_owner)
+        negative_case = self.service.check_ownership(existing.id, other_owner)
+
+        self.assertEquals(positive_case, True)
+        self.assertEquals(negative_case, False)
+
+
     def test_modify_proposal(self):
         data = ValidProposalFactory().to_json()
         existing = self.service.create(data, self.mock_owner)
@@ -131,14 +143,26 @@ class ProposalControllerTestCases(SegueApiTestCase):
     def test_modify_proposal(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        existing = ValidProposalWithOwnerFactory.build()
-        resulting = ValidProposalWithOwnerFactory.build()
+        existing = ValidProposalFactory.build(owner = ValidAccountFactory.create())
+        resulting = ValidProposalFactory.build()
+
+        mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(True)
         mockito.when(self.mock_service).modify(123, data).thenReturn(resulting)
 
         response = self.jput('/proposals/123', data=raw_json)
         content = json.loads(response.data)['resource']
 
         mockito.verify(self.mock_service).modify(123, data)
+        self.assertEquals(content['title'], resulting.title)
+
+    def test_modify_proposal_wrong_owner(self):
+        data = { "arbitrary": "json that will be mocked out anyway" }
+        raw_json = json.dumps(data)
+        mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(False)
+
+        response = self.jput('/proposals/123', data=raw_json)
+
+        self.assertEquals(response.status_code, 403)
 
     def test_list_proposals(self):
         prop1 = ValidProposalFactory.build()

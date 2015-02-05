@@ -39,6 +39,12 @@ class ProposalService(object):
     def query(self, **kw):
         return Proposal.query.filter_by(**kw).all()
 
+    def check_ownership(self, proposal_id, account):
+        if not account: return False
+        if not account.id: return False
+        proposal = self.get_one(proposal_id)
+        return proposal.owner == account
+
     def modify(self, proposal_id, data):
         proposal = self.get_one(proposal_id)
         for name, value in ProposalFactory.clean_for_update(data).items():
@@ -62,7 +68,9 @@ class ProposalController(object):
     @jwt_required()
     @jsoned
     def modify(self, proposal_id):
-        # TODO: check ownership
+        if not self.service.check_ownership(proposal_id, self.current_user):
+            flask.abort(403)
+
         data = request.get_json()
         result = self.service.modify(proposal_id, data) or flask.abort(404)
         return result, 200
