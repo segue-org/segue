@@ -1,10 +1,11 @@
 from flask import request, url_for, redirect
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
 
 from ..core import db
 from ..factory import Factory
 from ..json import jsoned
-from ..errors import InvalidLogin
+from ..errors import InvalidLogin, EmailAlreadyInUse
 
 from jwt import Signer
 
@@ -32,10 +33,13 @@ class AccountService(object):
         return Account.query.get(id)
 
     def create(self, data):
-        account = AccountFactory.from_json(data, schema.signup)
-        db.session.add(account)
-        db.session.commit()
-        return account
+        try:
+            account = AccountFactory.from_json(data, schema.signup)
+            db.session.add(account)
+            db.session.commit()
+            return account
+        except IntegrityError, e:
+            raise EmailAlreadyInUse(account.email)
 
     def login(self, email=None, password=None):
         try:

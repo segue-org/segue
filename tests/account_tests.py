@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse
 
 from support import SegueApiTestCase, ValidAccountFactory, InvalidAccountFactory, hashie
 
@@ -42,6 +42,14 @@ class AccountServiceTestCases(SegueApiTestCase):
 
         self.assertEquals(saved, retrieved)
 
+    def test_creation_of_duplicated_account(self):
+        existing = ValidAccountFactory.create()
+        new_one = ValidAccountFactory.build(email=existing.email).to_json(all_fields=True)
+        new_one['password'] = 'password';
+
+        with self.assertRaises(EmailAlreadyInUse):
+            self.service.create(new_one)
+
     def test_login_given_valid_credential(self):
         account = ValidAccountFactory.build().to_json(all_fields=True)
         account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
@@ -66,9 +74,8 @@ class AccountControllerTestCases(SegueApiTestCase):
         self.mock_controller_dep('sessions', 'service', self.mock_service)
 
     def _build_validation_error(self):
-        error_1 = hashie(message="m1", schema_path=["1","2"])
-        error_2 = hashie(message="m2", schema_path=["3","4"])
-
+        error_1 = hashie(validator='minLength', relative_path=['field']);
+        error_2 = hashie(validator='maxLength', relative_path=['other']);
         return SegueValidationError([error_1, error_2])
 
     def test_invalid_entities_become_422_error(self):
@@ -80,8 +87,8 @@ class AccountControllerTestCases(SegueApiTestCase):
         response = self.jpost('/accounts', data=raw_json)
         errors = json.loads(response.data)['errors']
 
-        self.assertEquals(errors['1.2'], 'm1')
-        self.assertEquals(errors['3.4'], 'm2')
+        self.assertEquals(errors[0]['field'], 'field')
+        self.assertEquals(errors[1]['field'], 'other')
         self.assertEquals(response.status_code, 422)
         self.assertEquals(response.content_type, 'application/json')
 
@@ -119,5 +126,16 @@ class AccountControllerTestCases(SegueApiTestCase):
         mockito.verify(self.mock_service).login(**data)
         self.assertEquals(errors, [ "bad login" ])
         self.assertEquals(response.status_code, 400)
+
+    def test_create_account(self):
+        data = { "email": "email@example.com", "password": "12345" }
+        raw_json = json.dumps(data)
+        mock_account = ValidAccountFactory.create()
+        mockito.when(self.mock_service).create(data).thenReturn(mock_account);
+
+        response = self.jpost('/accounts', data=raw_json)
+        content  = json.loads(response.data)['resource']
+
+        self.assertEquals(content['email'], mock_account.email)
 
 

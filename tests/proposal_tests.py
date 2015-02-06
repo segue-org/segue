@@ -81,9 +81,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.mock_jwt(self.mock_owner)
 
     def _build_validation_error(self):
-        error_1 = hashie(message="m1", schema_path=["1","2"])
-        error_2 = hashie(message="m2", schema_path=["3","4"])
-
+        error_1 = hashie(validator='minLength', relative_path=['field']);
+        error_2 = hashie(validator='maxLength', relative_path=['other']);
         return SegueValidationError([error_1, error_2])
 
     def test_invalid_entities_become_422_error(self):
@@ -95,8 +94,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
         response = self.jpost('/proposals', data=raw_json)
         errors = json.loads(response.data)['errors']
 
-        self.assertEquals(errors['1.2'], 'm1')
-        self.assertEquals(errors['3.4'], 'm2')
+        self.assertEquals(errors[0]['field'], 'field')
+        self.assertEquals(errors[1]['field'], 'other')
         self.assertEquals(response.status_code, 422)
         self.assertEquals(response.content_type, 'application/json')
 

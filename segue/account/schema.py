@@ -1,4 +1,5 @@
 ACCOUNT_ROLES = [ "user","operator","admin" ]
+CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}.?\d{2}$"
 
 signup = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -7,7 +8,7 @@ signup = {
         "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80 },
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
-        "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": "^\d{3}.?\d{3}.?\d{3}.?\d{2}$" },
+        "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
         "passport":     { "type": "string", "minLength": 5,  "maxLength": 15 },
         "country":      { "type": "string", "minLength": 5,  "maxLength": 30 },
         "city":         { "type": "string", "minLength": 5,  "maxLength": 30 },
