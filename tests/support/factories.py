@@ -39,6 +39,14 @@ class ValidAccountFactory(SegueFactory):
     name     = _Sequence('Joaozinho {0}')
     role     = "user"
     password = "password"
+    document     = "123.456.789-20"
+    country      = "Brazil"
+    state        = "RS"
+    city         = "Porto Alegre"
+    phone        = "51 2345678"
+    organization = "manos da quebrada"
+    resume       = "um cara legal"
+
 
 class InvalidAccountFactory(ValidAccountFactory):
     email    = "email"

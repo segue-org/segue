@@ -12,14 +12,15 @@ import schema
 from models import Proposal
 
 QUERY_WHITELIST = ('owner_id',)
-UPDATE_WHITELIST = schema.edit_proposal["properties"].keys()
 
 class ProposalFactory(Factory):
     model = Proposal
 
+    UPDATE_WHITELIST = schema.edit_proposal["properties"].keys()
+
     @classmethod
     def clean_for_update(self, data):
-        return { c:v for c,v in data.items() if c in UPDATE_WHITELIST }
+        return { c:v for c,v in data.items() if c in ProposalFactory.UPDATE_WHITELIST }
 
 
 class ProposalService(object):
