@@ -39,7 +39,7 @@ class JsonSerializable(object):
         return self.serialize(**kw)
 
 class JsonSerializer(object):
-    def hide_child(self, child):
+    def hide_field(self, child):
         return False;
 
     def serialize_child(self, child):
@@ -60,7 +60,7 @@ class PropertyJsonSerializer(JsonSerializer):
         for key, serializer in self.get_field_names(target):
             value          = getattr(target, key, None)
             override       = overrides.get(key, None)
-            hide_field     = self.hide_child(key)
+            hide_field     = self.hide_field(key)
             recurse_with   = self.serialize_child(key)
             is_list        = isinstance(value, list)
             is_nested_list = is_list and any([ isinstance(x, JsonSerializable) for x in value ])

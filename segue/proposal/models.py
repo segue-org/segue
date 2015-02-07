@@ -32,7 +32,7 @@ class InviteJsonSerializer(SQLAlchemyJsonSerializer):
     pass
 
 class SafeInviteJsonSerializer(SQLAlchemyJsonSerializer):
-    def hide_child(self, child):
+    def hide_field(self, child):
         return child in ['recipient']
 
 class ProposalInvite(JsonSerializable, db.Model):

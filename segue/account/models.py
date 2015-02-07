@@ -9,14 +9,14 @@ from ..core import db
 import schema
 
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
-    def hide_child(self, child):
+    def hide_field(self, child):
         return child == 'password'
 
     def serialize_child(self, child):
         return False
 
 class SafeAccountJsonSerializer(AccountJsonSerializer):
-    def hide_child(self, child):
+    def hide_field(self, child):
         return child in [ 'password','email','role' ]
 
 class Account(JsonSerializable, db.Model):
