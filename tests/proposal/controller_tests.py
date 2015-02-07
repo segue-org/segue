@@ -6,7 +6,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.proposal import ProposalController
-from segue.errors import SegueValidationError
+from segue.errors import SegueValidationError, NotAuthorized
 
 from support import SegueApiTestCase, hashie
 from support.factories import *
@@ -84,19 +84,19 @@ class ProposalControllerTestCases(SegueApiTestCase):
         existing = ValidProposalFactory.build(owner = ValidAccountFactory.create())
         resulting = ValidProposalFactory.build()
 
-        mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(True)
-        mockito.when(self.mock_service).modify(123, data).thenReturn(resulting)
+        mockito.when(self.mock_service).modify(123, data, by=self.mock_owner).thenReturn(resulting)
 
         response = self.jput('/proposals/123', data=raw_json)
         content = json.loads(response.data)['resource']
 
-        mockito.verify(self.mock_service).modify(123, data)
+        mockito.verify(self.mock_service).modify(123, data, by=self.mock_owner)
         self.assertEquals(content['title'], resulting.title)
 
     def test_modify_proposal_wrong_owner(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
         mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(False)
+        mockito.when(self.mock_service).modify(123, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
         response = self.jput('/proposals/123', data=raw_json)
 

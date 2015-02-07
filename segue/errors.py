@@ -37,6 +37,11 @@ class InvalidLogin(SegueError):
     def to_json(self):
         return [ 'bad login' ]
 
+class NotAuthorized(SegueError):
+    code = 403
+    def to_json(self):
+        return { 'message': 'user is not authorized for this action' }
+
 class SegueFieldError(SegueError):
     def __init__(self, field=None, label=None, message=None):
         self.field   = field   or getattr(self, 'FIELD', None)

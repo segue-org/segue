@@ -6,7 +6,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
-from segue.errors import SegueValidationError
+from segue.errors import SegueValidationError, NotAuthorized
 
 from support import SegueApiTestCase, hashie
 from support.factories import *
@@ -35,19 +35,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(1234)
         self.assertEquals(retrieved, None)
 
-    def test_check_ownership(self):
-        data = ValidProposalFactory().to_json()
-        existing = self.service.create(data, self.mock_owner)
-        other_owner = ValidAccountFactory.create()
-
-        positive_case = self.service.check_ownership(existing.id, self.mock_owner)
-        negative_case = self.service.check_ownership(existing.id, other_owner)
-
-        self.assertEquals(positive_case, True)
-        self.assertEquals(negative_case, False)
-
-
-    def test_modify_proposal(self):
+    def test_modify_proposal_valid_owner(self):
         data = ValidProposalFactory().to_json()
         existing = self.service.create(data, self.mock_owner)
 
@@ -57,7 +45,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
         new_data['summary']  = 'ma new summ'
         new_data['level']    = 'beginner'
         new_data['language'] = 'pt'
-        self.service.modify(existing.id, new_data)
+        self.service.modify(existing.id, new_data, by=self.mock_owner)
 
         retrieved = self.service.get_one(existing.id)
         self.assertEquals(retrieved.title,    'ma new title')
@@ -65,6 +53,33 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(retrieved.summary,  'ma new summ')
         self.assertEquals(retrieved.level,    'beginner')
         self.assertEquals(retrieved.language, 'pt')
+
+        # changing owner is a special case, and can't be done by mass update
+        self.assertEquals(retrieved.owner, existing.owner)
+        # id should never change
+        self.assertEquals(retrieved.id,    existing.id)
+
+    def test_modify_proposal_wrong_owner(self):
+        other_owner = ValidAccountFactory.create()
+        data = ValidProposalFactory().to_json()
+        existing = self.service.create(data, self.mock_owner)
+
+        new_data = data.copy()
+        new_data['title']    = 'ma new title'
+        new_data['full']     = 'ma new full'
+        new_data['summary']  = 'ma new summ'
+        new_data['level']    = 'beginner'
+        new_data['language'] = 'pt'
+
+        with self.assertRaises(NotAuthorized):
+            self.service.modify(existing.id, new_data, by=other_owner)
+
+        retrieved = self.service.get_one(existing.id)
+        self.assertNotEquals(retrieved.title,    'ma new title')
+        self.assertNotEquals(retrieved.full,     'ma new full')
+        self.assertNotEquals(retrieved.summary,  'ma new summ')
+        self.assertNotEquals(retrieved.level,    'beginner')
+        self.assertNotEquals(retrieved.language, 'pt')
 
         # changing owner is a special case, and can't be done by mass update
         self.assertEquals(retrieved.owner, existing.owner)

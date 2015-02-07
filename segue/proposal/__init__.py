@@ -7,6 +7,7 @@ from flask.ext.jwt import current_user
 from ..core import db, jwt_required
 from ..json import jsoned
 from ..factory import Factory
+from ..errors import NotAuthorized
 
 import schema
 from models import Proposal
@@ -40,19 +41,19 @@ class ProposalService(object):
     def query(self, **kw):
         return Proposal.query.filter_by(**kw).all()
 
-    def check_ownership(self, proposal_id, account):
-        if not account: return False
-        if not account.id: return False
+    def modify(self, proposal_id, data, by=None):
         proposal = self.get_one(proposal_id)
-        return proposal.owner == account
+        if not self._check_ownership(proposal, by): raise NotAuthorized
 
-    def modify(self, proposal_id, data):
-        proposal = self.get_one(proposal_id)
         for name, value in ProposalFactory.clean_for_update(data).items():
             setattr(proposal, name, value)
         db.session.add(proposal)
         db.session.commit()
         return proposal
+
+    def _check_ownership(self, proposal, alleged):
+        return proposal and alleged and proposal.owner_id == alleged.id
+
 
 
 class ProposalController(object):
@@ -69,11 +70,8 @@ class ProposalController(object):
     @jwt_required()
     @jsoned
     def modify(self, proposal_id):
-        if not self.service.check_ownership(proposal_id, self.current_user):
-            flask.abort(403)
-
         data = request.get_json()
-        result = self.service.modify(proposal_id, data) or flask.abort(404)
+        result = self.service.modify(proposal_id, data, by=self.current_user) or flask.abort(404)
         return result, 200
 
     @jwt_required
