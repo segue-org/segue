@@ -76,6 +76,21 @@ class ProposalController(object):
         result = self.service.modify(proposal_id, data) or flask.abort(404)
         return result, 200
 
+    @jwt_required
+    @jsoned
+    def invite(self, proposal_id):
+        if not self.service.check_ownership(proposal_id, self.current_user):
+            flask.abort(403)
+        data = request.get_json()
+        result = self.service.invite(proposal_id, data)
+        return result, 200
+
+    @jsoned
+    def invite_answer(self, proposal_id, invite_id):
+        data = request.get_json()
+        self.service.invite_answer(proposal_id, invite_id, data)
+        return {}, 200
+
     @jsoned
     def get_one(self, proposal_id):
         result = self.service.get_one(proposal_id) or flask.abort(404)
@@ -91,3 +106,5 @@ class ProposalController(object):
     @jsoned
     def schema(self, name):
         return schema.whitelist[name], 200
+
+

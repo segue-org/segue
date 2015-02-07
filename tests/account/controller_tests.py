@@ -6,66 +6,9 @@ from werkzeug.exceptions import NotFound
 from segue.account import AccountController, AccountService, Account, Signer
 from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse
 
-from support import SegueApiTestCase, ValidAccountFactory, InvalidAccountFactory, hashie
+from support.factories import *
+from support import SegueApiTestCase, hashie
 
-class SignerTestsCases(SegueApiTestCase):
-    def test_wraps_account_with_jwt(self):
-        mock_account = ValidAccountFactory.build()
-        mock_token   = "token"
-        mock_jwt = mockito.Mock()
-        mockito.when(mock_jwt).encode_callback(mock_account.to_json()).thenReturn(mock_token)
-
-        signer = Signer(jwt=mock_jwt)
-        result = signer.sign(mock_account)
-
-        self.assertEquals(result['account'], mock_account)
-        self.assertEquals(result['token'],   mock_token)
-
-class AccountServiceTestCases(SegueApiTestCase):
-    def setUp(self):
-        super(AccountServiceTestCases, self).setUp()
-        self.mock_signer = mockito.Mock()
-        self.service = AccountService(signer=self.mock_signer)
-
-    def test_invalid_account_raises_validation_error(self):
-        account = InvalidAccountFactory.build().to_json(all_fields=True)
-
-        with self.assertRaises(SegueValidationError):
-            self.service.create(account)
-
-    def test_create_and_retrieve_of_valid_account(self):
-        account = ValidAccountFactory.build().to_json(all_fields=True)
-        account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
-
-        saved = self.service.create(account)
-        retrieved = self.service.get_one(saved.id)
-
-        self.assertEquals(saved, retrieved)
-
-    def test_creation_of_duplicated_account(self):
-        existing = ValidAccountFactory.create()
-        new_one = ValidAccountFactory.build(email=existing.email).to_json(all_fields=True)
-        new_one['password'] = 'password';
-
-        with self.assertRaises(EmailAlreadyInUse):
-            self.service.create(new_one)
-
-    def test_login_given_valid_credential(self):
-        account = ValidAccountFactory.build().to_json(all_fields=True)
-        account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
-        mockito.when(self.mock_signer).sign(account).thenReturn()
-        saved = self.service.create(account)
-
-        result = self.service.login(email=account['email'], password="password")
-
-        mockito.verify(self.mock_signer).sign(account)
-
-    def test_login_raises_given_invalid_credentials(self):
-        account = ValidAccountFactory.build().to_json(all_fields=True)
-        account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
-
-        with self.assertRaises(InvalidLogin):
-            self.service.login(email=account['email'], password="password")
 
 class AccountControllerTestCases(SegueApiTestCase):
     def setUp(self):

@@ -15,6 +15,9 @@ class ProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>',    methods=['PUT'],  view_func=self.controller.modify)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
+        self.add_url_rule('/<int:proposal_id>/invite',                 methods=['POST'], view_func=self.controller.invite)
+        self.add_url_rule('/<int:proposal_id>/invite/<int:invite_id>', methods=['PUT'],  view_func=self.controller.invite_answer)
+
 class AccountBlueprint(flask.Blueprint):
     def __init__(self):
         super(AccountBlueprint, self).__init__('accounts', __name__, url_prefix='/accounts')
