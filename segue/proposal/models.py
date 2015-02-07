@@ -33,7 +33,7 @@ class ProposalInvite(JsonSerializable, db.Model):
     _serializer = InviteJsonSerializer
 
     id           = db.Column(db.Integer, primary_key=True)
-    proposal     = db.Column(db.Integer, db.ForeignKey('proposal.id'))
+    proposal_id  = db.Column(db.Integer, db.ForeignKey('proposal.id'))
     recipient    = db.Column(db.Text)
     name         = db.Column(db.Text)
     created      = db.Column(db.DateTime, default=func.now())
