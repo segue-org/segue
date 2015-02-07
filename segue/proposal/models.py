@@ -24,3 +24,16 @@ class Proposal(JsonSerializable, db.Model):
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+class InviteJsonSerializer(SQLAlchemyJsonSerializer):
+    pass
+
+class ProposalInvite(JsonSerializable, db.Model):
+    _serializer = InviteJsonSerializer
+
+    id           = db.Column(db.Integer, primary_key=True)
+    proposal     = db.Column(db.Integer, db.ForeignKey('proposal.id'))
+    recipient    = db.Column(db.Text)
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    status       = db.Column(db.Enum('pending','accepted','declined', name='invite_statuses'))
