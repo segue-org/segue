@@ -35,7 +35,7 @@ class SegueValidationError(SegueError):
 
 class InvalidLogin(SegueError):
     def to_json(self):
-        return [ 'bad login' ]
+        return { 'message': 'bad login' }
 
 class NotAuthorized(SegueError):
     code = 403

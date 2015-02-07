@@ -67,7 +67,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         errors   = json.loads(response.data)['errors']
 
         mockito.verify(self.mock_service).login(**data)
-        self.assertEquals(errors, [ "bad login" ])
+        self.assertEquals(errors['message'], "bad login")
         self.assertEquals(response.status_code, 400)
 
     def test_create_account(self):

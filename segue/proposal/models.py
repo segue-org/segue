@@ -8,14 +8,13 @@ from ..core import db
 import schema
 
 class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
-    __json_hidden__ = ['invites','owner_id']
-
-    def override_children(self):
-        from ..models import SafeAccountJsonSerializer
-        self.override_child('owner', SafeAccountJsonSerializer)
+    def serialize_child(self, child):
+        if child == 'owner':
+            return 'SafeAccountJsonSerializer'
+        return False
 
 class Proposal(JsonSerializable, db.Model):
-    _serializer = ProposalJsonSerializer
+    _serializers = [ ProposalJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     title        = db.Column(db.Text)
@@ -32,8 +31,12 @@ class Proposal(JsonSerializable, db.Model):
 class InviteJsonSerializer(SQLAlchemyJsonSerializer):
     pass
 
+class SafeInviteJsonSerializer(SQLAlchemyJsonSerializer):
+    def hide_child(self, child):
+        return child in ['recipient']
+
 class ProposalInvite(JsonSerializable, db.Model):
-    _serializer = InviteJsonSerializer
+    _serializers = [ InviteJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     proposal_id  = db.Column(db.Integer, db.ForeignKey('proposal.id'))

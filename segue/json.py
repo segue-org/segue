@@ -25,62 +25,67 @@ class JSONEncoder(flask.json.JSONEncoder):
             return obj.serialize()
         return super(JSONEncoder, self).default(obj)
 
-class JsonSerializer(object):
-    def __init__(self, target):
-        self.target = target
-
-    def override_child(self, field_name, replacement):
-        field = getattr(self.target, field_name)
-        if field is not None:
-            field._serializer = replacement
-
-    def override_children(self):
-        pass
-
-    def to_json(self, **kw):
-        return self.target.to_json(**kw)
-
-class PropertyJsonSerializer(JsonSerializer):
-    __json_public__ = None
-    __json_hidden__ = None
-
-    def get_field_names(self):
-        return NotImplemented()
-
-    def to_json(self, **kw):
-        field_names = self.get_field_names()
-
-        if kw.pop('all_fields',False):
-            public = field_names
-            hidden = []
-        else:
-            public = self.__json_public__ or field_names
-            hidden = self.__json_hidden__ or []
-
-        rv = dict()
-        for key in public:
-            rv[key] = getattr(self.target, key)
-        for key in hidden:
-            rv.pop(key, None)
-        for key in rv.keys():
-            if rv.get(key) == None:
-                rv.pop(key)
-        return rv
-
-class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
-    def get_field_names(self):
-        for p in self.target.__mapper__.iterate_properties:
-            yield p.key
-
 class JsonSerializable(object):
-    _serializer = JsonSerializer
+    _serializers = [ ]
 
     def serialize(self, **kw):
-        serializer = kw.pop('serializer', self._serializer(self))
-        serializer.override_children()
-        return serializer.to_json(**kw)
+        candidates = []
+        candidates.extend(self._serializers)
+        candidates.append(JsonSerializer)
+        serializer = candidates[0]()
+        return serializer.emit_json_for(self, **kw)
 
     def to_json(self, **kw):
         return self.serialize(**kw)
 
+class JsonSerializer(object):
+    def hide_child(self, child):
+        return False;
 
+    def serialize_child(self, child):
+        return False
+
+    def emit_json_for(self, target, **kw):
+        if hasattr(target, 'to_json'):
+            return target.to_json()
+        return target
+
+class PropertyJsonSerializer(JsonSerializer):
+    def get_field_names(self, target):
+        raise NotImplementedError()
+
+    def emit_json_for(self, target, all_fields=False, **overrides):
+        # WORST CODE EVER
+        result = {}
+        for key, serializer in self.get_field_names(target):
+            value          = getattr(target, key, None)
+            override       = overrides.get(key, None)
+            hide_field     = self.hide_child(key)
+            recurse_with   = self.serialize_child(key)
+            is_list        = isinstance(value, list)
+            is_nested_list = is_list and any([ isinstance(x, JsonSerializable) for x in value ])
+            is_nested      = is_nested_list or isinstance(value, JsonSerializable)
+            available      = value[0]._serializers if is_nested_list else getattr(value, '_serializers', [])
+
+            selected   = override or recurse_with or 'JsonSerializer'
+            serializer = JsonSerializer()
+            for cls in available:
+                if cls.__name__ == selected:
+                    serializer = cls()
+                    break
+            if is_nested_list:
+                if not recurse_with: continue
+                result[key] = [ serializer.emit_json_for(item, **overrides) for item in value ]
+            elif is_nested:
+                if not recurse_with: continue
+                result[key] = serializer.emit_json_for(value, **overrides)
+            elif value and not hide_field:
+                result[key] = serializer.emit_json_for(value, **overrides)
+
+        return result
+
+class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
+    def get_field_names(self, target):
+        for p in target.__mapper__.iterate_properties:
+            if p.key.endswith("_id"): continue
+            yield [ p.key, None ]

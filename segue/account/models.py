@@ -9,13 +9,18 @@ from ..core import db
 import schema
 
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
-    __json_public__ = [ 'id', 'email', 'name', 'role', 'document', 'country', 'state', 'city', 'phone', 'organization', 'resume' ]
+    def hide_child(self, child):
+        return child == 'password'
 
-class SafeAccountJsonSerializer(SQLAlchemyJsonSerializer):
-    __json_public__ = [ 'id', 'name' ]
+    def serialize_child(self, child):
+        return False
+
+class SafeAccountJsonSerializer(AccountJsonSerializer):
+    def hide_child(self, child):
+        return child in [ 'password','email','role' ]
 
 class Account(JsonSerializable, db.Model):
-    _serializer = AccountJsonSerializer
+    _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     email        = db.Column(db.Text, unique=True)
