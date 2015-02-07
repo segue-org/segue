@@ -12,6 +12,8 @@ def jsoned(f):
             return flask.jsonify(dict(items=result)), status
         elif isinstance(result, dict):
             return flask.jsonify(dict(**result)), status
+        elif hasattr(result, 'to_json'):
+            return flask.jsonify(dict(resource=result.to_json())), status
         else:
             return flask.jsonify(dict(resource=result)), status
     return wrapper
@@ -74,7 +76,7 @@ class JsonSerializable(object):
     _serializer = JsonSerializer
 
     def serialize(self, **kw):
-        serializer = self._serializer(self)
+        serializer = kw.pop('serializer', self._serializer(self))
         serializer.override_children()
         return serializer.to_json(**kw)
 
