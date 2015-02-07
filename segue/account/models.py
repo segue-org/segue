@@ -17,7 +17,7 @@ class AccountJsonSerializer(SQLAlchemyJsonSerializer):
 
 class SafeAccountJsonSerializer(AccountJsonSerializer):
     def hide_field(self, child):
-        return child in [ 'password','email','role' ]
+        return child in [ 'password','email','role', 'phone', 'city', 'document' ]
 
 class Account(JsonSerializable, db.Model):
     _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer ]

@@ -76,8 +76,11 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['summary'],  mock_proposal.summary)
         self.assertEquals(content['language'], mock_proposal.language)
         self.assertEquals(content['level'],    mock_proposal.level)
-        self.assertNotIn('email', content['owner'].keys())
-        self.assertNotIn('role',  content['owner'].keys())
+        self.assertNotIn('email',    content['owner'].keys())
+        self.assertNotIn('phone',    content['owner'].keys())
+        self.assertNotIn('city',     content['owner'].keys())
+        self.assertNotIn('document', content['owner'].keys())
+        self.assertNotIn('role',     content['owner'].keys())
 
     def test_modify_proposal(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
