@@ -34,6 +34,7 @@ class ProposalInvite(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     proposal     = db.Column(db.Integer, db.ForeignKey('proposal.id'))
     recipient    = db.Column(db.Text)
+    name         = db.Column(db.Text)
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', name='invite_statuses'))
