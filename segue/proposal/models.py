@@ -7,6 +7,7 @@ from ..core import db
 
 import schema
 
+
 class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
     def override_children(self):
         from ..models import SafeAccountJsonSerializer

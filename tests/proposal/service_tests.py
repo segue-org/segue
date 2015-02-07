@@ -5,7 +5,7 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from segue.proposal import ProposalService, ProposalController, ProposalFactory, Proposal
+from segue.proposal import ProposalService, ProposalController, ProposalFactory
 from segue.errors import SegueValidationError, NotAuthorized
 
 from support import SegueApiTestCase, hashie
