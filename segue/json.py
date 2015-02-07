@@ -45,9 +45,6 @@ class PropertyJsonSerializer(JsonSerializer):
     def get_field_names(self):
         return NotImplemented()
 
-    def override_field_serializer(self):
-        pass
-
     def to_json(self, **kw):
         field_names = self.get_field_names()
 

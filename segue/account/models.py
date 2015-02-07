@@ -1,4 +1,7 @@
+import datetime
+
 from sqlalchemy_utils.types.password import PasswordType
+from sqlalchemy.sql import functions as func
 
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
@@ -26,5 +29,7 @@ class Account(JsonSerializable, db.Model):
     phone        = db.Column(db.Text)
     organization = db.Column(db.Text)
     resume       = db.Column(db.Text)
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     proposals    = db.relationship("Proposal", backref="owner")
