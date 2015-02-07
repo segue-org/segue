@@ -3,8 +3,8 @@ import mockito
 
 from segue.account import Signer
 
-from support import SegueApiTestCase
-from support.factories import *
+from ..support import SegueApiTestCase
+from ..support.factories import *
 
 class SignerTestsCases(SegueApiTestCase):
     def test_wraps_account_with_jwt(self):

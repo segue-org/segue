@@ -5,8 +5,8 @@ import json
 from segue.proposal import ProposalService
 from segue.errors import SegueValidationError, NotAuthorized
 
-from support import SegueApiTestCase
-from support.factories import *
+from ..support import SegueApiTestCase
+from ..support.factories import *
 
 class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):

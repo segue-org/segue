@@ -7,8 +7,9 @@ from ..core import db
 
 import schema
 
-
 class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
+    __json_hidden__ = ['invites','owner_id']
+
     def override_children(self):
         from ..models import SafeAccountJsonSerializer
         self.override_child('owner', SafeAccountJsonSerializer)

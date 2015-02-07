@@ -6,8 +6,8 @@ from werkzeug.exceptions import NotFound
 from segue.account import AccountController, AccountService, Account, Signer
 from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse
 
-from support.factories import *
-from support import SegueApiTestCase, hashie
+from ..support.factories import *
+from ..support import SegueApiTestCase, hashie
 
 class AccountServiceTestCases(SegueApiTestCase):
     def setUp(self):

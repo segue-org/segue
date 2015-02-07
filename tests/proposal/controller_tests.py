@@ -8,8 +8,8 @@ from werkzeug.exceptions import NotFound
 from segue.proposal import ProposalController
 from segue.errors import SegueValidationError, NotAuthorized
 
-from support import SegueApiTestCase, hashie
-from support.factories import *
+from ..support import SegueApiTestCase, hashie
+from ..support.factories import *
 
 class ProposalControllerTestCases(SegueApiTestCase):
     def setUp(self):
@@ -41,7 +41,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
     def test_json_input_is_sent_to_service_for_creation(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        mockito.when(self.mock_service).create(data, self.mock_owner).thenReturn('bla')
+        mock_proposal = ValidProposalFactory.build()
+        mockito.when(self.mock_service).create(data, self.mock_owner).thenReturn(mock_proposal)
 
         response = self.jpost('/proposals', data=raw_json)
 
