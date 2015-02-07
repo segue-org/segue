@@ -67,3 +67,15 @@ class ProposalServiceTestCases(SegueApiTestCase):
 
         retrieved = self.service.get_one(existing.id)
         self.assertNotEquals(retrieved.title,    'ma new title')
+
+    def test_invite_coauthor(self):
+        data = ValidProposalFactory().to_json()
+        invite_data = { 'recipient': 'fulano@example.com', 'name': 'Fulano' }
+        proposal = self.service.create(data, self.mock_owner)
+
+        result = self.service.invite(proposal.id, invite_data, by=self.mock_owner)
+
+        self.assertEquals(result.recipient, invite_data['recipient'])
+        self.assertEquals(result.name,      invite_data['name'])
+
+

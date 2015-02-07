@@ -26,6 +26,8 @@ class Proposal(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    invites      = db.relationship("ProposalInvite", backref="proposal")
+
 class InviteJsonSerializer(SQLAlchemyJsonSerializer):
     pass
 

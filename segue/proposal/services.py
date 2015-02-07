@@ -2,7 +2,7 @@ from ..core import db
 from ..errors import NotAuthorized
 
 import schema
-from factories import ProposalFactory
+from factories import ProposalFactory, InviteFactory
 from models    import Proposal
 
 class ProposalService(object):
@@ -31,6 +31,18 @@ class ProposalService(object):
         db.session.add(proposal)
         db.session.commit()
         return proposal
+
+    def invite(self, proposal_id, data, by=None):
+        proposal = self.get_one(proposal_id)
+        if not self._check_ownership(proposal, by): raise NotAuthorized
+
+        invite = InviteFactory.from_json(data, schema.new_invite)
+        invite.proposal = proposal
+
+        db.session.add(invite)
+        db.session.commit()
+
+        return invite
 
     def _check_ownership(self, proposal, alleged):
         return proposal and alleged and proposal.owner_id == alleged.id

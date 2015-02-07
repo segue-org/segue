@@ -129,8 +129,12 @@ class ProposalControllerTestCases(SegueApiTestCase):
         data = { "email": "fulano@example.com" }
         raw_json = json.dumps(data)
         mock_invite = ValidInviteFactory.build()
-        mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(True)
-        mockito.when(self.mock_service).invite(123, data).thenReturn(mock_invite)
+        mockito.when(self.mock_service).invite(123, data, by=self.mock_owner).thenReturn(mock_invite)
+
+        response = self.jpost('/proposals/123/invite', data=raw_json)
+        content = json.loads(response.data)['resource']
+
+        self.assertEquals(content['recipient'], mock_invite.recipient)
 
     def test_invite_answer(self):
         data = { "hash": "12345" }
