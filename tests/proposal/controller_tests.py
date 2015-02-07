@@ -95,7 +95,6 @@ class ProposalControllerTestCases(SegueApiTestCase):
     def test_modify_proposal_wrong_owner(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        mockito.when(self.mock_service).check_ownership(123, self.mock_owner).thenReturn(False)
         mockito.when(self.mock_service).modify(123, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
         response = self.jput('/proposals/123', data=raw_json)
