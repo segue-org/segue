@@ -50,4 +50,4 @@ class ProposalInvite(JsonSerializable, db.Model):
     name         = db.Column(db.Text)
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    status       = db.Column(db.Enum('pending','accepted','declined', name='invite_statuses'))
+    status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'))
