@@ -94,4 +94,10 @@ class InviteServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.recipient, invite_data['recipient'])
         self.assertEquals(result.name,      invite_data['name'])
 
+    def test_decline(self):
+        invite = self.create_from_factory(ValidInviteFactory)
+        result = self.service.decline(invite.hash)
+        retrieved = self.service.get_by_hash(invite.hash)
+        self.assertEquals(retrieved.status, 'declined')
+
 
