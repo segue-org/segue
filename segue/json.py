@@ -29,12 +29,18 @@ class JsonSerializable(object):
     _serializers = [ ]
 
     def serialize(self, **kw):
-        using = kw.pop('using',None)
-        candidates = [using] if using else []
+        instance_using = getattr(self, '_using', None)
+        argument_using = kw.pop('using',None)
+        first_option = argument_using or instance_using or None
+        candidates = [ first_option ] if first_option else []
         candidates.extend(self._serializers)
         candidates.append(JsonSerializer)
         serializer = candidates[0]()
         return serializer.emit_json_for(self, **kw)
+
+    def serializing_with(self, impl):
+        self._using = constantize(self._serializers, impl).__class__
+        return self
 
     def to_json(self, **kw):
         return self.serialize(**kw)
@@ -50,6 +56,12 @@ class JsonSerializer(object):
         if hasattr(target, 'to_json'):
             return target.to_json()
         return target
+
+def constantize(glossary, selected):
+    for cls in glossary:
+        if cls.__name__ == selected:
+            return cls()
+
 
 class PropertyJsonSerializer(JsonSerializer):
     def get_field_names(self, target):
@@ -69,11 +81,7 @@ class PropertyJsonSerializer(JsonSerializer):
             available      = value[0]._serializers if is_nested_list else getattr(value, '_serializers', [])
 
             selected   = override or recurse_with or 'JsonSerializer'
-            serializer = JsonSerializer()
-            for cls in available:
-                if cls.__name__ == selected:
-                    serializer = cls()
-                    break
+            serializer = constantize(available, selected) or JsonSerializer()
             if is_nested_list:
                 if not recurse_with: continue
                 result[key] = [ serializer.emit_json_for(item, **overrides) for item in value ]
