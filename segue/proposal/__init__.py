@@ -5,7 +5,7 @@ from flask import request
 from flask.ext.jwt import current_user
 
 from ..core import jwt_required
-from ..json import jsoned
+from ..json import jsoned, JsonFor
 
 import schema
 from factories import ProposalFactory

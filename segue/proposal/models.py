@@ -29,14 +29,19 @@ class Proposal(JsonSerializable, db.Model):
     invites      = db.relationship("ProposalInvite", backref="proposal")
 
 class InviteJsonSerializer(SQLAlchemyJsonSerializer):
-    pass
+    def serialize_child(self, child):
+        return dict(proposal='ProposalJsonSerializer').get(child, False)
 
-class SafeInviteJsonSerializer(SQLAlchemyJsonSerializer):
+class ShortInviteJsonSerializer(InviteJsonSerializer):
+    def serialize_child(self, child):
+        return False;
+
+class SafeInviteJsonSerializer(InviteJsonSerializer):
     def hide_field(self, child):
         return child in ['recipient']
 
 class ProposalInvite(JsonSerializable, db.Model):
-    _serializers = [ InviteJsonSerializer ]
+    _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     proposal_id  = db.Column(db.Integer, db.ForeignKey('proposal.id'))

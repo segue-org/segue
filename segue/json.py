@@ -46,6 +46,9 @@ class JsonSerializable(object):
         return self.serialize(**kw)
 
 class JsonSerializer(object):
+    def __init__(self, **overrides):
+        self.serializer_overrides = overrides
+
     def hide_field(self, child):
         return False;
 
@@ -57,6 +60,15 @@ class JsonSerializer(object):
             return target.to_json()
         return target
 
+class JsonFor(object):
+    def __init__(self, target):
+        self.target = target
+
+    def using(self, serializer_name):
+        for item in list(self.target):
+            item.serializing_with(serializer_name)
+        return self.target
+
 def constantize(glossary, selected):
     for cls in glossary:
         if cls.__name__ == selected:
@@ -67,8 +79,9 @@ class PropertyJsonSerializer(JsonSerializer):
     def get_field_names(self, target):
         raise NotImplementedError()
 
-    def emit_json_for(self, target, all_fields=False, **overrides):
+    def emit_json_for(self, target, all_fields=False, items_with=None, **overrides):
         # WORST CODE EVER
+        overrides.update(self.serializer_overrides)
         result = {}
         for key, serializer in self.get_field_names(target):
             value          = getattr(target, key, None)
