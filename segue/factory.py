@@ -9,6 +9,7 @@ class Factory(object):
 
     @classmethod
     def from_json(cls, data, schema):
+        data.pop('$type',None)
         validator = jsonschema.Draft4Validator(schema, format_checker=jsonschema.FormatChecker())
         errors = list(validator.iter_errors(data))
         cleaned_data = cls.clean_for_insert(data)

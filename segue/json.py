@@ -46,6 +46,8 @@ class JsonSerializable(object):
         return self.serialize(**kw)
 
 class JsonSerializer(object):
+    _serializer_name = 'default'
+
     def __init__(self, **overrides):
         self.serializer_overrides = overrides
 
@@ -76,6 +78,7 @@ def constantize(glossary, selected):
 
 
 class PropertyJsonSerializer(JsonSerializer):
+    _serializer_name = 'properties'
     def get_field_names(self, target):
         raise NotImplementedError()
 
@@ -103,10 +106,13 @@ class PropertyJsonSerializer(JsonSerializer):
                 result[key] = serializer.emit_json_for(value, **overrides)
             elif value and not hide_field:
                 result[key] = serializer.emit_json_for(value, **overrides)
+        result['$type'] = ".".join([target.__class__.__name__,self._serializer_name])
 
         return result
 
 class SQLAlchemyJsonSerializer(PropertyJsonSerializer):
+    _serializer_name = 'db'
+
     def get_field_names(self, target):
         for p in target.__mapper__.iterate_properties:
             if p.key.endswith("_id"): continue

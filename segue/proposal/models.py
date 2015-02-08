@@ -8,10 +8,9 @@ from ..core import db
 import schema
 
 class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'
     def serialize_child(self, child):
-        if child == 'owner':
-            return 'SafeAccountJsonSerializer'
-        return False
+        return dict(owner='SafeAccountJsonSerializer').get(child, False)
 
 class Proposal(JsonSerializable, db.Model):
     _serializers = [ ProposalJsonSerializer ]
@@ -29,14 +28,17 @@ class Proposal(JsonSerializable, db.Model):
     invites      = db.relationship("ProposalInvite", backref="proposal")
 
 class InviteJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'
     def serialize_child(self, child):
         return dict(proposal='ProposalJsonSerializer').get(child, False)
 
 class ShortInviteJsonSerializer(InviteJsonSerializer):
+    _serializer_name = 'short'
     def serialize_child(self, child):
         return False;
 
 class SafeInviteJsonSerializer(InviteJsonSerializer):
+    _serializer_name = 'safe'
     def hide_field(self, child):
         return child in ['recipient']
 

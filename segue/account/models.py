@@ -9,6 +9,7 @@ from ..core import db
 import schema
 
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'
     def hide_field(self, child):
         return child == 'password'
 
@@ -16,10 +17,12 @@ class AccountJsonSerializer(SQLAlchemyJsonSerializer):
         return False
 
 class SafeAccountJsonSerializer(AccountJsonSerializer):
+    _serializer_name = 'safe'
     def hide_field(self, child):
         return child in [ 'password','email','role', 'phone', 'city', 'document' ]
 
 class TokenJsonSerializer(AccountJsonSerializer):
+    _serializer_name = 'token'
     def hide_field(self, child):
         return child not in [ 'id','email','role' ]
 
