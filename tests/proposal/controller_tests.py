@@ -177,13 +177,24 @@ class InviteControllerTestCases(SegueApiTestCase):
         response = self.jget('/proposals/123/invites/123ABC')
         self.assertEquals(response.status_code, 404)
 
-    def test_decline_valid(self):
+    def test_decline(self):
         mock_invite = ValidInviteFactory.build(hash='123ABC')
-        mockito.when(self.mock_service).decline('123ABC').thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('123ABC', accepted=False).thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=False).thenReturn(None)
+
         response = self.jpost('/proposals/123/invites/123ABC/decline')
         self.assertEquals(response.status_code, 200)
 
-    def test_decline_invalid(self):
-        mockito.when(self.mock_service).decline('123ABC').thenReturn(None)
-        response = self.jpost('/proposals/123/invites/123ABC/decline')
+        response = self.jpost('/proposals/123/invites/FFFFFF/decline')
+        self.assertEquals(response.status_code, 404)
+
+    def test_decline(self):
+        mock_invite = ValidInviteFactory.build(hash='123ABC')
+        mockito.when(self.mock_service).answer('123ABC', accepted=True).thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=True).thenReturn(None)
+
+        response = self.jpost('/proposals/123/invites/123ABC/accept')
+        self.assertEquals(response.status_code, 200)
+
+        response = self.jpost('/proposals/123/invites/FFFFFF/accept')
         self.assertEquals(response.status_code, 404)

@@ -77,6 +77,11 @@ class ProposalInviteController(object):
 
     @jsoned
     def decline(self, proposal_id, hash):
-        result = self.service.decline(hash) or flask.abort(404)
+        result = self.service.answer(hash, accepted=False) or flask.abort(404)
+        return result, 200
+
+    @jsoned
+    def accept(self, proposal_id, hash):
+        result = self.service.answer(hash, accepted=True) or flask.abort(404)
         return result, 200
 

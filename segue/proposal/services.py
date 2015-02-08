@@ -66,11 +66,11 @@ class InviteService(object):
 
         return invite
 
-    def decline(self, hash):
+    def answer(self, hash, accepted=True):
         invite = self.get_by_hash(hash)
         if not invite: return None
 
-        invite.status = 'declined'
+        invite.status = 'accepted' if accepted else 'declined'
         db.session.add(invite)
         db.session.commit()
         return invite
