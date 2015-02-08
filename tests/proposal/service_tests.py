@@ -1,8 +1,9 @@
 import sys;
 
 import json
+import mockito
 
-from segue.proposal import ProposalService
+from segue.proposal import ProposalService, InviteService
 from segue.errors import SegueValidationError, NotAuthorized
 
 from ..support import SegueApiTestCase
@@ -33,10 +34,9 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(retrieved, None)
 
     def test_modify_proposal_valid_owner(self):
-        data = ValidProposalFactory().to_json()
-        existing = self.service.create(data, self.mock_owner)
+        existing = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
-        new_data = data.copy()
+        new_data = {}
         new_data['title']    = 'ma new title'
         new_data['full']     = 'ma new full'
         new_data['summary']  = 'ma new summ'
@@ -58,22 +58,32 @@ class ProposalServiceTestCases(SegueApiTestCase):
 
     def test_modify_proposal_wrong_owner(self):
         other_owner = ValidAccountFactory.create()
-        data = ValidProposalFactory().to_json()
-        new_data = { 'title': 'ma new title' }
-        existing = self.service.create(data, self.mock_owner)
+        existing = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
         with self.assertRaises(NotAuthorized):
+            new_data = { 'title': 'ma new title' }
             self.service.modify(existing.id, new_data, by=other_owner)
 
         retrieved = self.service.get_one(existing.id)
-        self.assertNotEquals(retrieved.title,    'ma new title')
+        self.assertNotEquals(retrieved.title, 'ma new title')
+
+class InviteServiceTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(InviteServiceTestCases, self).setUp()
+        self.mock_owner = ValidAccountFactory.create()
+        self.service = InviteService()
+        self.proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
+
+    def test_list_valid_owner(self):
+        pass
+
+    def test_list_wrong_owner(self):
+        pass
 
     def test_invite_coauthor(self):
-        data = ValidProposalFactory().to_json()
         invite_data = { 'recipient': 'fulano@example.com', 'name': 'Fulano' }
-        proposal = self.service.create(data, self.mock_owner)
 
-        result = self.service.invite(proposal.id, invite_data, by=self.mock_owner)
+        result = self.service.create(self.proposal.id, invite_data, by=self.mock_owner)
 
         self.assertEquals(result.recipient, invite_data['recipient'])
         self.assertEquals(result.name,      invite_data['name'])

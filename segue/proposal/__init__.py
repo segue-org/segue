@@ -9,7 +9,7 @@ from ..json import jsoned
 
 import schema
 from factories import ProposalFactory
-from services  import ProposalService
+from services  import ProposalService, InviteService
 
 class ProposalController(object):
     def __init__(self, service=None):
@@ -45,19 +45,39 @@ class ProposalController(object):
     def schema(self, name):
         return schema.whitelist[name], 200
 
+
+class ProposalInviteController(object):
+    def __init__(self, service=None):
+        self.service      = service   or InviteService()
+        self.current_user = current_user
+
     @jwt_required()
     @jsoned
-    def invite(self, proposal_id):
+    def list(self, proposal_id):
+        result = self.service.list(proposal_id, by=self.current_user)
+        return JsonFor(result).using('ShortInviteJsonSerializer'), 200
+
+    @jsoned
+    def get_by_hash(self, proposal_id, hash):
+        invite = self.service.get_by_hash(hash) or flask.abort(404)
+        return invite, 200
+
+    @jwt_required()
+    @jsoned
+    def create(self, proposal_id):
         data = request.get_json()
         result = self.service.invite(proposal_id, data, by=self.current_user)
         return result, 200
 
     @jsoned
-    def invite_answer(self, proposal_id, invite_id):
+    def accept(self, proposal_id, hash):
         data = request.get_json()
-        self.service.invite_answer(proposal_id, invite_id, data)
+        self.service.invite_answer(proposal_id, hash, data)
         return {}, 200
 
-
-
+    @jsoned
+    def decline(self, proposal_id, hash):
+        data = request.get_json()
+        self.service.invite_decline(proposal_id, hash, data)
+        return {}, 200
 

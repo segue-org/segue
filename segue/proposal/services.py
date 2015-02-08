@@ -3,7 +3,7 @@ from ..errors import NotAuthorized
 
 import schema
 from factories import ProposalFactory, InviteFactory
-from models    import Proposal
+from models    import Proposal, ProposalInvite
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
@@ -24,7 +24,7 @@ class ProposalService(object):
 
     def modify(self, proposal_id, data, by=None):
         proposal = self.get_one(proposal_id)
-        if not self._check_ownership(proposal, by): raise NotAuthorized
+        if not self.check_ownership(proposal, by): raise NotAuthorized
 
         for name, value in ProposalFactory.clean_for_update(data).items():
             setattr(proposal, name, value)
@@ -32,9 +32,24 @@ class ProposalService(object):
         db.session.commit()
         return proposal
 
-    def invite(self, proposal_id, data, by=None):
-        proposal = self.get_one(proposal_id)
-        if not self._check_ownership(proposal, by): raise NotAuthorized
+    def check_ownership(self, proposal, alleged):
+        if isinstance(proposal, int): proposal = self.get_one(proposal)
+        return proposal and alleged and proposal.owner_id == alleged.id
+
+class InviteService(object):
+    def __init__(self, proposals=None):
+        self.proposals = proposals or ProposalService()
+
+    def get_one(self, invite_id):
+        return ProposalInvite.query.get(invite_id)
+
+    def get_by_hash(self, invite_hash):
+        candidates = ProposalInvite.query.filter_by(hash=invite_hash).all()
+        return candidates[0] if len(candidates) else None
+
+    def create(self, proposal_id, data, by=None):
+        proposal = self.proposals.get_one(proposal_id)
+        if not self.proposals.check_ownership(proposal, by): raise NotAuthorized
 
         invite = InviteFactory.from_json(data, schema.new_invite)
         invite.proposal = proposal
@@ -44,7 +59,9 @@ class ProposalService(object):
 
         return invite
 
-    def _check_ownership(self, proposal, alleged):
-        return proposal and alleged and proposal.owner_id == alleged.id
+    def list(self, proposal_id, by=None):
+        proposal = self.proposals.get_one(proposal_id)
+        if not self.proposals.check_ownership(proposal, by): raise NotAuthorized
+        return proposal.invites
 
 

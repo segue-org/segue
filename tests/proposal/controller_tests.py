@@ -129,22 +129,38 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0]['title'], prop1.title)
 
+class InviteControllerTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(InviteControllerTestCases, self).setUp()
+        self.mock_service = self.mock_controller_dep('proposal_invites', 'service')
+        self.mock_owner   = self.mock_controller_dep('proposal_invites', 'current_user', ValidAccountFactory.create())
+        self.mock_jwt(self.mock_owner)
+
+    def test_list_invites(self):
+        pass
+
     def test_invite(self):
         data = { "email": "fulano@example.com" }
         raw_json = json.dumps(data)
         mock_invite = ValidInviteFactory.build()
         mockito.when(self.mock_service).invite(123, data, by=self.mock_owner).thenReturn(mock_invite)
 
-        response = self.jpost('/proposals/123/invite', data=raw_json)
+        response = self.jpost('/proposals/123/invites', data=raw_json)
         content = json.loads(response.data)['resource']
 
         self.assertEquals(content['recipient'], mock_invite.recipient)
 
-    def test_invite_answer(self):
-        data = { "hash": "12345" }
-        raw_json = json.dumps(data)
-        mockito.when(self.mock_service).invite_answer(123, 456, data).thenReturn(True)
+    def test_invite_check_invalid(self):
+        mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(None)
 
-        response = self.jput('/proposals/123/invite/456', data=raw_json)
+        response = self.jget('/proposals/123/invites/123ABC')
+
+        self.assertEquals(response.status_code, 404)
+
+    def test_invite_check_valid(self):
+        mock_invite = ValidInviteFactory.build(hash='123ABC')
+        mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(mock_invite)
+
+        response = self.jget('/proposals/123/invites/123ABC')
 
         self.assertEquals(response.status_code, 200)
