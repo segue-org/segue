@@ -31,6 +31,12 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.jwt.decode_handler(lambda token: returned_mock.to_json())
         segue.core.jwt.user_handler(lambda payload: returned_mock)
 
+    def create_from_factory(self, factory, *args, **kw):
+        entity = factory.create(*args, **kw)
+        segue.core.db.session.add(entity)
+        segue.core.db.session.commit()
+        return entity
+
     def jput(self, *args, **kw):
         return self.jrequest(self.client.put, *args, **kw)
 
