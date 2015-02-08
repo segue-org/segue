@@ -44,6 +44,7 @@ class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
+    hash         = db.Column(db.String(64))
     proposal_id  = db.Column(db.Integer, db.ForeignKey('proposal.id'))
     recipient    = db.Column(db.Text)
     name         = db.Column(db.Text)

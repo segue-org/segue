@@ -64,3 +64,4 @@ class ValidInviteFactory(SegueFactory):
     recipient = _Sequence('fulano{0}@example.com')
     name      = _Sequence('Fulano {0}')
     status    = 'pending'
+    hash      = _Sequence('DEAD{0:04x}')
