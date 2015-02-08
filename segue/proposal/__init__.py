@@ -66,7 +66,7 @@ class ProposalInviteController(object):
     @jsoned
     def create(self, proposal_id):
         data = request.get_json()
-        result = self.service.invite(proposal_id, data, by=self.current_user)
+        result = self.service.create(proposal_id, data, by=self.current_user)
         return result, 200
 
     @jsoned

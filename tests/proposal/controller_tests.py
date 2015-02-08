@@ -49,19 +49,15 @@ class ProposalControllerTestCases(SegueApiTestCase):
         mockito.verify(self.mock_service).create(data, self.mock_owner)
         self.assertEquals(response.status_code, 201)
 
-    def test_404s_on_non_existing_entity(self):
-        mockito.when(self.mock_service).get_one(456).thenReturn(None)
-
-        response = self.jget('/proposals/456')
-
-        self.assertEquals(response.status_code, 404)
-
-    def test_200_on_existing_entity(self):
+    def test_retrieving_entity(self):
         mock_proposal = ValidProposalFactory.build()
+        mockito.when(self.mock_service).get_one(456).thenReturn(None)
         mockito.when(self.mock_service).get_one(123).thenReturn(mock_proposal)
 
-        response = self.jget('/proposals/123')
+        response = self.jget('/proposals/456')
+        self.assertEquals(response.status_code, 404)
 
+        response = self.jget('/proposals/123')
         self.assertEquals(response.status_code, 200)
 
     def test_response_is_json(self):
@@ -89,20 +85,14 @@ class ProposalControllerTestCases(SegueApiTestCase):
         resulting = ValidProposalFactory.build()
 
         mockito.when(self.mock_service).modify(123, data, by=self.mock_owner).thenReturn(resulting)
+        mockito.when(self.mock_service).modify(456, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
         response = self.jput('/proposals/123', data=raw_json)
         content = json.loads(response.data)['resource']
-
         mockito.verify(self.mock_service).modify(123, data, by=self.mock_owner)
         self.assertEquals(content['title'], resulting.title)
 
-    def test_modify_proposal_wrong_owner(self):
-        data = { "arbitrary": "json that will be mocked out anyway" }
-        raw_json = json.dumps(data)
-        mockito.when(self.mock_service).modify(123, data, by=self.mock_owner).thenRaise(NotAuthorized)
-
-        response = self.jput('/proposals/123', data=raw_json)
-
+        response = self.jput('/proposals/456', data=raw_json)
         self.assertEquals(response.status_code, 403)
 
     def test_list_proposals(self):
@@ -110,22 +100,16 @@ class ProposalControllerTestCases(SegueApiTestCase):
         prop2 = ValidProposalFactory.build()
 
         mockito.when(self.mock_service).query().thenReturn([prop1, prop2])
+        mockito.when(self.mock_service).query(owner_id=u'123').thenReturn([prop1])
 
         response = self.jget('/proposals')
         items = json.loads(response.data)['items']
-
         self.assertEquals(len(items), 2)
         self.assertEquals(items[0]['title'], prop1.title)
         self.assertEquals(items[1]['title'], prop2.title)
 
-    def test_list_proposals_with_whitelisted_columns_as_filters(self):
-        prop1 = ValidProposalFactory.build()
-
-        mockito.when(self.mock_service).query(owner_id=u'123').thenReturn([prop1])
-
         response = self.jget('/proposals', query_string={'xonga': u'123', 'owner_id': u'123'})
         items = json.loads(response.data)['items']
-
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0]['title'], prop1.title)
 
@@ -139,59 +123,53 @@ class InviteControllerTestCases(SegueApiTestCase):
     def test_list_invites(self):
         mock_invite = ValidInviteFactory.build()
         mockito.when(self.mock_service).list(123, by=self.mock_owner).thenReturn([mock_invite])
+        mockito.when(self.mock_service).list(456, by=self.mock_owner).thenRaise(NotAuthorized)
 
         response = self.jget('/proposals/123/invites')
         items = json.loads(response.data)['items']
-
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0]['recipient'], mock_invite.recipient)
 
-    def test_list_invites_wrong_owner(self):
-        mock_invite = ValidInviteFactory.build()
-        mockito.when(self.mock_service).list(123, by=self.mock_owner).thenRaise(NotAuthorized)
-
-        response = self.jget('/proposals/123/invites')
-
+        response = self.jget('/proposals/456/invites')
         self.assertEquals(response.status_code, 403)
 
     def test_invite(self):
         data = { "email": "fulano@example.com" }
         raw_json = json.dumps(data)
         mock_invite = ValidInviteFactory.build()
-        mockito.when(self.mock_service).invite(123, data, by=self.mock_owner).thenReturn(mock_invite)
+        mockito.when(self.mock_service).create(123, data, by=self.mock_owner).thenReturn(mock_invite)
+        mockito.when(self.mock_service).create(456, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
         response = self.jpost('/proposals/123/invites', data=raw_json)
         content = json.loads(response.data)['resource']
-
         self.assertEquals(content['recipient'], mock_invite.recipient)
 
+        response = self.jpost('/proposals/456/invites', data=raw_json)
+        self.assertEquals(response.status_code, 403)
 
-    def test_invite_check_valid(self):
+    def test_invite_check(self):
         mock_invite = ValidInviteFactory.build(hash='123ABC')
         mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(mock_invite)
+        mockito.when(self.mock_service).get_by_hash('FFFFFF').thenReturn(None)
+
         response = self.jget('/proposals/123/invites/123ABC')
         self.assertEquals(response.status_code, 200)
 
-    def test_invite_check_invalid(self):
-        mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(None)
-        response = self.jget('/proposals/123/invites/123ABC')
+        response = self.jget('/proposals/123/invites/FFFFFF')
         self.assertEquals(response.status_code, 404)
 
-    def test_decline(self):
+    def test_answering(self):
         mock_invite = ValidInviteFactory.build(hash='123ABC')
         mockito.when(self.mock_service).answer('123ABC', accepted=False).thenReturn(mock_invite)
         mockito.when(self.mock_service).answer('FFFFFF', accepted=False).thenReturn(None)
+        mockito.when(self.mock_service).answer('123ABC', accepted=True).thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=True).thenReturn(None)
 
         response = self.jpost('/proposals/123/invites/123ABC/decline')
         self.assertEquals(response.status_code, 200)
 
         response = self.jpost('/proposals/123/invites/FFFFFF/decline')
         self.assertEquals(response.status_code, 404)
-
-    def test_decline(self):
-        mock_invite = ValidInviteFactory.build(hash='123ABC')
-        mockito.when(self.mock_service).answer('123ABC', accepted=True).thenReturn(mock_invite)
-        mockito.when(self.mock_service).answer('FFFFFF', accepted=True).thenReturn(None)
 
         response = self.jpost('/proposals/123/invites/123ABC/accept')
         self.assertEquals(response.status_code, 200)
