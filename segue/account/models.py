@@ -24,7 +24,7 @@ class TokenJsonSerializer(AccountJsonSerializer):
         return child not in [ 'id','email','role' ]
 
 class Account(JsonSerializable, db.Model):
-    _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer ]
+    _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer, TokenJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     email        = db.Column(db.Text, unique=True)

@@ -19,7 +19,7 @@ class Signer(object):
     def sign(self, account):
         token = self.jwt.encode_callback(self.serializer.emit_json_for(account))
         return {
-            "account": account.serializing_with('SafeAccountJsonSerializer'),
+            "account": account.serializing_with('TokenJsonSerializer'),
             "token": token
         }
 
