@@ -29,7 +29,8 @@ class JsonSerializable(object):
     _serializers = [ ]
 
     def serialize(self, **kw):
-        candidates = []
+        using = kw.pop('using',None)
+        candidates = [using] if using else []
         candidates.extend(self._serializers)
         candidates.append(JsonSerializer)
         serializer = candidates[0]()
