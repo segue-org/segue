@@ -137,7 +137,22 @@ class InviteControllerTestCases(SegueApiTestCase):
         self.mock_jwt(self.mock_owner)
 
     def test_list_invites(self):
-        pass
+        mock_invite = ValidInviteFactory.build()
+        mockito.when(self.mock_service).list(123, by=self.mock_owner).thenReturn([mock_invite])
+
+        response = self.jget('/proposals/123/invites')
+        items = json.loads(response.data)['items']
+
+        self.assertEquals(len(items), 1)
+        self.assertEquals(items[0]['recipient'], mock_invite.recipient)
+
+    def test_list_invites_wrong_owner(self):
+        mock_invite = ValidInviteFactory.build()
+        mockito.when(self.mock_service).list(123, by=self.mock_owner).thenRaise(NotAuthorized)
+
+        response = self.jget('/proposals/123/invites')
+
+        self.assertEquals(response.status_code, 403)
 
     def test_invite(self):
         data = { "email": "fulano@example.com" }

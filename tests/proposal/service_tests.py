@@ -75,10 +75,16 @@ class InviteServiceTestCases(SegueApiTestCase):
         self.proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
     def test_list_valid_owner(self):
-        pass
+        proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
+        result = self.service.list(proposal.id, by=self.mock_owner)
+        self.assertEquals(result, [])
 
     def test_list_wrong_owner(self):
-        pass
+        other_owner = ValidAccountFactory.create()
+        proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.list(proposal.id, by=other_owner)
 
     def test_invite_coauthor(self):
         invite_data = { 'recipient': 'fulano@example.com', 'name': 'Fulano' }

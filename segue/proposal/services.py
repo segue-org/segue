@@ -57,6 +57,8 @@ class InviteService(object):
         db.session.add(invite)
         db.session.commit()
 
+        # TODO: send email
+
         return invite
 
     def list(self, proposal_id, by=None):
