@@ -70,8 +70,9 @@ class ProposalServiceTestCases(SegueApiTestCase):
 class InviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteServiceTestCases, self).setUp()
+        self.mock_hasher = mockito.Mock()
         self.mock_owner = ValidAccountFactory.create()
-        self.service = InviteService()
+        self.service = InviteService(hasher=self.mock_hasher)
         self.proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
     def test_list_valid_owner(self):
@@ -88,9 +89,11 @@ class InviteServiceTestCases(SegueApiTestCase):
 
     def test_invite_coauthor(self):
         invite_data = { 'recipient': 'fulano@example.com', 'name': 'Fulano' }
+        mockito.when(self.mock_hasher).generate().thenReturn('123ABC')
 
         result = self.service.create(self.proposal.id, invite_data, by=self.mock_owner)
 
+        self.assertEquals(result.hash,      '123ABC')
         self.assertEquals(result.recipient, invite_data['recipient'])
         self.assertEquals(result.name,      invite_data['name'])
 

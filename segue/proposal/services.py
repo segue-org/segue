@@ -1,9 +1,19 @@
+import random
+
 from ..core import db
 from ..errors import NotAuthorized
 
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite
+
+class Hasher(object):
+    def __init__(self, length=32):
+        self.length = length
+
+    def generate(self):
+        value = random.getrandbits(self.length * 4)
+        return "{0:0{1}X}".format(value, self.length)
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
@@ -37,8 +47,9 @@ class ProposalService(object):
         return proposal and alleged and proposal.owner_id == alleged.id
 
 class InviteService(object):
-    def __init__(self, proposals=None):
+    def __init__(self, proposals=None, hasher=None):
         self.proposals = proposals or ProposalService()
+        self.hasher    = hasher    or Hasher()
 
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
@@ -58,6 +69,7 @@ class InviteService(object):
 
         invite = InviteFactory.from_json(data, schema.new_invite)
         invite.proposal = proposal
+        invite.hash     = self.hasher.generate()
 
         db.session.add(invite)
         db.session.commit()
