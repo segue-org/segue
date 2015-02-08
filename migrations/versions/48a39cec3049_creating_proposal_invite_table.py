@@ -25,6 +25,7 @@ def upgrade():
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('last_updated', sa.DateTime(), nullable=True),
     sa.Column('status', sa.Enum('pending', 'accepted', 'declined', name='invite_statuses'), nullable=True),
+    sa.Column('hash', sa.String(length=64), nullable=True),
     sa.ForeignKeyConstraint(['proposal_id'], ['proposal.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
