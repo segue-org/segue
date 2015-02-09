@@ -19,11 +19,12 @@ class ProposalInviteBluePrint(flask.Blueprint):
     def __init__(self):
         super(ProposalInviteBluePrint, self).__init__('proposal_invites', __name__, url_prefix='/proposals/<int:proposal_id>/invites')
         self.controller = ProposalInviteController()
-        self.add_url_rule('',                       methods=['GET'],   view_func=self.controller.list)
-        self.add_url_rule('',                       methods=['POST'],  view_func=self.controller.create)
-        self.add_url_rule('/<string:hash>',         methods=['GET'],   view_func=self.controller.get_by_hash)
-        self.add_url_rule('/<string:hash>/accept',  methods=['POST'],  view_func=self.controller.accept)
-        self.add_url_rule('/<string:hash>/decline', methods=['POST'],  view_func=self.controller.decline)
+        self.add_url_rule('',                        methods=['GET'],   view_func=self.controller.list)
+        self.add_url_rule('',                        methods=['POST'],  view_func=self.controller.create)
+        self.add_url_rule('/<string:hash>',          methods=['GET'],   view_func=self.controller.get_by_hash)
+        self.add_url_rule('/<string:hash>/accept',   methods=['POST'],  view_func=self.controller.accept)
+        self.add_url_rule('/<string:hash>/decline',  methods=['POST'],  view_func=self.controller.decline)
+        self.add_url_rule('/<string:hash>/register', methods=['POST'],  view_func=self.controller.register)
 
 class AccountBlueprint(flask.Blueprint):
     def __init__(self):
