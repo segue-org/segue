@@ -39,7 +39,7 @@ class ProposalController(object):
         parms = { c: request.args.get(c) for c in ProposalFactory.QUERY_WHITELIST if c in request.args }
 
         result = self.service.query(**parms)
-        return result, 200
+        return JsonFor(result).using('ShortChildProposalJsonSerializer'), 200
 
     @jsoned
     def schema(self, name):

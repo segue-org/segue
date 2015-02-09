@@ -9,11 +9,16 @@ import schema
 
 class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
+    _child_serializers = dict(owner='SafeAccountJsonSerializer')
     def serialize_child(self, child):
-        return dict(owner='SafeAccountJsonSerializer').get(child, False)
+        return self._child_serializers.get(child, False)
+
+class ShortChildProposalJsonSerializer(ProposalJsonSerializer):
+    _serializer_name = 'short_child'
+    _child_serializers = dict(owner='SafeAccountJsonSerializer', invites='ShortInviteJsonSerializer')
 
 class Proposal(JsonSerializable, db.Model):
-    _serializers = [ ProposalJsonSerializer ]
+    _serializers = [ ProposalJsonSerializer, ShortChildProposalJsonSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     title        = db.Column(db.Text)
