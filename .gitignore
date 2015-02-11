@@ -2,3 +2,4 @@ env
 .*.sw?
 .vagrant
 *.pyc
+ansible/group_vars/production.yml

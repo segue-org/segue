@@ -1,4 +1,13 @@
 ---
 
+app_name: api
 app_path: /opt/segue
 app_virtualenv: "{{app_path}}/env"
+
+app_host: http://{{ sitename }}.{{ master_host }}
+git_branch: master
+git_repo: https://github.com/segue-org/segue.git
+port: 9001
+
+processes: 1
+threads: 15

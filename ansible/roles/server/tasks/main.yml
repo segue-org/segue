@@ -1,0 +1,31 @@
+---
+
+- apt: update_cache=yes
+       cache_valid_time=3600
+
+- apt: pkg={{ item }}
+       state=installed
+  with_items:
+    - apache2
+    - libapache2-mod-wsgi
+
+- service: name=apache2
+           state=restarted
+
+- template: src=handler.wsgi.j2
+            dest={{ app_path }}/handler.wsgi
+            owner=www-data
+            mode=0755
+  tags: config
+
+- template: src=apache.conf.j2
+            dest=/etc/apache2/conf.d/segue.conf
+  tags: config
+  notify: restart apache
+
+- template: src=settings.py.j2 dest={{ app_path }}/settings.py
+            owner=www-data
+            mode=0755
+  tags: config
+  notify:
+    - restart papers

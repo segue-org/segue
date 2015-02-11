@@ -1,0 +1,9 @@
+WSGIDaemonProcess {{ app_name }} processes={{ processes }} threads={{ threads }} display-name=%{GROUP}
+WSGIProcessGroup {{ app_name }}
+WSGIPythonHome {{ app_virtualenv }}
+WSGIScriptAlias /{{ app_name }} {{ app_path }}/handler.wsgi
+WSGIPassAuthorization On
+
+<Directory {{ app_path }}>
+  Allow from All
+</Directory>
