@@ -3,3 +3,4 @@ env
 .vagrant
 *.pyc
 ansible/group_vars/production.yml
+handler.wsgi

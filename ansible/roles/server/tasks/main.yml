@@ -19,7 +19,7 @@
   tags: config
 
 - template: src=apache.conf.j2
-            dest=/etc/apache2/conf.d/segue.conf
+            dest=/etc/apache2/conf-enabled/segue.conf
   tags: config
   notify: restart apache
 

@@ -9,6 +9,7 @@
   sudo: true
   accelerate: true
   roles:
+    - git-down
     - database
     - segue
     - server

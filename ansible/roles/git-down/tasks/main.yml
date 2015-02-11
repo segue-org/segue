@@ -1,0 +1,12 @@
+---
+
+- git: repo={{ git_repo }}
+       dest={{ app_path }}
+       version={{ git_branch }}
+       update=yes
+  tags: git
+
+- name: reload apache
+  tags: git
+  service: name=apache2
+           state=reloaded
