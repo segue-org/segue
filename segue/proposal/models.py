@@ -4,18 +4,9 @@ from sqlalchemy.sql import functions as func
 
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
+from .serializers import *
 
 import schema
-
-class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
-    _serializer_name = 'normal'
-    _child_serializers = dict(owner='SafeAccountJsonSerializer')
-    def serialize_child(self, child):
-        return self._child_serializers.get(child, False)
-
-class ShortChildProposalJsonSerializer(ProposalJsonSerializer):
-    _serializer_name = 'short_child'
-    _child_serializers = dict(owner='SafeAccountJsonSerializer', invites='ShortInviteJsonSerializer')
 
 class Proposal(JsonSerializable, db.Model):
     _serializers = [ ProposalJsonSerializer, ShortChildProposalJsonSerializer ]
@@ -28,23 +19,7 @@ class Proposal(JsonSerializable, db.Model):
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-
     invites      = db.relationship("ProposalInvite", backref="proposal")
-
-class InviteJsonSerializer(SQLAlchemyJsonSerializer):
-    _serializer_name = 'normal'
-    def serialize_child(self, child):
-        return dict(proposal='ProposalJsonSerializer').get(child, False)
-
-class ShortInviteJsonSerializer(InviteJsonSerializer):
-    _serializer_name = 'short'
-    def serialize_child(self, child):
-        return False;
-
-class SafeInviteJsonSerializer(InviteJsonSerializer):
-    _serializer_name = 'safe'
-    def hide_field(self, child):
-        return child in ['recipient']
 
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
