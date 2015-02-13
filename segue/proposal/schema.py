@@ -5,12 +5,11 @@ new_proposal = {
     "type": "object",
     "properties": {
         "title":    { "type": "string", "minLength": 5, "maxLength": 80   },
-        "summary":  { "type": "string", "minLength": 5, "maxLength": 200  },
         "full":     { "type": "string", "minLength": 5, "maxLength": 2000 },
         "language": { "type": "string", "minLength": 2, "maxLenght": 2 },
         "level":    { "enum": PROPOSAL_LEVELS },
     },
-    "required": [ "title", "summary", "full", "language", "level" ]
+    "required": [ "title", "full", "language", "level" ]
 }
 edit_proposal = new_proposal.copy()
 

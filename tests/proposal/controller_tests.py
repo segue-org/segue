@@ -69,7 +69,6 @@ class ProposalControllerTestCases(SegueApiTestCase):
 
         self.assertEquals(content['title'],    mock_proposal.title)
         self.assertEquals(content['full'],     mock_proposal.full)
-        self.assertEquals(content['summary'],  mock_proposal.summary)
         self.assertEquals(content['language'], mock_proposal.language)
         self.assertEquals(content['level'],    mock_proposal.level)
         self.assertNotIn('email',    content['owner'].keys())

@@ -39,7 +39,6 @@ class ProposalServiceTestCases(SegueApiTestCase):
         new_data = {}
         new_data['title']    = 'ma new title'
         new_data['full']     = 'ma new full'
-        new_data['summary']  = 'ma new summ'
         new_data['level']    = 'beginner'
         new_data['language'] = 'pt'
         self.service.modify(existing.id, new_data, by=self.mock_owner)
@@ -47,7 +46,6 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(existing.id)
         self.assertEquals(retrieved.title,    'ma new title')
         self.assertEquals(retrieved.full,     'ma new full')
-        self.assertEquals(retrieved.summary,  'ma new summ')
         self.assertEquals(retrieved.level,    'beginner')
         self.assertEquals(retrieved.language, 'pt')
 

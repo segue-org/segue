@@ -18,7 +18,6 @@ class ValidProposalFactory(SegueFactory):
         model = Proposal
 
     title       = _Sequence('Proposal Title #{0}')
-    summary     = _Sequence('abstract #{0}')
     full        = _Sequence('description #{0}')
     language    = 'en'
     level       = 'advanced'
@@ -26,7 +25,6 @@ class ValidProposalFactory(SegueFactory):
 
 class InvalidProposalFactory(ValidProposalFactory):
     title       = "x"
-    summary     = "a"
     full        = "d"
     language    = "xunga"
     level       = "professional"

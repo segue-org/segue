@@ -22,7 +22,6 @@ def upgrade():
     op.create_table('proposal',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.Text(), nullable=True),
-    sa.Column('summary', sa.Text(), nullable=True),
     sa.Column('full', sa.Text(), nullable=True),
     sa.Column('language', sa.String(length=100), nullable=True),
     sa.Column('level', sa.Enum('beginner', 'advanced', name='proposal_levels'), nullable=True),
