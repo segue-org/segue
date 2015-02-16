@@ -26,3 +26,5 @@ class SafeInviteJsonSerializer(InviteJsonSerializer):
         return child in ['recipient']
 
 
+class TrackSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'

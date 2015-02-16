@@ -32,3 +32,10 @@ class ProposalInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+
+class Track(JsonSerializable, db.Model):
+    _serializers = [ TrackSerializer ]
+
+    id           = db.Column(db.Integer, primary_key=True)
+    name         = db.Column(db.Text)
+    public       = db.Column(db.Boolean)
