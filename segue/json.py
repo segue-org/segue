@@ -109,7 +109,6 @@ class PropertyJsonSerializer(JsonSerializer):
                 result[key] = serializer.emit_json_for(value, **overrides)
             elif value and not hide_field:
                 result[key] = serializer.emit_json_for(value, **overrides)
-        print self.__dict__
         if self.debug_mode:
             result['$type'] = ".".join([target.__class__.__name__,self._serializer_name])
 

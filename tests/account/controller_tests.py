@@ -17,7 +17,7 @@ class AccountControllerTestCases(SegueApiTestCase):
         self.mock_controller_dep('sessions', 'service', self.mock_service)
 
     def _build_validation_error(self):
-        error_1 = hashie(validator='minLength', relative_path=['field']);
+        error_1 = hashie(validator='minLength', relative_path=['xonga']);
         error_2 = hashie(validator='maxLength', relative_path=['other']);
         return SegueValidationError([error_1, error_2])
 
@@ -30,10 +30,27 @@ class AccountControllerTestCases(SegueApiTestCase):
         response = self.jpost('/accounts', data=raw_json)
         errors = json.loads(response.data)['errors']
 
-        self.assertEquals(errors[0]['field'], 'field')
+        self.assertEquals(errors[0]['field'], 'xonga')
         self.assertEquals(errors[1]['field'], 'other')
         self.assertEquals(response.status_code, 422)
         self.assertEquals(response.content_type, 'application/json')
+
+    def test_existing_email_becomes_422_error(self):
+        data = { "arbitrary": "json that will be mocked out anyway" }
+        raw_json = json.dumps(data)
+        mockito.when(self.mock_service).create(data).thenRaise(EmailAlreadyInUse('le@email'))
+
+        response = self.jpost('/accounts', data=raw_json)
+        errors = json.loads(response.data)['errors']
+
+        self.assertEquals(len(errors), 1)
+        self.assertEquals(errors[0]['field'], 'email')
+        self.assertEquals(errors[0]['label'], 'already_in_use')
+        self.assertEquals(errors[0]['value'], 'le@email')
+        self.assertEquals(response.status_code, 422)
+        self.assertEquals(response.content_type, 'application/json')
+
+
 
     def test_json_input_is_sent_to_service_for_creation(self):
         data = { "arbitrary": "json that will be mocked out anyway" }

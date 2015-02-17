@@ -52,9 +52,18 @@ class SegueFieldError(SegueError):
         return self.__dict__
 
 class EmailAlreadyInUse(SegueFieldError):
+    code = 422
+
     FIELD = 'email'
     LABEL = 'already_in_use'
     MESSAGE = 'this e-mail address is already registered'
+
+    def __init__(self, email):
+        super(EmailAlreadyInUse, self).__init__()
+        self.value = email
+
+    def to_json(self):
+        return [ self.__dict__ ]
 
 class GenericFieldErrorRecognizer():
     def __init__(self, validator_name, failure_label):

@@ -8,7 +8,9 @@ class ProposalJsonSerializer(SQLAlchemyJsonSerializer):
 
 class ShortChildProposalJsonSerializer(ProposalJsonSerializer):
     _serializer_name = 'short_child'
-    _child_serializers = dict(owner='SafeAccountJsonSerializer', track='ShortTrackSerializer', invites='ShortInviteJsonSerializer')
+    _child_serializers = dict(owner='SafeAccountJsonSerializer',
+                              track='ShortTrackSerializer',
+                              invites='ShortInviteJsonSerializer')
 
 class InviteJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -18,7 +20,7 @@ class InviteJsonSerializer(SQLAlchemyJsonSerializer):
 class ShortInviteJsonSerializer(InviteJsonSerializer):
     _serializer_name = 'short'
     def hide_field(self, child):
-        return child not in ['name','recipient']
+        return child not in ['name','status']
     def serialize_child(self, child):
         return False;
 

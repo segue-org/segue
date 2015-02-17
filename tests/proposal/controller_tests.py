@@ -139,7 +139,7 @@ class InviteControllerTestCases(SegueApiTestCase):
         response = self.jget('/proposals/123/invites')
         items = json.loads(response.data)['items']
         self.assertEquals(len(items), 1)
-        self.assertEquals(items[0]['recipient'], mock_invite.recipient)
+        self.assertEquals(items[0]['name'], mock_invite.name)
 
         response = self.jget('/proposals/456/invites')
         self.assertEquals(response.status_code, 403)
