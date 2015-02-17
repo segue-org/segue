@@ -5,7 +5,7 @@ from ..errors import NotAuthorized
 
 import schema
 from factories import ProposalFactory, InviteFactory
-from models    import Proposal, ProposalInvite
+from models    import Proposal, ProposalInvite, Track
 
 class Hasher(object):
     def __init__(self, length=32):
@@ -45,6 +45,9 @@ class ProposalService(object):
     def check_ownership(self, proposal, alleged):
         if isinstance(proposal, int): proposal = self.get_one(proposal)
         return proposal and alleged and proposal.owner_id == alleged.id
+
+    def list_tracks(self):
+        return Track.query.all()
 
 class InviteService(object):
     def __init__(self, proposals=None, hasher=None):

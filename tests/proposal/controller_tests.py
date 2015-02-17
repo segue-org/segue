@@ -112,6 +112,18 @@ class ProposalControllerTestCases(SegueApiTestCase):
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0]['title'], prop1.title)
 
+    def test_list_tracks(self):
+        track1 = ValidTrackFactory.build()
+        track2 = ValidTrackFactory.build()
+        mockito.when(self.mock_service).list_tracks().thenReturn([track1, track2])
+
+        response = self.jget('/proposals/tracks')
+        items = json.loads(response.data)['items']
+
+        self.assertEquals(len(items), 2)
+        self.assertEquals(items[0]['name_en'], track1.name_en)
+        self.assertEquals(items[0]['name_en'], track1.name_en)
+
 class InviteControllerTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteControllerTestCases, self).setUp()

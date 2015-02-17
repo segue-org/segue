@@ -45,6 +45,10 @@ class ProposalController(object):
     def schema(self, name):
         return schema.whitelist[name], 200
 
+    @jsoned
+    def list_tracks(self):
+        return self.service.list_tracks()
+
 
 class ProposalInviteController(object):
     def __init__(self, service=None):

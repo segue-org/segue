@@ -65,6 +65,16 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(existing.id)
         self.assertNotEquals(retrieved.title, 'ma new title')
 
+    def test_list_tracks(self):
+        track1 = ValidTrackFactory.create()
+        track2 = ValidTrackFactory.create()
+
+        result = self.service.list_tracks()
+
+        self.assertEquals(len(result), 2)
+        self.assertEquals(result[0].name_en, track1.name_en)
+        self.assertEquals(result[1].name_en, track2.name_en)
+
 class InviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteServiceTestCases, self).setUp()

@@ -4,7 +4,7 @@ from factory import Sequence, LazyAttribute, SubFactory
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite
+from segue.models import Account, Proposal, ProposalInvite, Track
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
@@ -63,3 +63,10 @@ class ValidInviteFactory(SegueFactory):
     name      = _Sequence('Fulano {0}')
     status    = 'pending'
     hash      = _Sequence('DEAD{0:04x}')
+
+class ValidTrackFactory(SegueFactory):
+    class Meta:
+        model = Track
+    name_en = _Sequence('track {0}')
+    name_pt = _Sequence('track {0}')
+    public  = True

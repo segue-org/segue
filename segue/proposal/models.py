@@ -20,6 +20,7 @@ class Proposal(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     invites      = db.relationship("ProposalInvite", backref="proposal")
+    track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
 
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
@@ -37,5 +38,8 @@ class Track(JsonSerializable, db.Model):
     _serializers = [ TrackSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
-    name         = db.Column(db.Text)
-    public       = db.Column(db.Boolean)
+    name_pt      = db.Column(db.Text)
+    name_en      = db.Column(db.Text)
+    public       = db.Column(db.Boolean, default=True)
+
+    proposals    = db.relationship("Proposal", backref="track")
