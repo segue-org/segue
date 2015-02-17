@@ -1,3 +1,4 @@
+
 PROPOSAL_LEVELS = ['beginner','advanced']
 
 new_proposal = {
@@ -8,6 +9,7 @@ new_proposal = {
         "full":     { "type": "string", "minLength": 5, "maxLength": 2000 },
         "language": { "type": "string", "minLength": 2, "maxLenght": 2 },
         "level":    { "enum": PROPOSAL_LEVELS },
+        "track_id": { "type": "integer" },
     },
     "required": [ "title", "full", "language", "level" ]
 }

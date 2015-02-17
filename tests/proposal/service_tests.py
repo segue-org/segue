@@ -34,13 +34,17 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(retrieved, None)
 
     def test_modify_proposal_valid_owner(self):
+        track1 = ValidTrackFactory.create()
+        track2 = ValidTrackFactory.create()
         existing = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
+
 
         new_data = {}
         new_data['title']    = 'ma new title'
         new_data['full']     = 'ma new full'
         new_data['level']    = 'beginner'
         new_data['language'] = 'pt'
+        new_data['track_id'] = track2.id
         self.service.modify(existing.id, new_data, by=self.mock_owner)
 
         retrieved = self.service.get_one(existing.id)
@@ -48,6 +52,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(retrieved.full,     'ma new full')
         self.assertEquals(retrieved.level,    'beginner')
         self.assertEquals(retrieved.language, 'pt')
+        self.assertEquals(retrieved.track.id, track2.id)
 
         # changing owner is a special case, and can't be done by mass update
         self.assertEquals(retrieved.owner, existing.owner)

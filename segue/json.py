@@ -1,6 +1,8 @@
 from functools import wraps
 import flask
 
+import core
+
 def jsoned(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -49,6 +51,7 @@ class JsonSerializer(object):
     _serializer_name = 'default'
 
     def __init__(self, **overrides):
+        self.debug_mode = core.config.DEBUG or False
         self.serializer_overrides = overrides
 
     def hide_field(self, child):
@@ -106,7 +109,9 @@ class PropertyJsonSerializer(JsonSerializer):
                 result[key] = serializer.emit_json_for(value, **overrides)
             elif value and not hide_field:
                 result[key] = serializer.emit_json_for(value, **overrides)
-        result['$type'] = ".".join([target.__class__.__name__,self._serializer_name])
+        print self.__dict__
+        if self.debug_mode:
+            result['$type'] = ".".join([target.__class__.__name__,self._serializer_name])
 
         return result
 

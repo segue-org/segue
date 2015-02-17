@@ -35,7 +35,7 @@ class ProposalInvite(JsonSerializable, db.Model):
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
 
 class Track(JsonSerializable, db.Model):
-    _serializers = [ TrackSerializer ]
+    _serializers = [ TrackSerializer, ShortTrackSerializer ]
 
     id           = db.Column(db.Integer, primary_key=True)
     name_pt      = db.Column(db.Text)
