@@ -3,6 +3,10 @@ WSGIProcessGroup {{ app_name }}
 WSGIPythonHome {{ app_virtualenv }}
 WSGIScriptAlias /{{ app_name }} {{ app_path }}/handler.wsgi
 WSGIPassAuthorization On
+# touch handler.wsgi will refresh the application
+WSGIScriptReloading On
+# name of the WSGI application object
+WSGICallableObject backend
 
 <Directory {{ app_path }}>
   Require all granted
