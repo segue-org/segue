@@ -4,3 +4,4 @@ env
 *.pyc
 ansible/group_vars/production.yml
 handler.wsgi
+settings.py
