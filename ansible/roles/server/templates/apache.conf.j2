@@ -5,6 +5,5 @@ WSGIScriptAlias /{{ app_name }} {{ app_path }}/handler.wsgi
 WSGIPassAuthorization On
 
 <Directory {{ app_path }}>
-  Order allow,deny
-  Allow from All
+  Require all granted
 </Directory>

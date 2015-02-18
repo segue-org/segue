@@ -6,6 +6,7 @@
 - apt: pkg={{ item }}
        state=installed
   with_items:
+    - language-pack-en
     - apache2
     - libapache2-mod-wsgi
 
