@@ -1,7 +1,7 @@
  # -*- coding: latin-1 -*-
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite
 from tests.support.factories import *
+from segue.models import Account, Proposal, ProposalInvite, Track
 
 def populate(clean=False):
     if clean:
