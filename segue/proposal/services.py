@@ -77,7 +77,12 @@ class InviteService(object):
         db.session.add(invite)
         db.session.commit()
 
-        # TODO: send email
+        from segue.core import mail
+        from flask_mail import Message
+
+        msg = Message("Hello {0}".format(invite.proposal.title),
+                      recipients=[invite.recipient])
+        mailer.proposal_invite(invite)
 
         return invite
 

@@ -1,5 +1,6 @@
 import flask_sqlalchemy
 import flask_jwt
+import flask_mail
 
 
 def log(*args):
@@ -17,5 +18,6 @@ class Config():
 
 db = flask_sqlalchemy.SQLAlchemy()
 jwt = flask_jwt.JWT()
+mail = flask_mail.Mail()
 jwt_required = flask_jwt.jwt_required
 config = Config()

@@ -44,6 +44,7 @@ class Application(flask.Flask):
     def _init_deps(self):
         core.db.init_app(self)
         core.jwt.init_app(self)
+        core.mail.init_app(self)
         core.config.init_app(self)
 
     def _set_json_encoder(self):

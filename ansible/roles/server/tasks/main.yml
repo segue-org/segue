@@ -24,7 +24,7 @@
   tags: config
   notify: restart apache
 
-- template: src=settings.py.j2 dest={{ app_path }}/settings.py
+- template: src=settings.py.j2 dest={{ app_path }}/segue/settings.py
             owner=www-data
             mode=0755
   tags: config

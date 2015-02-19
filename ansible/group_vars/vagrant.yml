@@ -11,3 +11,7 @@ jwt_secret: sshh
 dbuser: segue
 dbname: segue
 dbpass: segue
+
+mail_server: localhost
+mail_port: 1025
+mail_sender: teste@softwarelivre.org

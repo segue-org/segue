@@ -5,3 +5,4 @@ env
 ansible/group_vars/production.yml
 handler.wsgi
 settings.py
+segue/settings.py
