@@ -1,3 +1,4 @@
+import logging, logging.handlers
 import flask
 from flask.ext.cors import CORS
 
@@ -14,13 +15,28 @@ class NullApplication(flask.Flask):
 class Application(flask.Flask):
     def __init__(self, settings_override=None):
         super(Application, self).__init__(__name__)
+        self._load_configs(settings_override)
+        self._set_logger()
         self._set_json_encoder()
         self._set_debug()
-        self._load_configs(settings_override)
         self._register_blueprints()
         self._register_error_handlers()
         self._init_deps()
         self._load_cors()
+
+    def _load_configs(self, settings_override):
+        self.config.from_object('segue.settings')
+        self.config.from_object(settings_override)
+
+    def _set_logger(self):
+        formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
+
+        handler = logging.handlers.RotatingFileHandler(self.config['LOGFILE'], maxBytes=100000, backupCount=5)
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(formatter)
+
+        self.logger.addHandler(handler)
+        self.logger.info('SEGUE HAS STARTED (well, at least we have a logger to speak of)');
 
     def _load_cors(self):
         self.cors = CORS(self)
@@ -29,10 +45,6 @@ class Application(flask.Flask):
         def handler(e):
             return flask.jsonify(dict(errors=e)), getattr(e, 'code', 400)
         self.errorhandler(errors.SegueError)(handler)
-
-    def _load_configs(self, settings_override):
-        self.config.from_object('segue.settings')
-        self.config.from_object(settings_override)
 
     def _set_debug(self):
         self.debug = True

@@ -1,6 +1,8 @@
 DEBUG = False
 TESTING = True
 
+LOGFILE="/tmp/segue-testing.log"
+
 SQLALCHEMY_POOL_SIZE = None
 SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None

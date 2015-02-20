@@ -8,6 +8,7 @@ SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None
 SQLALCHEMY_DATABASE_URI = 'postgresql://segue:segue@localhost/segue'
 
+LOGFILE = '/var/log/segue/segue.log'
 
 JWT_SECRET_KEY = 'sshh'
 JWT_DEFAULT_REALM = 'Login Required'

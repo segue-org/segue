@@ -13,6 +13,12 @@
 - service: name=apache2
            state=restarted
 
+
+- file: path=/var/log/segue/
+        owner=www-data
+        mode=0777
+        state=directory
+
 - template: src=handler.wsgi.j2
             dest={{ app_path }}/handler.wsgi
             owner=www-data
