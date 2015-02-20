@@ -1,1 +1,1 @@
-from service import MailerService
+from service import MailerService, Template

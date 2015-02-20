@@ -1,0 +1,31 @@
+---
+
+template: proposal_invite
+language: pt
+subject: "{proposal.owner.name} te convidou para o {event.short_name}"
+
+body: |
+
+    Olá {invitee.name}!
+
+    Você está sendo convidado por **{proposal.owner.name}** para
+    participar do **{event.full_name}** na condição de co-autor
+    da proposta de palestra descrita abaixo:
+
+    * título: **{proposal.title}**
+    * trilha: **{proposal.track.name}**
+    * língua: **{proposal.language}**
+
+    Para responder a este convite, por favor utilize o link
+    abaixo:
+
+    {settings.service_url}/api/proposal/{proposal.id}/invite/{invite.hash}
+
+    **Atenção**: a aceitação deste convite não garante participação
+    como palestrante no evento. Todas propostas de palestras serão
+    submetidas a avaliação por parte da comissão organizadora do
+    evento, em um processo de avaliação feito em colaboração com
+    a comunidade de ouvintes do evento. Somente após o término do
+    processo de avaliação os proponentes selecionados serão convocados
+    para apresentação.
+
