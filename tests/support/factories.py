@@ -58,7 +58,7 @@ class ValidProposalWithOwnerFactory(ValidProposalFactory):
 class ValidInviteFactory(SegueFactory):
     class Meta:
         model = ProposalInvite
-    proposal  = SubFactory(ValidProposalFactory)
+    proposal  = SubFactory(ValidProposalWithOwnerFactory)
     recipient = _Sequence('fulano{0}@example.com')
     name      = _Sequence('Fulano {0}')
     status    = 'pending'

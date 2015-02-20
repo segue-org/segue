@@ -2,6 +2,7 @@ import random
 
 from ..core import db
 from ..errors import NotAuthorized
+from ..mailer import MailerService
 
 import schema
 from factories import ProposalFactory, InviteFactory
@@ -50,9 +51,10 @@ class ProposalService(object):
         return Track.query.all()
 
 class InviteService(object):
-    def __init__(self, proposals=None, hasher=None):
+    def __init__(self, proposals=None, hasher=None, mailer=None):
         self.proposals = proposals or ProposalService()
         self.hasher    = hasher    or Hasher()
+        self.mailer    = mailer    or MailerService()
 
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
@@ -77,12 +79,7 @@ class InviteService(object):
         db.session.add(invite)
         db.session.commit()
 
-        from segue.core import mail
-        from flask_mail import Message
-
-        msg = Message("Hello {0}".format(invite.proposal.title),
-                      recipients=[invite.recipient])
-        mailer.proposal_invite(invite)
+        self.mailer.proposal_invite(invite)
 
         return invite
 
