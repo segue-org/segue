@@ -23,10 +23,10 @@ class Template(dict):
 
 class TemplateLoader(dict):
     def __init__(self):
-        print config.__dict__
+        base = os.path.dirname(__file__)
         templates = ['proposal/invite']
         for template in templates:
-            path = os.path.join(config.APP_PATH, 'mailer/templates', template)
+            path = os.path.join(base, 'templates', template + '.yml')
             self[template] = Template(**yaml.load(open(path)))
 
 class MailerService(object):

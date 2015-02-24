@@ -1,7 +1,5 @@
 import flask
 
-from core import log
-
 from proposal import ProposalController, ProposalInviteController
 from account import AccountController
 
