@@ -2,7 +2,7 @@ import sys
 import flask
 
 from flask import request
-from flask.ext.jwt import current_user
+from flask.ext.jwt import current_user, verify_jwt, JWTError
 
 from ..core import jwt_required, config
 from ..json import jsoned, accepts_html, JsonFor
@@ -85,6 +85,11 @@ class ProposalInviteController(object):
 
     @jsoned
     def accept(self, proposal_id, hash):
+        try:
+            verify_jwt()
+        except JWTError, e:
+            pass
+
         result = self.service.answer(hash, accepted=True, by=self.current_user) or flask.abort(404)
         return result, 200
 
