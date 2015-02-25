@@ -6,7 +6,7 @@ subject: "{proposal.owner.name} te convidou para o {event.short_name}"
 
 body: |
 
-    Olá {invitee.name}!
+    Olá {invite.name}!
 
     Você está sendo convidado por **{proposal.owner.name}** para
     participar do **{event.full_name}** na condição de co-autor

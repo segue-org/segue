@@ -7,6 +7,7 @@ from ..mailer import MailerService
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
+from ..account import AccountService
 
 class Hasher(object):
     def __init__(self, length=32):
@@ -51,10 +52,11 @@ class ProposalService(object):
         return Track.query.all()
 
 class InviteService(object):
-    def __init__(self, proposals=None, hasher=None, mailer=None):
+    def __init__(self, proposals=None, hasher=None, accounts = None, mailer=None):
         self.proposals = proposals or ProposalService()
         self.hasher    = hasher    or Hasher()
         self.mailer    = mailer    or MailerService()
+        self.accounts  = accounts  or AccountService()
 
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
@@ -83,9 +85,13 @@ class InviteService(object):
 
         return invite
 
-    def answer(self, hash, accepted=True):
+    def answer(self, hash, accepted=True, by=None):
         invite = self.get_by_hash(hash)
-        if not invite: return None
+        if not invite:
+            return None
+        if self.accounts.is_email_registered(invite.recipient):
+            if not by or by.email != invite.recipient:
+                raise NotAuthorized
 
         invite.status = 'accepted' if accepted else 'declined'
         db.session.add(invite)

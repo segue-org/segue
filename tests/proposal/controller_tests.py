@@ -169,12 +169,10 @@ class InviteControllerTestCases(SegueApiTestCase):
         response = self.jget('/proposals/123/invites/FFFFFF')
         self.assertEquals(response.status_code, 404)
 
-    def test_answering(self):
+    def test_decline(self):
         mock_invite = ValidInviteFactory.build(hash='123ABC')
         mockito.when(self.mock_service).answer('123ABC', accepted=False).thenReturn(mock_invite)
         mockito.when(self.mock_service).answer('FFFFFF', accepted=False).thenReturn(None)
-        mockito.when(self.mock_service).answer('123ABC', accepted=True).thenReturn(mock_invite)
-        mockito.when(self.mock_service).answer('FFFFFF', accepted=True).thenReturn(None)
 
         response = self.jpost('/proposals/123/invites/123ABC/decline')
         self.assertEquals(response.status_code, 200)
@@ -182,8 +180,40 @@ class InviteControllerTestCases(SegueApiTestCase):
         response = self.jpost('/proposals/123/invites/FFFFFF/decline')
         self.assertEquals(response.status_code, 404)
 
+    def test_accept_for_new_user(self):
+        self.unmock_jwt('proposal_invites')
+        mock_invite = ValidInviteFactory.build(hash='123ABC')
+
+        mockito.when(self.mock_service).answer('123ABC', accepted=True, by=None).thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=True, by=None).thenReturn(None)
+
         response = self.jpost('/proposals/123/invites/123ABC/accept')
         self.assertEquals(response.status_code, 200)
+
+        response = self.jpost('/proposals/123/invites/FFFFFF/accept')
+        self.assertEquals(response.status_code, 404)
+
+    def test_accept_for_existing_user_with_good_auth(self):
+        mock_invite = ValidInviteFactory.build(hash='123ABC')
+
+        mockito.when(self.mock_service).answer('123ABC', accepted=True, by=self.mock_owner).thenReturn(mock_invite)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=True, by=self.mock_owner).thenReturn(None)
+
+        response = self.jpost('/proposals/123/invites/123ABC/accept')
+        self.assertEquals(response.status_code, 200)
+
+        response = self.jpost('/proposals/123/invites/FFFFFF/accept')
+        self.assertEquals(response.status_code, 404)
+
+    def test_accept_for_existing_user_with_no_auth(self):
+        self.unmock_jwt('proposal_invites')
+        mock_invite = ValidInviteFactory.build(hash='123ABC')
+
+        mockito.when(self.mock_service).answer('123ABC', accepted=True, by=None).thenRaise(NotAuthorized)
+        mockito.when(self.mock_service).answer('FFFFFF', accepted=True, by=None).thenReturn(None)
+
+        response = self.jpost('/proposals/123/invites/123ABC/accept')
+        self.assertEquals(response.status_code, 403)
 
         response = self.jpost('/proposals/123/invites/FFFFFF/accept')
         self.assertEquals(response.status_code, 404)

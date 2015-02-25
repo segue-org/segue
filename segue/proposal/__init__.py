@@ -66,8 +66,8 @@ class ProposalInviteController(object):
     def get_by_hash(self, proposal_id, hash, wants_html=False):
         invite = self.service.get_by_hash(hash) or flask.abort(404)
         if wants_html:
-            frontend_url = config.FRONTEND_URL + '/#/invite/answer/' + hash
-            return flask.redirect(frontend_url)
+            path = '/#/proposal/{}/invite/{}/answer'.format(proposal_id, hash)
+            return flask.redirect(config.FRONTEND_URL + path)
         else:
             return invite, 200
 
@@ -79,19 +79,13 @@ class ProposalInviteController(object):
         return result, 200
 
     @jsoned
-    def accept(self, proposal_id, hash):
-        data = request.get_json()
-        self.service.accept(proposal_id, hash, data)
-        return {}, 200
-
-    @jsoned
     def decline(self, proposal_id, hash):
         result = self.service.answer(hash, accepted=False) or flask.abort(404)
         return result, 200
 
     @jsoned
     def accept(self, proposal_id, hash):
-        result = self.service.answer(hash, accepted=True) or flask.abort(404)
+        result = self.service.answer(hash, accepted=True, by=self.current_user) or flask.abort(404)
         return result, 200
 
     @jsoned

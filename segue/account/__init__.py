@@ -29,6 +29,9 @@ class AccountService(object):
         self.db     = db_impl or db
         self.signer = signer or Signer()
 
+    def is_email_registered(self, email):
+        return Account.query.filter(Account.email == email).count() > 0
+
     def get_one(self, id):
         return Account.query.get(id)
 

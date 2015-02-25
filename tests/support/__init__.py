@@ -31,6 +31,12 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.jwt.decode_handler(lambda token: returned_mock.to_json())
         segue.core.jwt.user_handler(lambda payload: returned_mock)
 
+    def unmock_jwt(self, blueprint):
+        setattr(self.app.blueprints[blueprint].controller, 'current_user', None)
+        segue.core.jwt.decode_handler(lambda token: None)
+        segue.core.jwt.user_handler(lambda payload: None)
+
+
     def create_from_factory(self, factory, *args, **kw):
         entity = factory.create(*args, **kw)
         segue.core.db.session.add(entity)

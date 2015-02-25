@@ -114,7 +114,7 @@ class InviteServiceTestCases(SegueApiTestCase):
 
         mockito.verify(self.mock_mailer).proposal_invite(invite)
 
-    def test_answer(self):
+    def test_answer_new_user(self):
         invite = self.create_from_factory(ValidInviteFactory)
 
         result = self.service.answer(invite.hash, accepted=True)
@@ -124,5 +124,20 @@ class InviteServiceTestCases(SegueApiTestCase):
         result = self.service.answer(invite.hash, accepted=False)
         retrieved = self.service.get_by_hash(invite.hash)
         self.assertEquals(retrieved.status, 'declined')
+
+    def test_answer_existing_user(self):
+        existing = self.create_from_factory(ValidAccountFactory)
+        other_user = self.create_from_factory(ValidAccountFactory)
+        invite = self.create_from_factory(ValidInviteFactory, recipient=existing.email)
+
+        with self.assertRaises(NotAuthorized):
+            result = self.service.answer(invite.hash, accepted=True, by=None)
+
+        with self.assertRaises(NotAuthorized):
+            result = self.service.answer(invite.hash, accepted=True, by=other_user)
+
+        result = self.service.answer(invite.hash, accepted=True, by=existing)
+        retrieved = self.service.get_by_hash(invite.hash)
+        self.assertEquals(retrieved.status, 'accepted')
 
 
