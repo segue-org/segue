@@ -7,6 +7,7 @@ user_home: /home/vagrant
 webhost: 192.168.33.90.xip.io
 port: 9001
 jwt_secret: sshh
+frontend_url: http://localhost:9000
 
 dbuser: segue
 dbname: segue

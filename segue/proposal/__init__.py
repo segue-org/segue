@@ -4,8 +4,8 @@ import flask
 from flask import request
 from flask.ext.jwt import current_user
 
-from ..core import jwt_required
-from ..json import jsoned, JsonFor
+from ..core import jwt_required, config
+from ..json import jsoned, accepts_html, JsonFor
 
 import schema
 from factories import ProposalFactory
@@ -62,9 +62,14 @@ class ProposalInviteController(object):
         return JsonFor(result).using('ShortInviteJsonSerializer'), 200
 
     @jsoned
-    def get_by_hash(self, proposal_id, hash):
+    @accepts_html
+    def get_by_hash(self, proposal_id, hash, wants_html=False):
         invite = self.service.get_by_hash(hash) or flask.abort(404)
-        return invite, 200
+        if wants_html:
+            frontend_url = config.FRONTEND_URL + '/#/invite/answer/' + hash
+            return flask.redirect(frontend_url)
+        else:
+            return invite, 200
 
     @jwt_required()
     @jsoned

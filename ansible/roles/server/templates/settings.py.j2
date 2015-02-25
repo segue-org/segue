@@ -12,6 +12,8 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://{{dbuser}}:{{dbpass}}@localhost/{{dbname
 
 LOGFILE = '/var/log/segue/segue.log'
 
+FRONTEND_URL = '{{ frontend_url }}'
+
 JWT_SECRET_KEY = '{{ jwt_secret }}'
 JWT_DEFAULT_REALM = 'Login Required'
 JWT_AUTH_URL_RULE = None
