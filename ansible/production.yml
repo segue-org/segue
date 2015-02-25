@@ -1,11 +1,11 @@
 ---
 
-- hosts: vagrant
+- hosts: production
   sudo: True
   roles:
     - accelerate
 
-- hosts: vagrant
+- hosts: production
   sudo: true
   accelerate: true
   roles:

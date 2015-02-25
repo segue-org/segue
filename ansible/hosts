@@ -1,5 +1,5 @@
 [production]
-api.fisl16.softwarelivre.org ansible_ssh_user=root
+segue-api.fisl16.softwarelivre.org ansible_ssh_user=segue
 
 [vagrant]
 192.168.33.91 user=vagrant
