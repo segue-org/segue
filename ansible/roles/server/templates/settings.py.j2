@@ -25,6 +25,7 @@ JWT_VERIFY_EXPIRATION =  True
 JWT_EXPIRATION_DELTA = timedelta(days=30)
 
 CORS_HEADERS = 'Content-Type,Authorization'
+CORS_ORIGIN  = '{{ cors_origin }}'
 
 MAIL_SERVER = '{{mail_server}}'
 MAIL_PORT   = {{ mail_port }}

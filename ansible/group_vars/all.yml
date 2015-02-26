@@ -11,3 +11,5 @@ port: 9001
 
 processes: 1
 threads: 15
+
+cors_origin: '*'
