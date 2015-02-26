@@ -2,14 +2,14 @@
 
 template: proposal_invite
 language: pt
-subject: "{proposal.owner.name} te convidou para o {event.short_name}"
+subject: "{proposal.owner.name} te convidou para o FISL16"
 
 body: |
 
     Olá {invite.name}!
 
     Você está sendo convidado por **{proposal.owner.name}** para
-    participar do **{event.full_name}** na condição de co-autor
+    participar do FISL 16 na condição de co-autor
     da proposta de palestra descrita abaixo:
 
     * título: **{proposal.title}**
@@ -19,7 +19,7 @@ body: |
     Para responder a este convite, por favor utilize o link
     abaixo:
 
-    {settings.service_url}/api/proposal/{proposal.id}/invite/{invite.hash}
+    http://segue-api.fisl16.softwarelivre.org/api/proposal/{proposal.id}/invite/{invite.hash}
 
     **Atenção**: a aceitação deste convite não garante participação
     como palestrante no evento. Todas propostas de palestras serão
