@@ -19,6 +19,13 @@
         mode=0777
         state=directory
 
+- file: path=/var/log/segue/segue.log
+        owner=www-data
+        mode=0777
+        state=touch
+
+- template: src=handler.wsgi.j2
+
 - template: src=handler.wsgi.j2
             dest={{ app_path }}/handler.wsgi
             owner=www-data

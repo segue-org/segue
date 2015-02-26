@@ -9,6 +9,8 @@ port: 9001
 jwt_secret: sshh
 frontend_url: http://localhost:9000
 
+debugging: True
+
 dbuser: segue
 dbname: segue
 dbpass: segue

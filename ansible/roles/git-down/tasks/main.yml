@@ -1,5 +1,8 @@
 ---
 
+- apt: pkg=git
+       state=installed
+
 - git: repo={{ git_repo }}
        dest={{ app_path }}
        version={{ git_branch }}
