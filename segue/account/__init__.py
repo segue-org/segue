@@ -6,7 +6,7 @@ from flask.ext.jwt import current_user, verify_jwt, JWTError
 from ..core import db, jwt_required
 from ..factory import Factory
 from ..json import jsoned
-from ..errors import InvalidLogin, EmailAlreadyInUse
+from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
 
 from jwt import Signer
 
@@ -27,7 +27,11 @@ class AccountFactory(Factory):
     
     @classmethod
     def clean_for_update(cls, data):
-        return cls.clean_for_insert(data);
+        update_whitelist = AccountFactory.UPDATE_WHITELIST[:]
+        update_whitelist.remove('email')
+        data = { c:v for c,v in data.items() if c in update_whitelist }
+        data['document'] = data.pop('cpf', None) or data.pop('passport', None)
+        return data;
 
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None):
@@ -42,12 +46,17 @@ class AccountService(object):
 
     def modify(self, account_id, data, by=None):
         account = self.get_one(account_id)
+        if not self.check_ownership(account, by): raise NotAuthorized
 
         for name, value in AccountFactory.clean_for_update(data).items():
             setattr(account, name, value)
         db.session.add(account)
         db.session.commit()
         return account
+
+    def check_ownership(self, account, alleged):
+        if isinstance(account, int): account = self.get_one(account)
+        return account and alleged and account.id == alleged.id
 
     def create(self, data):
         try:
