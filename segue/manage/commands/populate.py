@@ -1,4 +1,4 @@
- # -*- coding: latin-1 -*-
+ # -*- coding: utf-8 -*-
 from segue.core import db
 from tests.support.factories import *
 from segue.models import Account, Proposal, ProposalInvite, Track
@@ -37,84 +37,84 @@ def populate_reference_data(clean=False):
         Track.query.delete()
 
     tracks = [
-        #Zona AdministraÁ„o
-        ValidTrackFactory(name_pt=u'AdministraÁ„o - AdministraÁ„o de Sistemas',
-                          name_en=u'Administration - Systems Administration'),
+        #Zona Administra√ß√£o
+        ValidTrackFactory(name_pt='Administra√ß√£o - Administra√ß√£o de Sistemas',
+                          name_en='Administration - Systems Administration'),
         
-        ValidTrackFactory(name_pt=u'AdministraÁ„o - Bancos de Dados',
-                          name_en=u'Administration - Databases'),
+        ValidTrackFactory(name_pt='Administra√ß√£o - Bancos de Dados',
+                          name_en='Administration - Databases'),
         
-        ValidTrackFactory(name_pt=u'AdministraÁ„o - Sistemas operacionais',
-                          name_en=u'Administration - Operating Systems'),
+        ValidTrackFactory(name_pt='Administra√ß√£o - Sistemas operacionais',
+                          name_en='Administration - Operating Systems'),
         
-        ValidTrackFactory(name_pt=u'AdministraÁ„o - SeguranÁa',
-                          name_en=u'Administration - Security'),
+        ValidTrackFactory(name_pt='Administra√ß√£o - Seguran√ßa',
+                          name_en='Administration - Security'),
         
         #Zona Desenvolvimento
-        ValidTrackFactory(name_pt=u'Desenvolvimento - Ferramentas, Metodologias e Padrıes',
-                          name_en=u'Development - Tools, Methodologies and Standards'),
+        ValidTrackFactory(name_pt='Desenvolvimento - Ferramentas, Metodologias e Padr√µes',
+                          name_en='Development - Tools, Methodologies and Standards'),
         
-        ValidTrackFactory(name_pt=u'Desenvolvimento - GerÍncia de Conte˙do / CMS',
-                          name_en=u'Development - Content Management / CMS'),
+        ValidTrackFactory(name_pt='Desenvolvimento - Ger√™ncia de Conte√∫do / CMS',
+                          name_en='Development - Content Management / CMS'),
         
-        ValidTrackFactory(name_pt=u'Desenvolvimento - Linguagens de programaÁ„o',
-                          name_en=u'Development - Programming Languages'),
+        ValidTrackFactory(name_pt='Desenvolvimento - Linguagens de programa√ß√£o',
+                          name_en='Development - Programming Languages'),
         
         #Zona Desktop
-        ValidTrackFactory(name_pt=u'Desktop - AplicaÁıes Desktop',
-                          name_en=u'Desktop - Desktop Applications'),
+        ValidTrackFactory(name_pt='Desktop - Aplica√ß√µes Desktop',
+                          name_en='Desktop - Desktop Applications'),
         
-        ValidTrackFactory(name_pt=u'Desktop - MultimÌdia',
-                          name_en=u'Desktop - Multimedia'),
+        ValidTrackFactory(name_pt='Desktop - Multim√≠dia',
+                          name_en='Desktop - Multimedia'),
         
-        ValidTrackFactory(name_pt=u'Desktop - Jogos',
-                          name_en=u'Desktop - Games'),
+        ValidTrackFactory(name_pt='Desktop - Jogos',
+                          name_en='Desktop - Games'),
         
-        ValidTrackFactory(name_pt=u'Desktop - DistribuiÁıes',
-                          name_en=u'Desktop - Distros'),
+        ValidTrackFactory(name_pt='Desktop - Distribui√ß√µes',
+                          name_en='Desktop - Distros'),
         
         #Zona Ecossistema
-        ValidTrackFactory(name_pt=u'Ecossistema - Cultura, Filosofia, e PolÌtica',
-                          name_en=u'Ecosystem - Culture, Philosophy, and Politics'),
+        ValidTrackFactory(name_pt='Ecossistema - Cultura, Filosofia, e Pol√≠tica',
+                          name_en='Ecosystem - Culture, Philosophy, and Politics'),
         
-        ValidTrackFactory(name_pt=u'Ecossistema - NegÛcios, MigraÁıes e Casos',
-                          name_en=u'Ecosystem - Business, Migrations and Cases'),
+        ValidTrackFactory(name_pt='Ecossistema - Neg√≥cios, Migra√ß√µes e Casos',
+                          name_en='Ecosystem - Business, Migrations and Cases'),
         
-        #Zona EducaÁ„o
-        ValidTrackFactory(name_pt=u'EducaÁ„o - Inclus„o Digital',
-                          name_en=u'Education - Digital Inclusion'),
+        #Zona Educa√ß√£o
+        ValidTrackFactory(name_pt='Educa√ß√£o - Inclus√£o Digital',
+                          name_en='Education - Digital Inclusion'),
         
-        ValidTrackFactory(name_pt=u'EducaÁ„o - EducaÁ„o',
-                          name_en=u'Education - Education'),
+        ValidTrackFactory(name_pt='Educa√ß√£o - Educa√ß√£o',
+                          name_en='Education - Education'),
         
-        #Zona Encontros Comunit·rios
-        ValidTrackFactory(name_pt=u'Encontros Comunit·rios - Principal',
-                          name_en=u'Community Meetings - Main'),
+        #Zona Encontros Comunit√°rios
+        ValidTrackFactory(name_pt='Encontros Comunit√°rios - Principal',
+                          name_en='Community Meetings - Main'),
         
-        ValidTrackFactory(name_pt=u'Encontros Comunit·rios - ASL',
-                          name_en=u'Community Meetings - ASL'),
+        ValidTrackFactory(name_pt='Encontros Comunit√°rios - ASL',
+                          name_en='Community Meetings - ASL'),
         
-        ValidTrackFactory(name_pt=u'Encontros Comunit·rios - WSL',
-                          name_en=u'Community Meetings - WSL'),
+        ValidTrackFactory(name_pt='Encontros Comunit√°rios - WSL',
+                          name_en='Community Meetings - WSL'),
         
-        #Zona TÛpicos Emergentes
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - Hardware Aberto',
-                          name_en=u'Trending Topics - Open Hardware'),
+        #Zona T√≥picos Emergentes
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Hardware Aberto',
+                          name_en='Trending Topics - Open Hardware'),
         
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - Dados Abertos',
-                          name_en=u'Trending Topics - Open Data'),
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Dados Abertos',
+                          name_en='Trending Topics - Open Data'),
         
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - Acesso Aberto',
-                          name_en=u'Trending Topics - Open Access'),
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Acesso Aberto',
+                          name_en='Trending Topics - Open Access'),
         
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - GovernanÁa da Internet',
-                          name_en=u'Trending Topics - Internet Governance'),
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Governan√ßa da Internet',
+                          name_en='Trending Topics - Internet Governance'),
         
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - Privacidade e Vigil‚ncia',
-                          name_en=u'Trending Topics - Privacy and Surveillance'),
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Privacidade e Vigil√¢ncia',
+                          name_en='Trending Topics - Privacy and Surveillance'),
         
-        ValidTrackFactory(name_pt=u'TÛpicos Emergentes - Energia Livre',
-                          name_en=u'Trending Topics - Free Energy'),
+        ValidTrackFactory(name_pt='T√≥picos Emergentes - Energia Livre',
+                          name_en='Trending Topics - Free Energy'),
     ]
     db.session.add_all(tracks)
     db.session.commit()
