@@ -98,3 +98,13 @@ class InviteService(object):
         db.session.commit()
         return invite
 
+    def register(self, hash, account_data):
+        invite = self.get_by_hash(hash)
+        if not invite:
+            return None
+        if invite.recipient != account_data['email']:
+            return NotAuthorized
+
+        return self.accounts.create(account_data)
+
+

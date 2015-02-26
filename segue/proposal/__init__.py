@@ -94,7 +94,8 @@ class ProposalInviteController(object):
         return result, 200
 
     @jsoned
-    def register(self, proposal_id):
+    def register(self, proposal_id, hash):
+        data = request.get_json()
         result = self.service.register(hash, data) or flask.abort(404)
-        pass
+        return result, 200
 
