@@ -1,8 +1,9 @@
 from flask import request, url_for, redirect
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from flask.ext.jwt import current_user, verify_jwt, JWTError
 
-from ..core import db
+from ..core import db, jwt_required
 from ..factory import Factory
 from ..json import jsoned
 from ..errors import InvalidLogin, EmailAlreadyInUse
@@ -23,6 +24,10 @@ class AccountFactory(Factory):
         data = { c:v for c,v in data.items() if c in AccountFactory.UPDATE_WHITELIST }
         data['document'] = data.pop('cpf', None) or data.pop('passport', None)
         return data;
+    
+    @classmethod
+    def clean_for_update(cls, data):
+        return cls.clean_for_insert(data);
 
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None):
@@ -34,6 +39,15 @@ class AccountService(object):
 
     def get_one(self, id):
         return Account.query.get(id)
+
+    def modify(self, account_id, data, by=None):
+        account = self.get_one(account_id)
+
+        for name, value in AccountFactory.clean_for_update(data).items():
+            setattr(account, name, value)
+        db.session.add(account)
+        db.session.commit()
+        return account
 
     def create(self, data):
         try:
@@ -56,9 +70,22 @@ class AccountService(object):
 class AccountController(object):
     def __init__(self, service=None):
         self.service = service or AccountService()
+        self.current_user = current_user
+    
+    @jsoned
+    def get_one(self, account_id):
+        return self.service.get_one(account_id)
+        
+    @jwt_required()
+    @jsoned
+    def modify(self, account_id):
+        data = request.get_json()
+        result = self.service.modify(account_id, data, by=self.current_user) or flask.abort(404)
+        return result, 200
 
     @jsoned
     def schema(self, name):
+        print "schema: " + str(name)
         return schema.whitelist[name]
 
     @jsoned

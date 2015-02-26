@@ -19,7 +19,10 @@ signup = {
     },
     "required": ["email", "name", "password", "country", "city", "phone" ],
 }
+edit_account = signup.copy()
+edit_account['required'] = ["email", "name", "country", "city", "phone" ]
 
 whitelist = dict(
-    signup=signup
+  signup=signup,
+  edit_account=edit_account
 )
