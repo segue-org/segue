@@ -13,7 +13,7 @@ body: |
     da proposta de palestra descrita abaixo:
 
     * título: **{proposal.title}**
-    * trilha: **{proposal.track.name}**
+    * trilha: **{proposal.track.name_pt}**
     * língua: **{proposal.language}**
 
     Para responder a este convite, por favor utilize o link

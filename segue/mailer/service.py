@@ -36,6 +36,6 @@ class MailerService(object):
     def proposal_invite(self, invite):
         template = self.templates['proposal/invite']
         template.given(invite=invite, proposal=invite.proposal, owner=invite.proposal.owner)
-        template.to(invite.recipient)
+        template.to((invite.name, invite.recipient,))
 
         return mailer.send(template.build())
