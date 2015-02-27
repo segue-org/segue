@@ -24,7 +24,7 @@ class AccountFactory(Factory):
         data = { c:v for c,v in data.items() if c in AccountFactory.UPDATE_WHITELIST }
         data['document'] = data.pop('cpf', None) or data.pop('passport', None)
         return data;
-    
+
     @classmethod
     def clean_for_update(cls, data):
         update_whitelist = AccountFactory.UPDATE_WHITELIST[:]
@@ -41,7 +41,8 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
-    def get_one(self, id):
+    def get_one(self, id, by=None):
+        if not self.check_ownership(account, by): raise NotAuthorized
         return Account.query.get(id)
 
     def modify(self, account_id, data, by=None):
@@ -80,11 +81,13 @@ class AccountController(object):
     def __init__(self, service=None):
         self.service = service or AccountService()
         self.current_user = current_user
-    
+
+    @jwt_required()
     @jsoned
     def get_one(self, account_id):
-        return self.service.get_one(account_id)
-        
+        result = self.service.get_one(account_id, by=self.current_user) or flask.abort(404)
+        return result, 200
+
     @jwt_required()
     @jsoned
     def modify(self, account_id):
