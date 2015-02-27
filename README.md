@@ -1,15 +1,17 @@
 installing
 ==========
-
+```
   local$ pip install ansible==1.8.1
   local$ git clone http://github.com/segue-org/segue
   local$ cd segue
   local$ vagrant up
+```
 
 In case the provisioner fails with a weird ssh message, just try again
 with. There seems to be a weird timing issue with ansible and vagrant
 on the first try.
 
+```
   local$ vagrant provision
 
   local$ vagrant ssh
@@ -19,6 +21,7 @@ on the first try.
   vagrant> nosetests .
   vagrant> python manage.py db upgrade
   vagrant> python manage.py populate_reference_data
+```
 
 At this point, the API should be up and running at http://192.168.33.91/api.
 A good health check is to hit /api/proposal/tracks.
