@@ -1,13 +1,13 @@
 ---
 
-- hosts: production
-  sudo: True
-  roles:
-    - accelerate
+#- hosts: production
+#  sudo: True
+#  roles:
+#    - accelerate
 
 - hosts: production
   sudo: true
-  accelerate: true
+#  accelerate: true
   roles:
     - server
     - git-down
