@@ -12,7 +12,7 @@ class Template(dict):
     def given(self, **kw):
         self.update(**kw)
 
-    def to(self, *recipients):
+    def to(self, recipients):
         self.recipients.append(recipients)
 
     def build(self):
