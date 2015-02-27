@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -15,6 +15,9 @@ class AccountControllerTestCases(SegueApiTestCase):
         super(AccountControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('accounts', 'service')
         self.mock_controller_dep('sessions', 'service', self.mock_service)
+        self.mock_owner = self.mock_controller_dep('proposals', 'current_user', ValidAccountFactory.create())
+
+        self.mock_jwt(self.mock_owner)
 
     def _build_validation_error(self):
         error_1 = hashie(validator='minLength', relative_path=['xonga']);
@@ -49,7 +52,6 @@ class AccountControllerTestCases(SegueApiTestCase):
         self.assertEquals(errors[0]['value'], 'le@email')
         self.assertEquals(response.status_code, 422)
         self.assertEquals(response.content_type, 'application/json')
-
 
 
     def test_json_input_is_sent_to_service_for_creation(self):
@@ -98,4 +100,21 @@ class AccountControllerTestCases(SegueApiTestCase):
 
         self.assertEquals(content['email'], mock_account.email)
 
+    def test_get_one_account_valid_owner(self):
+        mock_account = ValidAccountFactory.build()
+        mockito.when(self.mock_service).get_one(123, by=self.mock_owner).thenReturn(mock_account)
 
+        response = self.jget('/accounts/123')
+        content = json.loads(response.data)['resource']
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(content['email'], mock_account.email)
+
+    def test_get_one_account_invalid_owner(self):
+        other_owner = ValidAccountFactory.build()
+        self.mock_jwt(other_owner)
+        mockito.when(self.mock_service).get_one(456, by=other_owner).thenRaise(NotAuthorized)
+
+        response = self.jget('/accounts/456')
+
+        self.assertEquals(response.status_code, 403)

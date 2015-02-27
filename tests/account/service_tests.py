@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -26,9 +26,15 @@ class AccountServiceTestCases(SegueApiTestCase):
         account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
 
         saved = self.service.create(account)
-        retrieved = self.service.get_one(saved.id)
+        unchecked_retrieval = self.service.get_one(saved.id, check_owner=False)
 
-        self.assertEquals(saved, retrieved)
+        checked_retrieval = self.service.get_one(saved.id, by=unchecked_retrieval)
+
+        self.assertEquals(saved, unchecked_retrieval)
+        self.assertEquals(saved, checked_retrieval)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.get_one(saved.id)
 
     def test_creation_of_duplicated_account(self):
         existing = ValidAccountFactory.create()

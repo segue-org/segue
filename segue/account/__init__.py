@@ -41,8 +41,12 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
-    def get_one(self, id, by=None):
-        if not self.check_ownership(account, by): raise NotAuthorized
+    def get_one(self, id, by=None, check_owner=True):
+        account = self._get_account(id)
+        if check_owner and not self.check_ownership(account, by): raise NotAuthorized
+        return account
+
+    def _get_account(self, id):
         return Account.query.get(id)
 
     def modify(self, account_id, data, by=None):
@@ -56,7 +60,7 @@ class AccountService(object):
         return account
 
     def check_ownership(self, account, alleged):
-        if isinstance(account, int): account = self.get_one(account)
+        if isinstance(account, int): account = self._get_account(id)
         return account and alleged and account.id == alleged.id
 
     def create(self, data):

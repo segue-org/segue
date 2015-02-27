@@ -9,7 +9,7 @@ local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
 def load_user(payload):
     from ..account import AccountService
     if payload["id"]:
-        return AccountService().get_one(payload["id"])
+        return AccountService().get_one(payload["id"], check_owner=False)
 
 class Signer(object):
     def __init__(self, jwt=local_jwt, serializer=None):
