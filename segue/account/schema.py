@@ -14,7 +14,7 @@ signup = {
         "city":         { "type": "string", "minLength": 5,  "maxLength": 30 },
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
         "organization": { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "resume":       { "type": "string", "minLength": 5,  "maxLength": 200 },
+        "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
         "role":         { "enum": ACCOUNT_ROLES }
     },
     "required": ["email", "name", "password", "country", "city", "phone" ],
