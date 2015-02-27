@@ -13,7 +13,7 @@ class Template(dict):
         self.update(**kw)
 
     def to(self, recipients):
-        self.recipients.append(recipients)
+        self.recipients = recipients
 
     def build(self):
         subject = self.template_data['subject'].format(**self)
