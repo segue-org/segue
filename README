@@ -1,8 +1,0 @@
-$ git clone github.com/segue-org/segue
-$ cd segue
-$ virtualenv env
-$ source env/bin/activate
-$ pip install -r requirements.txt
-$ python manage.py db upgrade
-$ nosetests
-$ python runserver.py
