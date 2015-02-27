@@ -13,3 +13,4 @@ processes: 1
 threads: 15
 
 cors_origin: '*'
+mail_use_tls: False
