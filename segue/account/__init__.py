@@ -50,7 +50,7 @@ class AccountService(object):
         return Account.query.get(id)
 
     def modify(self, account_id, data, by=None):
-        account = self.get_one(account_id)
+        account = self._get_account(account_id)
         if not self.check_ownership(account, by): raise NotAuthorized
 
         for name, value in AccountFactory.clean_for_update(data).items():

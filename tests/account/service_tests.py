@@ -36,6 +36,21 @@ class AccountServiceTestCases(SegueApiTestCase):
         with self.assertRaises(NotAuthorized):
             self.service.get_one(saved.id)
 
+    def test_modify(self):
+        account = self.create_from_factory(ValidAccountFactory)
+        other_account = self.create_from_factory(ValidAccountFactory)
+
+        new_data = account.to_json()
+        new_data['resume'] = 'a big hueon'
+
+        self.service.modify(account.id, new_data, by=account)
+        retrieved = self.service.get_one(account.id, by=account)
+
+        self.assertEquals(retrieved.resume, 'a big hueon')
+
+        with self.assertRaises(NotAuthorized):
+            self.service.modify(account.id, new_data, by=other_account)
+
     def test_creation_of_duplicated_account(self):
         existing = ValidAccountFactory.create()
         new_one = ValidAccountFactory.build(email=existing.email).to_json(all_fields=True)
