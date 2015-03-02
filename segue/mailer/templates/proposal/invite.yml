@@ -19,7 +19,7 @@ body: |
     Para responder a este convite, por favor utilize o link
     abaixo:
 
-    http://segue-api.fisl16.softwarelivre.org/api/proposals/{proposal.id}/invites/{invite.hash}
+    {backend_url}/api/proposals/{proposal.id}/invites/{invite.hash}
 
     **Atenção**: a aceitação deste convite não garante participação
     como palestrante no evento. Todas propostas de palestras serão
@@ -29,3 +29,7 @@ body: |
     processo de avaliação os proponentes selecionados serão convocados
     para apresentação.
 
+    Atenciosamente,
+
+    --
+    Associação Software Livre.Org

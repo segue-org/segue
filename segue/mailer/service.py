@@ -1,41 +1,49 @@
 import yaml
 import os.path
+import glob
 
 from segue.core import mailer, config
 from flask_mail import Message
 
-class Template(dict):
-    def __init__(self, **template_data):
-        self.template_data = template_data
-        self.recipients = [];
+class TemplatedMessage(object):
+    def __init__(self, template):
+        self.template = template
+        self.variables = { 'backend_url': config.BACKEND_URL, 'frontend_url': config.FRONTEND_URL }
+        self.recipients = []
 
-    def given(self, **kw):
-        self.update(**kw)
+    def given(self, **args):
+        self.variables.update(**args)
 
-    def to(self, recipients):
-        self.recipients = recipients
+    def to(self, name, email):
+        self.recipients.append((name, email,))
 
     def build(self):
-        subject = self.template_data['subject'].format(**self)
-        body    = self.template_data['body'].format(**self)
+        subject = self.template['subject'].format(**self.variables)
+        body    = self.template['body'].format(**self.variables)
 
         return Message(subject, body=body, recipients=self.recipients)
 
-class TemplateLoader(dict):
+class MessageFactory(object):
     def __init__(self):
-        base = os.path.dirname(__file__)
-        templates = ['proposal/invite']
-        for template in templates:
-            path = os.path.join(base, 'templates', template + '.yml')
-            self[template] = Template(**yaml.load(open(path)))
+        base = os.path.join(os.path.dirname(__file__), 'templates')
+        pattern = os.path.join(base, '**', '*.yml')
+
+        self._templates = {}
+        for template_path in glob.glob(pattern):
+            template_name = template_path.replace(base, '').replace('.yml','')[1:]
+            self._templates[template_name] = yaml.load(open(template_path))
+
+    def from_template(self, template_name):
+        return TemplatedMessage(self._templates[template_name])
+
 
 class MailerService(object):
-    def __init__(self, templates=None):
-        self.templates = templates or TemplateLoader()
+    def __init__(self, templates=None, message_factory=None):
+        self.message_factory = message_factory or MessageFactory()
 
     def proposal_invite(self, invite):
-        template = self.templates['proposal/invite']
-        template.given(invite=invite, proposal=invite.proposal, owner=invite.proposal.owner)
-        template.to((invite.name, invite.recipient,))
+        message = self.message_factory.from_template('proposal/invite')
+        message.given(invite=invite, proposal=invite.proposal, owner=invite.proposal.owner)
+        message.to(invite.name, invite.recipient)
 
-        return mailer.send(template.build())
+        return mailer.send(message.build())

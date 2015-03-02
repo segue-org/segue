@@ -4,10 +4,10 @@ app_path: /opt/segue
 virtualenvs: /home/vagrant/.venv/
 app_virtualenv: /home/vagrant/.venv/segue
 user_home: /home/vagrant
-webhost: 192.168.33.90.xip.io
-port: 9001
 jwt_secret: sshh
+
 frontend_url: http://localhost:9000
+backend_url: http://192.168.33.91:9001
 
 debugging: True
 
@@ -18,5 +18,5 @@ dbpass: segue
 mail_server: localhost
 mail_port: 1025
 mail_sender: teste@softwarelivre.org
-mail_user: 'user'
-mail_pass: 'pass'
+mail_user: ""
+mail_pass: ""
