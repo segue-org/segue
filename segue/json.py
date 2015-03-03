@@ -1,6 +1,7 @@
 from werkzeug.wrappers import Response
 from functools import wraps
 import flask
+import decimal
 
 import core
 
@@ -34,6 +35,8 @@ def jsoned(f):
 
 class JSONEncoder(flask.json.JSONEncoder):
     def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            return "{0:0.2f}".format(obj)
         if isinstance(obj, JsonSerializable):
             return obj.serialize()
         return super(JSONEncoder, self).default(obj)

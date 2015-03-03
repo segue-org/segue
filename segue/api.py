@@ -2,6 +2,7 @@ import flask
 
 from proposal import ProposalController, ProposalInviteController
 from account import AccountController
+from product import ProductController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -35,6 +36,13 @@ class AccountBlueprint(flask.Blueprint):
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:account_id>/proposals', methods=['GET'], view_func=self.controller.list_proposals)
 
+class ProductBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(ProductBlueprint, self).__init__('products', __name__, url_prefix='/products')
+        self.controller = ProductController()
+        self.add_url_rule('',                      methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:id>/purchase',    methods=['POST'], view_func=self.controller.purchase)
+
 class SessionBlueprint(flask.Blueprint):
     def __init__(self):
         super(SessionBlueprint, self).__init__('sessions', __name__, url_prefix='/sessions')
@@ -47,5 +55,6 @@ blueprints = [
     ProposalBlueprint(),
     ProposalInviteBluePrint(),
     AccountBlueprint(),
+    ProductBlueprint(),
     SessionBlueprint()
 ]

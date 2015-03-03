@@ -101,7 +101,6 @@ class AccountController(object):
 
     @jsoned
     def schema(self, name):
-        print "schema: " + str(name)
         return schema.whitelist[name]
 
     @jsoned

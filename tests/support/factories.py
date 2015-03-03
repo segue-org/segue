@@ -1,10 +1,13 @@
+import datetime
+
 import factory
 
 from factory import Sequence, LazyAttribute, SubFactory
+from factory.fuzzy import FuzzyChoice, FuzzyNaiveDateTime, FuzzyDecimal
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite, Track
+from segue.models import Account, Proposal, ProposalInvite, Track, Product
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
@@ -74,4 +77,13 @@ class ValidInviteFactory(SegueFactory):
     name      = _Sequence('Fulano {0}')
     status    = 'pending'
     hash      = _Sequence('DEAD{0:04x}')
+
+class ValidProductFactory(SegueFactory):
+    class Meta:
+        model = Product
+    kind       = FuzzyChoice(["ticket","swag"])
+    category   = FuzzyChoice(["student","normal"])
+    expiration = FuzzyNaiveDateTime(datetime.datetime.now(), datetime.datetime(2015,12,1,0,0,0))
+    public     = True
+    price      = FuzzyDecimal(70, 400, 2)
 
