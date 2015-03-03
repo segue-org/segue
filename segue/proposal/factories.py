@@ -5,7 +5,7 @@ from models import Proposal, ProposalInvite
 class ProposalFactory(Factory):
     model = Proposal
 
-    QUERY_WHITELIST = ('owner_id',)
+    QUERY_WHITELIST = ('owner_id', 'coauthor_id')
     UPDATE_WHITELIST = schema.edit_proposal["properties"].keys()
 
     @classmethod

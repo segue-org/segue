@@ -50,6 +50,9 @@ class ProposalService(object):
 
     def list_tracks(self):
         return Track.query.all()
+    
+    def by_coauthor(self, coauthor_id):
+        return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
 
 class InviteService(object):
     def __init__(self, proposals=None, hasher=None, accounts = None, mailer=None):

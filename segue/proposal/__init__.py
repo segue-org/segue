@@ -37,8 +37,11 @@ class ProposalController(object):
     @jsoned
     def list(self):
         parms = { c: request.args.get(c) for c in ProposalFactory.QUERY_WHITELIST if c in request.args }
-
-        result = self.service.query(**parms)
+        
+        if 'coauthor_id' in parms:
+            result = self.service.by_coauthor(parms['coauthor_id'])
+        else:
+            result = self.service.query(**parms)
         return JsonFor(result).using('ShortChildProposalJsonSerializer'), 200
 
     @jsoned

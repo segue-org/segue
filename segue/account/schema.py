@@ -1,5 +1,5 @@
 ACCOUNT_ROLES = [ "user","operator","admin" ]
-CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}.?\d{2}$"
+CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 
 signup = {
     "$schema": "http://json-schema.org/draft-04/schema#",
