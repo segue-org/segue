@@ -80,6 +80,31 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(result[0].name_en, track1.name_en)
         self.assertEquals(result[1].name_en, track2.name_en)
 
+    def test_query_proposals_by_owner(self):
+        owner = self.create_from_factory(ValidAccountFactory)
+        proposal1 = self.create_from_factory(ValidProposalFactory, owner=owner)
+        proposal2 = self.create_from_factory(ValidProposalWithOwnerFactory)
+
+        result = self.service.query(owner_id = owner.id)
+
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0].id, proposal1.id)
+
+    def test_query_proposals_by_coauthor(self):
+        account1 = self.create_from_factory(ValidAccountFactory)
+
+        proposal1 = self.create_from_factory(ValidProposalFactory)
+        proposal2 = self.create_from_factory(ValidProposalFactory)
+        proposal3 = self.create_from_factory(ValidProposalFactory)
+
+        invite1 = self.create_from_factory(ValidInviteFactory, proposal=proposal1, recipient=account1.email)
+        invite2 = self.create_from_factory(ValidInviteFactory, proposal=proposal2)
+
+        result = self.service.query(coauthor_id = account1.id)
+
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0].id, proposal1.id)
+
 class InviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteServiceTestCases, self).setUp()

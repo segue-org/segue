@@ -1,4 +1,5 @@
 import random
+from sqlalchemy import and_
 
 from ..core import db
 from ..errors import NotAuthorized
@@ -7,7 +8,7 @@ from ..mailer import MailerService
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
-from ..account import AccountService
+from ..account import AccountService, Account
 
 class Hasher(object):
     def __init__(self, length=32):
@@ -17,9 +18,24 @@ class Hasher(object):
         value = random.getrandbits(self.length * 4)
         return "{0:0{1}X}".format(value, self.length)
 
+class ProposalFilterStrategies(object):
+    def given(self, **criteria):
+        result = []
+        for key, value in criteria.items():
+            method = getattr(self, "by_"+key)
+            result.append(method(value))
+        return result
+
+    def by_owner_id(self, value):
+        return Proposal.owner_id == value
+
+    def by_coauthor_id(self, value):
+        return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
+
 class ProposalService(object):
     def __init__(self, db_impl=None):
         self.db = db_impl or db
+        self.filter_strategies = ProposalFilterStrategies()
 
     def create(self, data, owner):
         proposal = ProposalFactory.from_json(data, schema.new_proposal)
@@ -32,7 +48,9 @@ class ProposalService(object):
         return Proposal.query.get(proposal_id)
 
     def query(self, **kw):
-        return Proposal.query.filter_by(**kw).all()
+        filter_list = self.filter_strategies.given(**kw)
+
+        return Proposal.query.filter(*filter_list).all()
 
     def modify(self, proposal_id, data, by=None):
         proposal = self.get_one(proposal_id)
@@ -50,7 +68,7 @@ class ProposalService(object):
 
     def list_tracks(self):
         return Track.query.all()
-    
+
     def by_coauthor(self, coauthor_id):
         return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
 
