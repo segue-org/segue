@@ -40,9 +40,9 @@ class ProductBlueprint(flask.Blueprint):
     def __init__(self):
         super(ProductBlueprint, self).__init__('products', __name__, url_prefix='/products')
         self.controller = ProductController()
-        self.add_url_rule('',                      methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:id>/purchase',    methods=['POST'], view_func=self.controller.purchase)
-        self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
+        self.add_url_rule('',                           methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:product_id>/purchase', methods=['POST'], view_func=self.controller.purchase)
+        self.add_url_rule('/<string:name>.schema',      methods=['GET'],  view_func=self.controller.schema)
 
 class SessionBlueprint(flask.Blueprint):
     def __init__(self):

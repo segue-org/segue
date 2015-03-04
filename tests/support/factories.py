@@ -7,7 +7,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyNaiveDateTime, FuzzyDecimal
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite, Track, Product
+from segue.models import Account, Proposal, ProposalInvite, Track, Product, Purchase
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
@@ -87,3 +87,28 @@ class ValidProductFactory(SegueFactory):
     public     = True
     price      = FuzzyDecimal(70, 400, 2)
 
+class ValidPurchaseByPersonFactory(SegueFactory):
+    class Meta:
+        model = Purchase
+
+    product_id     = SubFactory(ValidProductFactory)
+    customer_id    = SubFactory(ValidAccountFactory)
+    status         = "pending"
+    buyer_type     = 'person'
+    buyer_name     = _Sequence("Pagador {0}")
+    buyer_document = _Sequence("123.345.789-{0:02}")
+    buyer_contact  = _Sequence("+55 23 4567-{0:04}")
+    buyer_address  = _Sequence("Rua dos Bobos, numero {0}")
+
+class ValidPurchaseByCorpFactory(SegueFactory):
+    class Meta:
+        model = Purchase
+
+    product_id     = SubFactory(ValidProductFactory)
+    customer_id    = SubFactory(ValidAccountFactory)
+    status         = "pending"
+    buyer_type     = 'company'
+    buyer_name     = _Sequence("Empresa {0}")
+    buyer_document = _Sequence("12.345.789/0001-{0:02}")
+    buyer_contact  = _Sequence("+55 23 4000-{0:04}")
+    buyer_address  = _Sequence("Av. dos Bobos, numero {0}")

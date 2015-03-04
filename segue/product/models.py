@@ -17,7 +17,11 @@ class Product(JsonSerializable, db.Model):
     public     = db.Column(db.Boolean, default=True)
     price      = db.Column(db.Numeric)
 
+class PurchaseJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'
+
 class Purchase(JsonSerializable, db.Model):
+    _serializers = [ PurchaseJsonSerializer ]
     id             = db.Column(db.Integer, primary_key=True)
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     customer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
