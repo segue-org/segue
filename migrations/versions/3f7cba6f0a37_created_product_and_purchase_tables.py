@@ -12,6 +12,7 @@ down_revision = '16b1659c8e'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import ENUM
 
 
 def upgrade():
@@ -30,6 +31,11 @@ def upgrade():
         sa.Column('product_id', sa.Integer(), nullable=True),
         sa.Column('customer_id', sa.Integer(), nullable=True),
         sa.Column('status', sa.Text(), nullable=True),
+        sa.Column('buyer_type', sa.Enum('person', 'company', 'government', name="buyer_types"), nullable=False),
+        sa.Column('buyer_name', sa.Text(), nullable=False),
+        sa.Column('buyer_document', sa.Text(), nullable=False),
+        sa.Column('buyer_contact', sa.Text(), nullable=False),
+        sa.Column('buyer_address', sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(['customer_id'], ['account.id'], ),
         sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
         sa.PrimaryKeyConstraint('id')
@@ -42,4 +48,5 @@ def downgrade():
     op.drop_table('purchase')
     op.drop_table('product')
     ENUM(name="product_kinds").drop(op.get_bind(), checkfirst=False)
+    ENUM(name="buyer_types").drop(op.get_bind(), checkfirst=False)
     ### end Alembic commands ###

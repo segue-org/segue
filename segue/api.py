@@ -42,6 +42,7 @@ class ProductBlueprint(flask.Blueprint):
         self.controller = ProductController()
         self.add_url_rule('',                      methods=['GET'],  view_func=self.controller.list)
         self.add_url_rule('/<int:id>/purchase',    methods=['POST'], view_func=self.controller.purchase)
+        self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
 class SessionBlueprint(flask.Blueprint):
     def __init__(self):
