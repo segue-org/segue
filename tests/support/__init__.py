@@ -43,6 +43,9 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.db.session.commit()
         return entity
 
+    def build_from_factory(self, factory, *args, **kw):
+        return factory.build(*args, **kw)
+
     def jput(self, *args, **kw):
         return self.jrequest(self.client.put, *args, **kw)
 

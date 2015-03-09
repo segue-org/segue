@@ -7,7 +7,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyNaiveDateTime, FuzzyDecimal
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite, Track, Product, Purchase
+from segue.models import Account, Proposal, ProposalInvite, Track, Product, Purchase, Buyer
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
@@ -45,8 +45,6 @@ class InvalidAccountFactory(ValidAccountFactory):
     role     = "luser"
     password = "p"
 
-
-
 class ValidProposalFactory(SegueFactory):
     class Meta:
         model = Proposal
@@ -83,32 +81,43 @@ class ValidProductFactory(SegueFactory):
         model = Product
     kind       = FuzzyChoice(["ticket","swag"])
     category   = FuzzyChoice(["student","normal"])
-    expiration = FuzzyNaiveDateTime(datetime.datetime.now(), datetime.datetime(2015,12,1,0,0,0))
+    sold_until = FuzzyNaiveDateTime(datetime.datetime.now(), datetime.datetime(2015,12,1,0,0,0))
     public     = True
     price      = FuzzyDecimal(70, 400, 2)
 
-class ValidPurchaseByPersonFactory(SegueFactory):
+
+class ValidBuyerFactory(SegueFactory):
+    class Meta:
+        model = Buyer
+
+    address_street  = "Rua dos Bobos"
+    address_number  = _Sequence("#{0}")
+    address_extra   = _Sequence("apto #{0}")
+    address_zipcode = _Sequence("90909-#{0:03}")
+    address_city    = "Porto Alegre"
+    address_country = "Brasil"
+
+class ValidBuyerCompanyFactory(ValidBuyerFactory):
+    kind     = "company"
+    name     = _Sequence("Empresa {0}")
+    document = _Sequence("12.345.789/0001-{0:02}")
+    contact  = _Sequence("+55 23 4000-{0:04}")
+
+class ValidBuyerPersonFactory(ValidBuyerFactory):
+    kind     = 'person'
+    name     = _Sequence("Pagador {0}")
+    document = _Sequence("123.345.789-{0:02}")
+    contact  = _Sequence("+55 23 4567-{0:04}")
+
+class ValidPurchaseFactory(SegueFactory):
     class Meta:
         model = Purchase
-
     product_id     = SubFactory(ValidProductFactory)
     customer_id    = SubFactory(ValidAccountFactory)
     status         = "pending"
-    buyer_type     = 'person'
-    buyer_name     = _Sequence("Pagador {0}")
-    buyer_document = _Sequence("123.345.789-{0:02}")
-    buyer_contact  = _Sequence("+55 23 4567-{0:04}")
-    buyer_address  = _Sequence("Rua dos Bobos, numero {0}")
+
+class ValidPurchaseByPersonFactory(ValidPurchaseFactory):
+    buyer_id       = SubFactory(ValidBuyerPersonFactory)
 
 class ValidPurchaseByCorpFactory(SegueFactory):
-    class Meta:
-        model = Purchase
-
-    product_id     = SubFactory(ValidProductFactory)
-    customer_id    = SubFactory(ValidAccountFactory)
-    status         = "pending"
-    buyer_type     = 'company'
-    buyer_name     = _Sequence("Empresa {0}")
-    buyer_document = _Sequence("12.345.789/0001-{0:02}")
-    buyer_contact  = _Sequence("+55 23 4000-{0:04}")
-    buyer_address  = _Sequence("Av. dos Bobos, numero {0}")
+    buyer_id       = SubFactory(ValidBuyerCompanyFactory)

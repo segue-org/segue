@@ -46,8 +46,8 @@ def populate_reference_data(clean=False):
 
 def _build_products():
     return [
-        ValidProductFactory(kind="ticket", category="student", expiration="2015-03-25 23:59:59",  price=70),
-        ValidProductFactory(kind="ticket", category="normal",  expiration="2015-03-25 23:59:59", price=140),
+        ValidProductFactory(kind="ticket", category="student", sold_until="2015-03-25 23:59:59",  price=70),
+        ValidProductFactory(kind="ticket", category="normal",  sold_until="2015-03-25 23:59:59", price=140),
     ]
 
 def _build_tracks():

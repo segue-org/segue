@@ -14,6 +14,7 @@ class Factory(object):
         errors = list(validator.iter_errors(data))
         cleaned_data = cls.clean_for_insert(data)
         if errors:
+            print errors
             raise SegueValidationError(errors)
         return cls.model(**cleaned_data)
 

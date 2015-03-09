@@ -1,19 +1,17 @@
 from flask import request, url_for, redirect
 from flask.ext.jwt import current_user
-from models import Product, Purchase
 
 from ..core import db, jwt_required
 from ..factory import Factory
 from ..json import jsoned, JsonFor
 
+from models import Product
 import schema
 
-class PurchaseFactory(Factory):
-    model = Purchase
-
 class ProductService(object):
-    def __init__(self, db_impl=None):
-        self.db = db_impl or db
+    def __init__(self, db_impl=None, purchases=None):
+        self.db        = db_impl or db
+        self.purchases = purchases #or PurchaseService();
 
     def list(self):
         return Product.query.all()
@@ -22,13 +20,8 @@ class ProductService(object):
         return Product.query.get(id)
 
     def purchase(self, buyer_data, product_id, account=None):
-        purchase = PurchaseFactory.from_json(buyer_data, schema.purchase)
-        purchase.product = self.get_product(product_id)
-        purchase.customer = account
-        db.session.add(purchase)
-        db.session.commit()
-        return purchase
-
+        product = self.get_product(product_id)
+        return self.purchases.create(buyer_data, product, account)
 
 class ProductController(object):
     def __init__(self, service=None):
