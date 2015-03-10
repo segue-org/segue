@@ -45,3 +45,4 @@ class Account(JsonSerializable, db.Model):
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     proposals    = db.relationship("Proposal", backref="owner")
+    purchases    = db.relationship("Purchase", backref="customer")

@@ -1,6 +1,7 @@
 import mockito
 
 from segue.purchase import PurchaseService
+from segue.errors import NotAuthorized
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -28,3 +29,13 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.buyer.address_city,    buyer_data['address_city'])
         self.assertEquals(result.buyer.address_country, buyer_data['address_country'])
         self.assertEquals(result.buyer.address_zipcode, buyer_data['address_zipcode'])
+
+    def test_retrieving_a_purchase(self):
+        other_account = self.create_from_factory(ValidAccountFactory)
+        purchase      = self.create_from_factory(ValidPurchaseFactory)
+
+        result = self.service.get_one(purchase.id, by=purchase.customer)
+        self.assertEquals(result.id, purchase.id)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.get_one(purchase.id, by=other_account)

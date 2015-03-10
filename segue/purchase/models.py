@@ -22,6 +22,7 @@ class Buyer(JsonSerializable, db.Model):
     address_zipcode = db.Column(db.Text)
     address_city    = db.Column(db.Text)
     address_country = db.Column(db.Text)
+    purchases       = db.relationship('Purchase', backref='buyer')
 
 class PurchaseJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

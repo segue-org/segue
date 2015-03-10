@@ -16,3 +16,5 @@ class Product(JsonSerializable, db.Model):
     price      = db.Column(db.Numeric)
     sold_until = db.Column(db.DateTime)
 
+    purchases  = db.relationship("Purchase", backref="product")
+

@@ -112,12 +112,12 @@ class ValidBuyerPersonFactory(ValidBuyerFactory):
 class ValidPurchaseFactory(SegueFactory):
     class Meta:
         model = Purchase
-    product_id     = SubFactory(ValidProductFactory)
-    customer_id    = SubFactory(ValidAccountFactory)
-    status         = "pending"
+    product  = SubFactory(ValidProductFactory)
+    customer = SubFactory(ValidAccountFactory)
+    status   = "pending"
 
 class ValidPurchaseByPersonFactory(ValidPurchaseFactory):
-    buyer_id       = SubFactory(ValidBuyerPersonFactory)
+    buyer = SubFactory(ValidBuyerPersonFactory)
 
 class ValidPurchaseByCorpFactory(SegueFactory):
-    buyer_id       = SubFactory(ValidBuyerCompanyFactory)
+    buyer = SubFactory(ValidBuyerCompanyFactory)
