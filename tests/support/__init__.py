@@ -43,8 +43,12 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.db.session.commit()
         return entity
 
-    def db_expunge(self):
-        segue.core.db.session.expunge_all()
+    def db_expunge(self, *entities):
+        ids = []
+        for entity in entities:
+            ids.append(entity.id)
+            segue.core.db.session.expunge(entity)
+        return ids
 
     def build_from_factory(self, factory, *args, **kw):
         return factory.build(*args, **kw)

@@ -50,13 +50,14 @@ class PaymentServiceTestCases(SegueApiTestCase):
     def test_retrieves_one_payment_autocasted_to_its_type(self):
         purchase = self.create_from_factory(ValidPurchaseFactory)
 
-        payment           = self.create_from_factory(ValidPaymentFactory, purchase=purchase)
-        pagseguro_payment = self.create_from_factory(ValidPagSeguroPaymentFactory, purchase=purchase)
+        p1 = self.create_from_factory(ValidPaymentFactory, purchase=purchase)
+        p2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, type='pagseguro')
+        p1_id, p2_id = self.db_expunge(p1, p2)
 
-        retrieved = self.service.get_one(purchase.id, payment.id)
-        self.assertEquals(retrieved.id, payment.id)
+        retrieved = self.service.get_one(purchase.id, p1_id)
+        self.assertEquals(retrieved.id, p1_id)
         self.assertEquals(retrieved.__class__, Payment)
 
-        retrieved = self.service.get_one(purchase.id, pagseguro_payment.id)
-        self.assertEquals(retrieved.id, pagseguro_payment.id)
+        retrieved = self.service.get_one(purchase.id, p2_id)
+        self.assertEquals(retrieved.id, p2_id)
         self.assertEquals(retrieved.__class__, PagSeguroPayment)
