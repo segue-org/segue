@@ -24,7 +24,8 @@ class PurchaseController(object):
     @jwt_required()
     @jsoned
     def pay(self, purchase_id=None, method=None):
-        result = self.service.pay(purchase_id, method, by=self.current_user)
+        payload = request.get_json()
+        result = self.service.create_payment(purchase_id, method, payload, by=self.current_user)
         return result, 200
 
 class PaymentController(object):

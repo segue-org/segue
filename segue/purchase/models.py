@@ -39,7 +39,11 @@ class Purchase(JsonSerializable, db.Model):
 
     payments       = db.relationship('Payment', backref='purchase')
 
-class Payment(db.Model):
+class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'
+
+class Payment(JsonSerializable, db.Model):
+    _serializers = [ PaymentJsonSerializer ]
     id          = db.Column(db.Integer, primary_key=True)
     type        = db.Column(db.String(20))
     purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'))

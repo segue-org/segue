@@ -1,8 +1,6 @@
-from pagseguro import PagSeguro
-
 from segue.factory import Factory
 
-from models import Buyer, Purchase
+from models import Buyer, Purchase, Payment, PagSeguroPayment
 
 class BuyerFactory(Factory):
     model = Buyer
@@ -11,30 +9,25 @@ class PurchaseFactory(Factory):
     model = Purchase
 
     @classmethod
-    def create(self, buyer, product, account):
-        result = Purchase()
+    def create(cls, buyer, product, account):
+        result = cls.model()
         result.buyer = buyer
         result.product = product
         result.customer = account
         return result
 
-class PagSeguroSessionFactory(object):
-    def __init__(self):
-        pass
+class PaymentFactory(Factory):
+    model = Payment
 
-    def create_session(self):
-        instance = PagSeguro(config.PAGSEGURO_EMAIL, config.PAGSEGURO_TOKEN)
-        instance.config.BASE_URL = config.PAGSEGURO_BASEURL
-        return instance
+class PagSeguroPaymentFactory(Factory):
+    model = PagSeguroPayment
 
-    def example_purchase(self):
-        pg = self.create_session()
-        pg.shipping = None
-        pg.reference_prefix = "SEGUE-FISL16-"
-        pg.reference = "00123456789"
-        pg.items = [ {"id": "0001", "description": "Produto 1", "amount": 354.20, "quantity": 2, "weight": 200} ]
-        pg.redirect_url = "http://google.com"
-        pg.notification_url = "http://google.com"
-        return pg
+    @classmethod
+    def create(cls, purchase, other_valid_payments=[]):
+        outstanding = purchase.product.price
+        for payment in other_valid_payments:
+            outstanding -= payment.amount
 
+        reference = "A{0:05d}-PU{1:05d}".format(purchase.customer.id, purchase.id)
 
+        return PagSeguroPayment(purchase=purchase, amount=outstanding, reference=reference)

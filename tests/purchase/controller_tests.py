@@ -33,6 +33,18 @@ class PurchaseControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['$type'], 'Purchase.normal')
         self.assertEquals(content['status'], 'pending')
 
+    def test_startinga_a_payment_for_a_purchase(self):
+        payment  = self.build_from_factory(ValidPagSeguroPaymentFactory)
+        purchase = self.build_from_factory(ValidPurchaseFactory)
+        mockito.when(self.mock_service).create_payment(123, 'pagseguro', {}, by=self.mock_owner).thenReturn(payment)
+
+        response = self.jpost('/purchases/123/pay/pagseguro', data="{}")
+        content = json.loads(response.data)['resource']
+
+        self.assertEquals(content['$type'], 'PagSeguroPayment.normal')
+        self.assertEquals(content['status'], 'pending')
+
+
 class PaymentControllerTestCases(SegueApiTestCase):
     def setUp(self):
         super(PaymentControllerTestCases, self).setUp()

@@ -1,17 +1,23 @@
 from segue.core import db
 from segue.errors import NotAuthorized
 
-from factories import BuyerFactory, PurchaseFactory, PagSeguroSessionFactory
+from factories import BuyerFactory, PurchaseFactory, PaymentFactory, PagSeguroPaymentFactory
+from .pagseguro import PagSeguroSessionFactory
 from models import Purchase, Payment
 
 import schema
 
 class PurchaseService(object):
+
+    def __init__(self, db_impl=None, payments=None):
+        self.db = db_impl or db
+        self.payments = payments or PaymentService()
+
     def create(self, buyer_data, product, account):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
         purchase = PurchaseFactory.create(buyer, product, account)
-        db.session.add(purchase)
-        db.session.commit()
+        self.db.session.add(purchase)
+        self.db.session.commit()
         return purchase
 
     def get_one(self, purchase_id, by=None):
@@ -22,9 +28,18 @@ class PurchaseService(object):
     def check_ownership(self, purchase, alleged):
         return purchase and alleged and purchase.customer_id == alleged.id
 
+    def create_payment(self, purchase_id, payment_method, payment_data, by=None):
+        purchase = self.get_one(purchase_id, by=by)
+        return payments.create(purchase, payment_method, payment_data)
+
 class PaymentService(object):
-    def __init__(self, pagseguro=PagSeguroSessionFactory):
-        pass
+    def __init__(self, **services):
+        self.services = services
+
+    def create(self, purchase, method, data):
+        if method not in self.services:
+            return NotImplementedError(method+' is not a valid payment method')
+        return self.services[method].create(purchase, data)
 
     def get_one(self, purchase_id, payment_id):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
@@ -34,8 +49,24 @@ class PaymentService(object):
         pass
 
 class PagSeguroPaymentService(object):
-    def __init__(self, pagseguro=PagSeguroSessionFactory):
-        pass
+    def __init__(self, session_factory=None):
+        self.session_factory = session_factory or PagSeguroSessionFactory()
+
+    def create(self, purchase, data={}):
+        # TODO: collect all other valid payments to allow the calculation of outstanding amount
+        payment = PagSeguroPaymentFactory.create(purchase)
+        db.session.add(payment)
+        db.session.commit()
+
+        session = self.session_factory.create_session()
+        session.shipping = None
+        session.reference_prefix = "SEGUE-FISL16-"
+        session.reference = "{0}-PA{1:05d}".format(payment.reference, payment.id)
+        session.items = [ dict(
+            id="0001", description="ingresso fisl16", amount=payment.amount, quantity=1, weight=0
+        ) ]
+        session.checkout()
+        return payment
 
 
 
