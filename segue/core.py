@@ -2,7 +2,6 @@ import flask_sqlalchemy
 import flask_jwt
 import flask_mail
 
-
 def log(*args):
     with open("/tmp/segue.log", "a+") as logfile:
         print >> logfile, args

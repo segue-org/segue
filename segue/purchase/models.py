@@ -37,3 +37,18 @@ class Purchase(JsonSerializable, db.Model):
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    payments       = db.relationship('Payment', backref='purchase')
+
+class Payment(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    type        = db.Column(db.String(20))
+    purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'))
+    status      = db.Column(db.Text, default='pending')
+    amount      = db.Column(db.Numeric(precision=2))
+
+    __tablename__ = 'payment'
+    __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'payment' }
+
+class PagSeguroPayment(Payment):
+    __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
+
