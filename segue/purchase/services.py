@@ -30,7 +30,6 @@ class PaymentService(object):
         pass
 
     def get_one(self, purchase_id, payment_id):
-        print list(Payment.query.all())
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
         return result.first()
 

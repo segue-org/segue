@@ -52,3 +52,5 @@ class Payment(db.Model):
 class PagSeguroPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
 
+    reference = db.Column(db.String(50), name='ps_reference')
+    code      = db.Column(db.String(32), name='ps_code')
