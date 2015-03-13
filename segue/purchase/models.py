@@ -12,7 +12,7 @@ class BuyerJsonSerializer(SQLAlchemyJsonSerializer):
 class Buyer(JsonSerializable, db.Model):
     _serializers = [ BuyerJsonSerializer ]
     id              = db.Column(db.Integer, primary_key=True)
-    kind            = db.Column(db.Enum('person','company','government'))
+    kind            = db.Column(db.Enum('person','company','government', name="buyer_kinds"))
     name            = db.Column(db.Text)
     document        = db.Column(db.Text)
     contact         = db.Column(db.Text)

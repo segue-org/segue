@@ -43,6 +43,9 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.db.session.commit()
         return entity
 
+    def db_expunge(self):
+        segue.core.db.session.expunge_all()
+
     def build_from_factory(self, factory, *args, **kw):
         return factory.build(*args, **kw)
 

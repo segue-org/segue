@@ -124,3 +124,15 @@ class ValidPurchaseByPersonFactory(ValidPurchaseFactory):
 
 class ValidPurchaseByCorpFactory(SegueFactory):
     buyer = SubFactory(ValidBuyerCompanyFactory)
+
+class ValidPaymentFactory(SegueFactory):
+    class Meta:
+        model = Payment
+
+    purchase = SubFactory(ValidPurchaseFactory)
+    amount   = FuzzyDecimal(70, 400, 2)
+    status   = "pending"
+
+class ValidPagSeguroPaymentFactory(ValidPaymentFactory):
+    class Meta:
+        model = PagSeguroPayment

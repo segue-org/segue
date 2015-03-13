@@ -1,10 +1,12 @@
 import mockito
 
-from segue.purchase import PurchaseService
+from segue.purchase import PurchaseService, PaymentService
+from segue.purchase.models import Payment, PagSeguroPayment
 from segue.errors import NotAuthorized
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
+
 
 class PurchaseServiceTestCases(SegueApiTestCase):
     def setUp(self):
@@ -39,3 +41,22 @@ class PurchaseServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(NotAuthorized):
             self.service.get_one(purchase.id, by=other_account)
+
+class PaymentServiceTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(PaymentServiceTestCases, self).setUp()
+        self.service = PaymentService()
+
+    def test_retrieves_one_payment_autocasted_to_its_type(self):
+        purchase = self.create_from_factory(ValidPurchaseFactory)
+
+        payment           = self.create_from_factory(ValidPaymentFactory, purchase=purchase)
+        pagseguro_payment = self.create_from_factory(ValidPagSeguroPaymentFactory, purchase=purchase)
+
+        retrieved = self.service.get_one(purchase.id, payment.id)
+        self.assertEquals(retrieved.id, payment.id)
+        self.assertEquals(retrieved.__class__, Payment)
+
+        retrieved = self.service.get_one(purchase.id, pagseguro_payment.id)
+        self.assertEquals(retrieved.id, pagseguro_payment.id)
+        self.assertEquals(retrieved.__class__, PagSeguroPayment)
