@@ -1,7 +1,7 @@
 import json
 import mockito
 
-from segue.errors import NotAuthorized
+from segue.errors import NotAuthorized, PaymentVerificationFailed
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -10,7 +10,7 @@ class PurchaseControllerTestCases(SegueApiTestCase):
     def setUp(self):
         super(PurchaseControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('purchases', 'service')
-        self.mock_owner   = self.mock_controller_dep('proposals', 'current_user', ValidAccountFactory.create())
+        self.mock_owner   = self.mock_controller_dep('purchases', 'current_user', ValidAccountFactory.create())
         self.mock_jwt(self.mock_owner)
 
     def test_getting_a_purchase_requires_auth(self):
@@ -32,3 +32,28 @@ class PurchaseControllerTestCases(SegueApiTestCase):
         content = json.loads(response.data)['resource']
         self.assertEquals(content['$type'], 'Purchase.normal')
         self.assertEquals(content['status'], 'pending')
+
+class PaymentControllerTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(PaymentControllerTestCases, self).setUp()
+        self.mock_service = self.mock_controller_dep('purchase_payments', 'service')
+
+    def test_notify_a_payment_transitioned(self):
+        payment = { 'abc': 123 }
+        query_string = "notificationCode=ABC-123-789&notificationType=transaction"
+
+        mockito.when(self.mock_service).notify(123, 456, 'ABC-123-789').thenReturn(payment)
+        mockito.when(self.mock_service).notify(123, 789, 'ABC-123-789').thenReturn(None)
+        mockito.when(self.mock_service).notify(123, 999, 'ABC-123-789').thenRaise(PaymentVerificationFailed)
+
+        response = self.jpost('/purchases/123/payments/456/notify', query_string=query_string)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.jpost('/purchases/123/payments/789/notify', query_string=query_string)
+        self.assertEquals(response.status_code, 404)
+
+        response = self.jpost('/purchases/123/payments/999/notify', query_string=query_string)
+        self.assertEquals(response.status_code, 500)
+
+        response = self.jpost('/purchases/123/payments/666/notify', query_string="")
+        self.assertEquals(response.status_code, 400)

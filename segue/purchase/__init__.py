@@ -1,34 +1,11 @@
+import flask
 from flask.ext.jwt import current_user
+from flask import request
 
-from ..factory import Factory
 from ..json import jsoned
-from ..errors import NotAuthorized
-from ..core import db, jwt_required
+from ..core import jwt_required
 
-from segue.models import Purchase, Buyer
-import schema
-
-class BuyerFactory(Factory):
-    model = Buyer
-
-class PurchaseService(object):
-    def create(self, buyer_data, product, account):
-        buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
-        purchase = Purchase()
-        purchase.buyer = buyer
-        purchase.product = product
-        purchase.customer = account
-        db.session.add(purchase)
-        db.session.commit()
-        return purchase
-
-    def get_one(self, purchase_id, by=None):
-        purchase = Purchase.query.get(purchase_id)
-        if not self.check_ownership(purchase, by): raise NotAuthorized()
-        return purchase
-
-    def check_ownership(self, purchase, alleged):
-        return purchase and alleged and purchase.customer_id == alleged.id
+from services import PurchaseService, PaymentService
 
 class PurchaseController(object):
     def __init__(self, service=None):
@@ -44,8 +21,24 @@ class PurchaseController(object):
         result = self.service.get_one(purchase_id, by=self.current_user)
         return result, 200
 
-    def pay(self):
+    @jwt_required()
+    @jsoned
+    def pay(self, purchase_id=None, method=None):
+        result = self.service.pay(purchase_id, method, by=self.current_user)
+        return result, 200
+
+class PaymentController(object):
+    def __init__(self, service=None):
+        self.service = service or PaymentService()
+
+    @jsoned
+    def notify(self, purchase_id=None, payment_id=None):
+        notification_code = request.args.get('notificationCode', None)
+        if not notification_code: flask.abort(400, "notificationCode is mandatory")
+
+        result = self.service.notify(purchase_id, payment_id, notification_code) or flask.abort(404)
+        return result, 200
+
+    def conclude(self):
         pass
 
-    def notify(self):
-        pass

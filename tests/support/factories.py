@@ -7,7 +7,10 @@ from factory.fuzzy import FuzzyChoice, FuzzyNaiveDateTime, FuzzyDecimal
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, Proposal, ProposalInvite, Track, Product, Purchase, Buyer
+from segue.models import Account
+from segue.models import Proposal, ProposalInvite, Track
+from segue.models import Product
+from segue.models import Purchase, Buyer, Payment, PagSeguroPayment
 
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))

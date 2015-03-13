@@ -37,6 +37,11 @@ class InvalidLogin(SegueError):
     def to_json(self):
         return { 'message': 'bad login' }
 
+class PaymentVerificationFailed(SegueError):
+    code = 500
+    def to_json(self):
+        return { 'message': 'the fetching notification data from payment provider failed' }
+
 class NotAuthorized(SegueError):
     code = 403
     def to_json(self):
