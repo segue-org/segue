@@ -2,10 +2,21 @@ from pagseguro import PagSeguro
 
 from segue.factory import Factory
 
-from models import Buyer
+from models import Buyer, Purchase
 
 class BuyerFactory(Factory):
     model = Buyer
+
+class PurchaseFactory(Factory):
+    model = Purchase
+
+    @classmethod
+    def create(self, buyer, product, account):
+        result = Purchase()
+        result.buyer = buyer
+        result.product = product
+        result.customer = account
+        return result
 
 class PagSeguroSessionFactory(object):
     def __init__(self):

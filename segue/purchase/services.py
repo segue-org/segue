@@ -1,7 +1,7 @@
 from segue.core import db
 from segue.errors import NotAuthorized
 
-from factories import BuyerFactory, PagSeguroSessionFactory
+from factories import BuyerFactory, PurchaseFactory, PagSeguroSessionFactory
 from models import Purchase, Payment
 
 import schema
@@ -9,10 +9,7 @@ import schema
 class PurchaseService(object):
     def create(self, buyer_data, product, account):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
-        purchase = Purchase()
-        purchase.buyer = buyer
-        purchase.product = product
-        purchase.customer = account
+        purchase = PurchaseFactory.create(buyer, product, account)
         db.session.add(purchase)
         db.session.commit()
         return purchase
