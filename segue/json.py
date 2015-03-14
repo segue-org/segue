@@ -111,6 +111,7 @@ class PropertyJsonSerializer(JsonSerializer):
             is_list        = isinstance(value, list)
             is_nested_list = is_list and any([ isinstance(x, JsonSerializable) for x in value ])
             is_nested      = is_nested_list or isinstance(value, JsonSerializable)
+            is_lazy_rel    = hasattr(value, "all")
             available      = value[0]._serializers if is_nested_list else getattr(value, '_serializers', [])
 
             selected   = override or recurse_with or 'JsonSerializer'
@@ -121,6 +122,9 @@ class PropertyJsonSerializer(JsonSerializer):
             elif is_nested:
                 if not recurse_with: continue
                 result[key] = serializer.emit_json_for(value, **overrides)
+            elif is_lazy_rel:
+                if not recurse_with: continue
+                result[key] = serializer.emit_json_for(value.all(), **overrides)
             elif value and not hide_field:
                 result[key] = serializer.emit_json_for(value, **overrides)
         if self.debug_mode:

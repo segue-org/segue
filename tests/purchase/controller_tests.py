@@ -13,6 +13,17 @@ class PurchaseControllerTestCases(SegueApiTestCase):
         self.mock_owner   = self.mock_controller_dep('purchases', 'current_user', ValidAccountFactory.create())
         self.mock_jwt(self.mock_owner)
 
+    def test_listing_purchases(self):
+        p1 = self.build_from_factory(ValidPurchaseFactory)
+        p2 = self.build_from_factory(ValidPurchaseFactory)
+        mockito.when(self.mock_service).query(by=self.mock_owner).thenReturn([p1,p2])
+
+        response = self.jget('/purchases')
+        contents = json.loads(response.data)['items']
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(contents), 2)
+
     def test_getting_a_purchase_requires_auth(self):
         purchase = self.build_from_factory(ValidPurchaseFactory)
         mockito.when(self.mock_service).get_one(123, by=self.mock_owner).thenReturn(purchase)

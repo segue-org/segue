@@ -7,11 +7,27 @@ from models import Purchase, Payment
 
 import schema
 
-class PurchaseService(object):
+class PurchaseFilterStrategies(object):
+    def given(self, **criteria):
+        result = []
+        for key, value in criteria.items():
+            method = getattr(self, "by_"+key)
+            result.append(method(value))
+        return result
 
-    def __init__(self, db_impl=None, payments=None):
+    def by_customer_id(self, value):
+        return Purchase.customer_id == value
+
+class PurchaseService(object):
+    def __init__(self, db_impl=None, payments=None, strategies=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
+        self.filter_strategies = strategies or PurchaseFilterStrategies()
+
+    def query(self, by=None, **kw):
+        kw['customer_id'] = by.id
+        filter_list = self.filter_strategies.given(**kw)
+        return Purchase.query.filter(*filter_list).all()
 
     def create(self, buyer_data, product, account):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
@@ -22,6 +38,7 @@ class PurchaseService(object):
 
     def get_one(self, purchase_id, by=None):
         purchase = Purchase.query.get(purchase_id)
+        if not purchase: return None
         if not self.check_ownership(purchase, by): raise NotAuthorized()
         return purchase
 

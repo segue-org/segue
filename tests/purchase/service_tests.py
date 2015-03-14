@@ -1,6 +1,6 @@
 import mockito
 
-from segue.purchase.services import PurchaseService, PaymentService, PagSeguroPaymentService
+from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
 from segue.errors import NotAuthorized
 
@@ -12,6 +12,15 @@ class PurchaseServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PurchaseServiceTestCases, self).setUp()
         self.service = PurchaseService()
+
+    def test_listing_purchases(self):
+        customer = self.create_from_factory(ValidAccountFactory)
+        p1 = self.create_from_factory(ValidPurchaseFactory, customer=customer)
+        p2 = self.create_from_factory(ValidPurchaseFactory, customer=customer)
+
+        result = self.service.query(by=customer)
+
+        self.assertEquals(len(result), 2)
 
     def test_purchasing_a_product(self):
         account    = self.create_from_factory(ValidAccountFactory)

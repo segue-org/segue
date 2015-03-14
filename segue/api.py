@@ -36,6 +36,7 @@ class AccountBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:account_id>',     methods=['PUT'],  view_func=self.controller.modify)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:account_id>/proposals', methods=['GET'], view_func=self.controller.list_proposals)
+        self.add_url_rule('/<int:account_id>/purchases', methods=['GET'], view_func=self.controller.list_purchases)
 
 class ProductBlueprint(flask.Blueprint):
     def __init__(self):

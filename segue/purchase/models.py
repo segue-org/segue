@@ -4,10 +4,7 @@ from sqlalchemy.sql import functions as func
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
-from sqlalchemy.ext.mutable import MutableDict
-
-class BuyerJsonSerializer(SQLAlchemyJsonSerializer):
-    _serializer_name = 'normal'
+from serializers import *
 
 class Buyer(JsonSerializable, db.Model):
     _serializers = [ BuyerJsonSerializer ]
@@ -24,11 +21,8 @@ class Buyer(JsonSerializable, db.Model):
     address_country = db.Column(db.Text)
     purchases       = db.relationship('Purchase', backref='buyer')
 
-class PurchaseJsonSerializer(SQLAlchemyJsonSerializer):
-    _serializer_name = 'normal'
-
 class Purchase(JsonSerializable, db.Model):
-    _serializers = [ PurchaseJsonSerializer ]
+    _serializers = [ PurchaseJsonSerializer, ShortPurchaseJsonSerializer ]
     id             = db.Column(db.Integer, primary_key=True)
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     customer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -37,7 +31,7 @@ class Purchase(JsonSerializable, db.Model):
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    payments       = db.relationship('Payment', backref='purchase')
+    payments       = db.relationship('Payment', backref='purchase', lazy='dynamic')
 
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

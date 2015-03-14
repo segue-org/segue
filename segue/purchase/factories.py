@@ -6,6 +6,7 @@ class BuyerFactory(Factory):
     model = Buyer
 
 class PurchaseFactory(Factory):
+    QUERY_WHITELIST = ('customer_id',)
     model = Purchase
 
     @classmethod
