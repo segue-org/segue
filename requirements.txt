@@ -25,4 +25,4 @@ six==1.9.0
 wsgiref==0.1.2
 Markdown==2.6
 PyYAML==3.10
-pagseguro==0.1.7.dev0
+-e git+https://github.com/dwolff/python-pagseguro@with_sandbox#egg=pagseguro-with_sandbox
