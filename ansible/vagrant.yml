@@ -12,3 +12,6 @@
     - database
     - segue
     - server
+
+  vars_files:
+    - secret/pagseguro-vagrant.yml
