@@ -23,6 +23,7 @@ def upgrade():
             sa.Column('category', sa.Text(), nullable=True),
             sa.Column('public', sa.Boolean(), nullable=True),
             sa.Column('price', sa.Numeric(), nullable=True),
+            sa.Column('description', sa.Text(), nullable=True),
             sa.Column('sold_until', sa.DateTime(), nullable=True),
             sa.PrimaryKeyConstraint('id')
     )

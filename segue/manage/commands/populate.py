@@ -46,8 +46,20 @@ def populate_reference_data(clean=False):
 
 def _build_products():
     return [
-        ValidProductFactory(kind="ticket", category="student", sold_until="2015-03-25 23:59:59",  price=70),
-        ValidProductFactory(kind="ticket", category="normal",  sold_until="2015-03-25 23:59:59", price=140),
+        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 1",  sold_until="2015-03-30 23:59:59", price=60 ),
+        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 1", sold_until="2015-03-30 23:59:59", price=120),
+
+        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 2",  sold_until="2015-04-13 23:59:59", price=85 ),
+        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 2", sold_until="2015-04-13 23:59:59", price=170),
+
+        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 3",  sold_until="2015-05-11 23:59:59", price=110),
+        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 3", sold_until="2015-05-11 23:59:59", price=220),
+
+        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 4",  sold_until="2015-06-08 23:59:59", price=135),
+        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 4", sold_until="2015-06-08 23:59:59", price=270),
+
+        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 5",  sold_until="2015-06-30 23:59:59", price=160),
+        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 5", sold_until="2015-06-30 23:59:59", price=320),
     ]
 
 def _build_tracks():
