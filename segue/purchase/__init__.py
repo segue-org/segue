@@ -35,6 +35,10 @@ class PurchaseController(object):
         result = self.service.create_payment(purchase_id, method, payload, by=self.current_user)
         return result, 200
 
+    @jsoned
+    def schema(self, name):
+        return schema.whitelist[name], 200
+
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
@@ -49,9 +53,5 @@ class PaymentController(object):
 
     def conclude(self):
         pass
-
-    @jsoned
-    def schema(self, name):
-        return schema.whitelist[name], 200
 
 
