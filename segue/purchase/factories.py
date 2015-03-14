@@ -20,15 +20,10 @@ class PurchaseFactory(Factory):
 class PaymentFactory(Factory):
     model = Payment
 
-class PagSeguroPaymentFactory(Factory):
-    model = PagSeguroPayment
-
     @classmethod
-    def create(cls, purchase, other_valid_payments=[]):
-        outstanding = purchase.product.price
-        for payment in other_valid_payments:
-            outstanding -= payment.amount
+    def create(cls, target_model, purchase):
+        payment = target_model()
+        payment.purchase = purchase
+        payment.amount   = purchase.outstanding_amount
+        return payment
 
-        reference = "A{0:05d}-PU{1:05d}".format(purchase.customer.id, purchase.id)
-
-        return PagSeguroPayment(purchase=purchase, amount=outstanding, reference=reference)

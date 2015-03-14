@@ -1,10 +1,10 @@
 from segue.core import db
 from segue.errors import NotAuthorized
 
-from factories import BuyerFactory, PurchaseFactory, PaymentFactory, PagSeguroPaymentFactory
-from .pagseguro import PagSeguroSessionFactory
+from factories import BuyerFactory, PurchaseFactory, PaymentFactory
 from models import Purchase, Payment
 
+from .pagseguro import PagSeguroPaymentService
 import schema
 
 class PurchaseFilterStrategies(object):
@@ -47,16 +47,21 @@ class PurchaseService(object):
 
     def create_payment(self, purchase_id, payment_method, payment_data, by=None):
         purchase = self.get_one(purchase_id, by=by)
-        return payments.create(purchase, payment_method, payment_data)
+        return self.payments.create(purchase, payment_method, payment_data)
 
 class PaymentService(object):
-    def __init__(self, **services):
-        self.services = services
+    DEFAULT_PROCESSORS = dict(
+        pagseguro=PagSeguroPaymentService()
+    )
+
+    def __init__(self, **processors_overrides):
+        self.processors_overrides = processors_overrides
 
     def create(self, purchase, method, data):
-        if method not in self.services:
-            return NotImplementedError(method+' is not a valid payment method')
-        return self.services[method].create(purchase, data)
+        processor = self.processor_for(method)
+        payment = processor.create(purchase, data)
+        instructions = processor.process(payment)
+        return instructions
 
     def get_one(self, purchase_id, payment_id):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
@@ -65,25 +70,10 @@ class PaymentService(object):
     def notify(self, purchase_id, payment_id, notification_code):
         pass
 
-class PagSeguroPaymentService(object):
-    def __init__(self, session_factory=None):
-        self.session_factory = session_factory or PagSeguroSessionFactory()
-
-    def create(self, purchase, data={}):
-        # TODO: collect all other valid payments to allow the calculation of outstanding amount
-        payment = PagSeguroPaymentFactory.create(purchase)
-        db.session.add(payment)
-        db.session.commit()
-
-        session = self.session_factory.create_session()
-        session.shipping = None
-        session.reference_prefix = "SEGUE-FISL16-"
-        session.reference = "{0}-PA{1:05d}".format(payment.reference, payment.id)
-        session.items = [ dict(
-            id="0001", description="ingresso fisl16", amount=payment.amount, quantity=1, weight=0
-        ) ]
-        session.checkout()
-        return payment
-
-
+    def processor_for(self, method):
+        if method in self.processors_overrides:
+            return self.processors_overrides[method]
+        if method in self.DEFAULT_PROCESSORS:
+            return self.DEFAULT_PROCESSORS[method]
+        raise NotImplementedError(method+' is not a valid payment method')
 

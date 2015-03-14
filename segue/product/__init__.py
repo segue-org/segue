@@ -6,12 +6,13 @@ from ..factory import Factory
 from ..json import jsoned, JsonFor
 
 from models import Product
+from segue.purchase.services import PurchaseService
 import schema
 
 class ProductService(object):
     def __init__(self, db_impl=None, purchases=None):
         self.db        = db_impl or db
-        self.purchases = purchases #or PurchaseService();
+        self.purchases = purchases or PurchaseService();
 
     def list(self):
         return Product.query.all()

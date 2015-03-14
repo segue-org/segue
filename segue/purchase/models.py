@@ -33,6 +33,18 @@ class Purchase(JsonSerializable, db.Model):
 
     payments       = db.relationship('Payment', backref='purchase', lazy='dynamic')
 
+    @property
+    def valid_payments(self):
+        return self.payments.filter(Payment.status == 'paid')
+
+    @property
+    def paid_amount(self):
+        return self.valid_payments.with_entities(func.sum(Payment.amount)).first()[0] or 0
+
+    @property
+    def outstanding_amount(self):
+        return self.product.price - self.paid_amount
+
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
 
