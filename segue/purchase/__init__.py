@@ -8,6 +8,8 @@ from ..core import jwt_required
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
 
+import schema
+
 class PurchaseController(object):
     def __init__(self, service=None):
         self.service = service or PurchaseService()
@@ -47,4 +49,9 @@ class PaymentController(object):
 
     def conclude(self):
         pass
+
+    @jsoned
+    def schema(self, name):
+        return schema.whitelist[name], 200
+
 

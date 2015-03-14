@@ -29,10 +29,6 @@ class ProductController(object):
         self.current_user = current_user
 
     @jsoned
-    def schema(self, name):
-        return schema.whitelist[name], 200
-
-    @jsoned
     def list(self):
         result = self.service.list()
         return JsonFor(result).using('ProductJsonSerializer'), 200

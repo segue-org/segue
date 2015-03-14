@@ -44,13 +44,13 @@ class ProductBlueprint(flask.Blueprint):
         self.controller = ProductController()
         self.add_url_rule('',                           methods=['GET'],  view_func=self.controller.list)
         self.add_url_rule('/<int:product_id>/purchase', methods=['POST'], view_func=self.controller.purchase)
-        self.add_url_rule('/<string:name>.schema',      methods=['GET'],  view_func=self.controller.schema)
 
 class PurchaseBlueprint(flask.Blueprint):
     def __init__(self):
         super(PurchaseBlueprint, self).__init__('purchases', __name__, url_prefix='/purchases')
         self.controller = PurchaseController()
         self.add_url_rule('',                                       methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
 
