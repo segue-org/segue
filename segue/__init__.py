@@ -1,3 +1,4 @@
+from werkzeug.utils import ImportStringError
 import logging, logging.handlers
 import flask
 from flask.ext.cors import CORS
@@ -25,7 +26,10 @@ class Application(flask.Flask):
         self._load_cors()
 
     def _load_configs(self, settings_override):
-        self.config.from_object('segue.settings')
+        try:
+            self.config.from_object('segue.settings')
+        except ImportStringError, e:
+            pass
         self.config.from_object(settings_override)
 
     def _set_logger(self):
