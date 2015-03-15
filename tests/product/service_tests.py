@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 import mockito
 
 from segue.product import ProductService, Product
 
 from ..support import SegueApiTestCase
-from ..support.factories import *
+from ..support.factories import ValidAccountFactory, ValidPurchaseFactory, ValidProductFactory
 
 class ProductServiceTestCase(SegueApiTestCase):
     def setUp(self):
@@ -11,9 +12,11 @@ class ProductServiceTestCase(SegueApiTestCase):
         self.mock_purchases = mockito.Mock()
         self.service = ProductService(purchases=self.mock_purchases)
 
-    def test_listing_all_products(self):
+    def test_listing_all_products_ignores_unavailable_products(self):
+        yesterday = datetime.now() - timedelta(days=1)
         product1 = self.create_from_factory(ValidProductFactory)
         product2 = self.create_from_factory(ValidProductFactory)
+        product3 = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
 
         result = self.service.list()
 

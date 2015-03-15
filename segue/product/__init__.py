@@ -2,6 +2,7 @@ import flask
 from flask import request, url_for
 from flask.ext.jwt import current_user
 
+from datetime import datetime
 from ..core import db, jwt_required
 from ..json import jsoned, JsonFor
 
@@ -14,7 +15,7 @@ class ProductService(object):
         self.purchases = purchases or PurchaseService();
 
     def list(self):
-        return Product.query.all()
+        return Product.query.filter(Product.sold_until >= datetime.now()).all()
 
     def get_product(self, product_id):
         return Product.query.get(product_id)
