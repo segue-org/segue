@@ -1,4 +1,6 @@
 [![Build Status](https://snap-ci.com/segue-org/segue/branch/master/build_image)](https://snap-ci.com/segue-org/segue/branch/master)
+[![Code Health](https://landscape.io/github/segue-org/segue/master/landscape.svg?style=flat)](https://landscape.io/github/segue-org/segue/master)
+
 
 installing
 ==========
