@@ -1,3 +1,5 @@
+[![Build Status](https://snap-ci.com/segue-org/segue/branch/master/build_image)](https://snap-ci.com/segue-org/segue/branch/master)
+
 installing
 ==========
 ```
