@@ -35,7 +35,8 @@ class Application(flask.Flask):
     def _set_logger(self):
         formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
 
-        handler = logging.handlers.RotatingFileHandler(self.config['LOGFILE'], maxBytes=100000, backupCount=5)
+        handler = logging.handlers.RotatingFileHandler(self.config['LOGFILE'],
+                                                       maxBytes=100000, backupCount=5, mode="a+")
         handler.setLevel(logging.INFO)
         handler.setFormatter(formatter)
 
