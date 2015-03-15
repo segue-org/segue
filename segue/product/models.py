@@ -1,6 +1,3 @@
-import datetime
-from sqlalchemy.sql import functions as func
-
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 

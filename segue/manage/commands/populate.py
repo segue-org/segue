@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from segue.core import db
 from tests.support.factories import *
 from segue.models import Account, Proposal, ProposalInvite, Track
@@ -45,22 +45,32 @@ def populate_reference_data(clean=False):
     db.session.commit()
 
 def _build_products():
-    return [
-        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 1",  sold_until="2015-03-30 23:59:59", price=60 ),
-        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 1", sold_until="2015-03-30 23:59:59", price=120),
+    def _build_one(entry):
+        return ValidProductFactory(
+            kind='ticket',
+            category=entry[0],
+            description="ingresso FISL16 - {} - lote {}".format(entry[1], entry[2]),
+            sold_until=entry[3],
+            price=entry[4]
+        )
 
-        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 2",  sold_until="2015-04-13 23:59:59", price=85 ),
-        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 2", sold_until="2015-04-13 23:59:59", price=170),
+    data = [
+        ("student", "estudante",  1, "2015-03-30 23:59:59", 60 ),
+        ("normal",  "individual", 1, "2015-03-30 23:59:59", 120),
 
-        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 3",  sold_until="2015-05-11 23:59:59", price=110),
-        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 3", sold_until="2015-05-11 23:59:59", price=220),
+        ("student", "estudante",  2, "2015-04-13 23:59:59", 85 ),
+        ("normal",  "individual", 2, "2015-04-13 23:59:59", 170),
 
-        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 4",  sold_until="2015-06-08 23:59:59", price=135),
-        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 4", sold_until="2015-06-08 23:59:59", price=270),
+        ("student", "estudante",  3, "2015-05-11 23:59:59", 110),
+        ("normal",  "individual", 3, "2015-05-11 23:59:59", 220),
 
-        ValidProductFactory(kind="ticket", category="student", description="ingresso FISL16 - estudante - lote 5",  sold_until="2015-06-30 23:59:59", price=160),
-        ValidProductFactory(kind="ticket", category="normal",  description="ingresso FISL16 - individual - lote 5", sold_until="2015-06-30 23:59:59", price=320),
+        ("student", "estudante",  4, "2015-06-08 23:59:59", 135),
+        ("normal",  "individual", 4, "2015-06-08 23:59:59", 270),
+
+        ("student", "estudante",  5, "2015-06-30 23:59:59", 160),
+        ("normal",  "individual", 5, "2015-06-30 23:59:59", 320),
     ]
+    return [ _build_one(x) for x in data ]
 
 def _build_tracks():
     return [

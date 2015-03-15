@@ -99,7 +99,7 @@ class PropertyJsonSerializer(JsonSerializer):
     def get_field_names(self, target):
         raise NotImplementedError()
 
-    def emit_json_for(self, target, all_fields=False, items_with=None, **overrides):
+    def emit_json_for(self, target, **overrides):
         # WORST CODE EVER
         overrides.update(self.serializer_overrides)
         result = {}

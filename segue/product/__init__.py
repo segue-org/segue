@@ -1,3 +1,4 @@
+import flask
 from flask import request, url_for, redirect
 from flask.ext.jwt import current_user
 
@@ -16,8 +17,8 @@ class ProductService(object):
     def list(self):
         return Product.query.all()
 
-    def get_product(self, id):
-        return Product.query.get(id)
+    def get_product(self, product_id):
+        return Product.query.get(product_id)
 
     def purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)

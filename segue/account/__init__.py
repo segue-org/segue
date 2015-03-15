@@ -1,7 +1,8 @@
+import flask
 from flask import request, url_for, redirect
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
-from flask.ext.jwt import current_user, verify_jwt, JWTError
+from flask.ext.jwt import current_user, JWTError
 
 from ..core import db, jwt_required
 from ..factory import Factory
@@ -41,8 +42,8 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
-    def get_one(self, id, by=None, check_owner=True):
-        account = self._get_account(id)
+    def get_one(self, account_id, by=None, check_owner=True):
+        account = self._get_account(account_id)
         if check_owner and not self.check_ownership(account, by): raise NotAuthorized
         return account
 
@@ -69,7 +70,7 @@ class AccountService(object):
             db.session.add(account)
             db.session.commit()
             return account
-        except IntegrityError, e:
+        except IntegrityError:
             raise EmailAlreadyInUse(account.email)
 
     def login(self, email=None, password=None):
@@ -78,7 +79,7 @@ class AccountService(object):
             if account.password == password:
                 return self.signer.sign(account)
             raise InvalidLogin()
-        except NoResultFound, e:
+        except NoResultFound:
             raise InvalidLogin()
 
 class AccountController(object):

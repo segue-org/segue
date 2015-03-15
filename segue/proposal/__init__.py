@@ -1,4 +1,3 @@
-import sys
 import flask
 
 from flask import request
@@ -62,10 +61,10 @@ class ProposalInviteController(object):
 
     @jsoned
     @accepts_html
-    def get_by_hash(self, proposal_id, hash, wants_html=False):
-        invite = self.service.get_by_hash(hash) or flask.abort(404)
+    def get_by_hash(self, proposal_id, hash_code, wants_html=False):
+        invite = self.service.get_by_hash(hash_code) or flask.abort(404)
         if wants_html:
-            path = '/#/proposal/{}/invite/{}/answer'.format(proposal_id, hash)
+            path = '/#/proposal/{}/invite/{}/answer'.format(proposal_id, hash_code)
             return flask.redirect(config.FRONTEND_URL + path)
         else:
             return invite, 200
@@ -78,23 +77,23 @@ class ProposalInviteController(object):
         return result, 200
 
     @jsoned
-    def decline(self, proposal_id, hash):
-        result = self.service.answer(hash, accepted=False) or flask.abort(404)
+    def decline(self, proposal_id, hash_code):
+        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
         return result, 200
 
     @jsoned
-    def accept(self, proposal_id, hash):
+    def accept(self, proposal_id, hash_code):
         try:
             verify_jwt()
-        except JWTError, e:
+        except JWTError:
             pass
 
-        result = self.service.answer(hash, accepted=True, by=self.current_user) or flask.abort(404)
+        result = self.service.answer(hash_code, accepted=True, by=self.current_user) or flask.abort(404)
         return result, 200
 
     @jsoned
-    def register(self, proposal_id, hash):
+    def register(self, proposal_id, hash_code):
         data = request.get_json()
-        result = self.service.register(hash, data) or flask.abort(404)
+        result = self.service.register(hash_code, data) or flask.abort(404)
         return result, 200
 

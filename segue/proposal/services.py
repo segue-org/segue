@@ -106,8 +106,8 @@ class InviteService(object):
 
         return invite
 
-    def answer(self, hash, accepted=True, by=None):
-        invite = self.get_by_hash(hash)
+    def answer(self, hash_code, accepted=True, by=None):
+        invite = self.get_by_hash(hash_code)
         if not invite:
             return None
         if self.accounts.is_email_registered(invite.recipient):
@@ -119,8 +119,8 @@ class InviteService(object):
         db.session.commit()
         return invite
 
-    def register(self, hash, account_data):
-        invite = self.get_by_hash(hash)
+    def register(self, hash_code, account_data):
+        invite = self.get_by_hash(hash_code)
         if not invite:
             return None
         if invite.recipient != account_data['email']:

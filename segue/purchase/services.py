@@ -1,7 +1,7 @@
 from segue.core import db
 from segue.errors import NotAuthorized
 
-from factories import BuyerFactory, PurchaseFactory, PaymentFactory
+from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
 
 from .pagseguro import PagSeguroPaymentService

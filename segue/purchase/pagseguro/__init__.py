@@ -1,5 +1,3 @@
-import pagseguro
-
 from segue.core import db
 
 from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory
@@ -8,7 +6,7 @@ class PagSeguroPaymentService(object):
     def __init__(self, session_factory=None):
         self.session_factory = session_factory or PagSeguroSessionFactory()
 
-    def create(self, purchase, data={}):
+    def create(self, purchase, data=None):
         payment = PagSeguroPaymentFactory.create(purchase)
         db.session.add(payment)
         db.session.commit()

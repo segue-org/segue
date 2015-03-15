@@ -16,13 +16,13 @@ class AccountServiceTestCases(SegueApiTestCase):
         self.service = AccountService(signer=self.mock_signer)
 
     def test_invalid_account_raises_validation_error(self):
-        account = InvalidAccountFactory.build().to_json(all_fields=True)
+        account = InvalidAccountFactory.build().to_json()
 
         with self.assertRaises(SegueValidationError):
             self.service.create(account)
 
     def test_create_and_retrieve_of_valid_account(self):
-        account = ValidAccountFactory.build().to_json(all_fields=True)
+        account = ValidAccountFactory.build().to_json()
         account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
 
         saved = self.service.create(account)
@@ -53,7 +53,7 @@ class AccountServiceTestCases(SegueApiTestCase):
 
     def test_creation_of_duplicated_account(self):
         existing = ValidAccountFactory.create()
-        new_one = ValidAccountFactory.build(email=existing.email).to_json(all_fields=True)
+        new_one = ValidAccountFactory.build(email=existing.email).to_json()
         new_one['password'] = 'password';
 
         with self.assertRaises(EmailAlreadyInUse):

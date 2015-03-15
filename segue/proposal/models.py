@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy.sql import functions as func
 
-from ..json import JsonSerializable, SQLAlchemyJsonSerializer
+from ..json import JsonSerializable
 from ..core import db
 from .serializers import *
 

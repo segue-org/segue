@@ -1,5 +1,5 @@
 import re
-from json import JsonSerializable, PropertyJsonSerializer
+from json import JsonSerializable
 
 class SegueError(JsonSerializable, Exception):
     code = 400
@@ -70,7 +70,7 @@ class EmailAlreadyInUse(SegueFieldError):
     def to_json(self):
         return [ self.__dict__ ]
 
-class GenericFieldErrorRecognizer():
+class GenericFieldErrorRecognizer(object):
     def __init__(self, validator_name, failure_label):
         self.validator_name = validator_name
         self.failure_label = failure_label

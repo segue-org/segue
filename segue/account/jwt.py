@@ -1,5 +1,5 @@
 from ..core import jwt
-from flask import request, current_app
+from flask import current_app
 from werkzeug.local import LocalProxy
 from models import TokenJsonSerializer
 

@@ -1,6 +1,6 @@
 from segue.factory import Factory
 
-from models import Buyer, Purchase, Payment, PagSeguroPayment
+from models import Buyer, Purchase, Payment
 
 class BuyerFactory(Factory):
     model = Buyer
