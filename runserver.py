@@ -1,4 +1,3 @@
-from werkzeug.debug import DebuggedApplication
 from werkzeug.wsgi import DispatcherMiddleware
 from werkzeug.serving import run_simple
 

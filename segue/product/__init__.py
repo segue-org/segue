@@ -1,9 +1,8 @@
 import flask
-from flask import request, url_for, redirect
+from flask import request, url_for
 from flask.ext.jwt import current_user
 
 from ..core import db, jwt_required
-from ..factory import Factory
 from ..json import jsoned, JsonFor
 
 from models import Product

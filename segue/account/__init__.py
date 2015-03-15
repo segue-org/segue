@@ -2,7 +2,7 @@ import flask
 from flask import request, url_for, redirect
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
-from flask.ext.jwt import current_user, JWTError
+from flask.ext.jwt import current_user
 
 from ..core import db, jwt_required
 from ..factory import Factory
