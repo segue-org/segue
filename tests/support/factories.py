@@ -136,4 +136,4 @@ class ValidPaymentFactory(SegueFactory):
 class ValidPagSeguroPaymentFactory(ValidPaymentFactory):
     class Meta:
         model = PagSeguroPayment
-    reference = 'A777-PU888'
+    reference = 'A00555-PU00444'

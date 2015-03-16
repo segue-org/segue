@@ -23,12 +23,19 @@ class PagSeguroSessionFactory(object):
         if not self.use_env: raise(BadConfiguration('No env set for pagseguro'))
 
     def create_session(self, payment):
-        # TODO: make the use of ConfigSandbox configurable
+        purchase = payment.purchase
+        buyer    = purchase.buyer
+        product  = purchase.product
+        customer = purchase.customer
+
         pg = PagSeguro(config.PAGSEGURO_EMAIL, config.PAGSEGURO_TOKEN)
         pg.config = ConfigSandbox
-
-        buyer = payment.purchase.buyer
-        product = payment.product
+        pg.sender = {
+            "name":      buyer.name,
+            "area_code": customer.phone[0:2].strip(),
+            "phone":     customer.phone[2:].strip(),
+            "email":     customer.email
+        }
         pg.shipping = {
             'type':        pg.NONE,
             "street":      buyer.address_street,
@@ -40,9 +47,15 @@ class PagSeguroSessionFactory(object):
         }
         pg.reference_prefix = "SEGUE-FISL16-"
         pg.reference = "{0}-PA{1:05d}".format(payment.reference, payment.id)
-        amount = "{0:0.2f}".format(payment.amount)
 
-        pg.items = [ dict(
-            id="0001", description=product.description, amount=amount, quantity=1, weight=0
-        ) ]
+        pg.redirect_url     = '{}/api/purchases/{}/payment/{}/conclude'.format(config.BACKEND_URL, purchase.id, payment.id)
+        pg.notification_url = '{}/api/purchases/{}/payment/{}/notify'.  format(config.BACKEND_URL, purchase.id, payment.id)
+
+        pg.add_item(
+            id="0001",
+            description=product.description,
+            amount="{0:0.2f}".format(payment.amount),
+            quantity=1,
+            weight=0
+        )
         return pg

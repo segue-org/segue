@@ -51,7 +51,7 @@ class PurchaseService(object):
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
-        pagseguro=PagSeguroPaymentService()
+        pagseguro=PagSeguroPaymentService
     )
 
     def __init__(self, **processors_overrides):
@@ -74,6 +74,6 @@ class PaymentService(object):
         if method in self.processors_overrides:
             return self.processors_overrides[method]
         if method in self.DEFAULT_PROCESSORS:
-            return self.DEFAULT_PROCESSORS[method]
+            return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
 
