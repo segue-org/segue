@@ -13,7 +13,7 @@ class PagSeguroPaymentFactory(Factory):
 
     @classmethod
     def create(cls, purchase):
-        payment = PaymentFactory.create(cls.model, purchase)
+        payment = PaymentFactory.create(purchase, target_model=cls.model)
         payment.reference = "A{0:05d}-PU{1:05d}".format(purchase.customer.id, purchase.id)
         return payment
 

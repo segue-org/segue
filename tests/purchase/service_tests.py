@@ -1,5 +1,6 @@
 import mockito
 
+from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
 from segue.errors import NotAuthorized
@@ -85,3 +86,16 @@ class PaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(retrieved.id, p2_id)
         self.assertEquals(retrieved.__class__, PagSeguroPayment)
 
+class PaymentFactoryTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(PaymentFactoryTestCases, self).setUp()
+
+    def test_payment_has_outstanding_amount_of_purchase_by_default(self):
+        product  = self.create_from_factory(ValidProductFactory, price=200)
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment1 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=50)
+        payment2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=25, status='paid')
+
+        payment3 = PaymentFactory.create(purchase)
+
+        self.assertEquals(payment3.amount, 175)
