@@ -14,4 +14,4 @@
     - server
 
   vars_files:
-    - secret/pagseguro-vagrant.yml
+    - secret/vagrant.yml

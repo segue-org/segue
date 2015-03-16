@@ -11,6 +11,9 @@ class SegueError(JsonSerializable, Exception):
     def to_json(self):
         return { 'args': self.args }
 
+class BadConfiguration(SegueError):
+    pass
+
 class SegueValidationError(SegueError):
     recognizers = []
 

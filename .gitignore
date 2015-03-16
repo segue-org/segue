@@ -6,4 +6,4 @@ ansible/group_vars/production.yml
 handler.wsgi
 settings.py
 segue/settings.py
-ansible/secret/pagseguro-vagrant.yml
+ansible/secret/*.yml

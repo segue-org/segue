@@ -33,3 +33,5 @@ MAIL_USE_TLS = False
 
 CORS_HEADERS = 'Content-Type,Authorization'
 CORS_ORIGINS = '*'
+
+PAGSEGURO_ENV='sandbox'

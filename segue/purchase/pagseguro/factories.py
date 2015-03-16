@@ -4,6 +4,7 @@ from pagseguro.sandbox import ConfigSandbox
 from segue.core import config
 from segue.factory import Factory
 from segue.purchase.factories import PaymentFactory
+from segue.errors import BadConfiguration
 
 from ..models import PagSeguroPayment
 
@@ -17,8 +18,9 @@ class PagSeguroPaymentFactory(Factory):
         return payment
 
 class PagSeguroSessionFactory(object):
-    def __init__(self):
-        pass
+    def __init__(self, use_env=None):
+        self.use_env = use_env or config.PAGSEGURO_ENV
+        if not self.use_env: raise(BadConfiguration('No env set for pagseguro'))
 
     def create_session(self, payment):
         # TODO: make the use of ConfigSandbox configurable

@@ -1,15 +1,11 @@
 ---
 
-#- hosts: production
-#  sudo: True
-#  roles:
-#    - accelerate
-
 - hosts: production
   sudo: true
-#  accelerate: true
   roles:
     - server
     - git-down
     - database
     - segue
+  vars_files:
+    - secret/production.yml
