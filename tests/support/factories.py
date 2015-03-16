@@ -12,6 +12,11 @@ from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product
 from segue.models import Purchase, Buyer, Payment, PagSeguroPayment
 
+import logging
+logger = logging.getLogger('factory')
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.INFO)
+
 def _Sequence(pattern):
     return Sequence(lambda counter: pattern.format(counter))
 
