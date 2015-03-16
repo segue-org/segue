@@ -67,8 +67,20 @@ class PaymentService(object):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
         return result.first()
 
-    def notify(self, purchase_id, payment_id, notification_code):
-        pass
+    def notify(self, method, purchase_id, payment_id, payload):
+        processor = self.processor_for(method)
+        payment = self.get_one(purchase_id, payment_id)
+        purchase = payment.purchase
+
+        transition = processor.notify(purchase, payment, payload)
+        payment.update_status(transition)
+        purchase.update_status()
+
+        db.session.add(payment)
+        db.session.add(transition)
+        db.session.add(purchase)
+        db.session.commit()
+        return purchase
 
     def processor_for(self, method):
         if method in self.processors_overrides:

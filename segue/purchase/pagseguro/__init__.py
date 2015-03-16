@@ -8,6 +8,9 @@ class PagSeguroPaymentService(object):
     def __init__(self, session_factory=None):
         self.session_factory = session_factory or PagSeguroSessionFactory()
 
+    def notify(self, purchase, payment, data=None):
+        pass
+
     def create(self, purchase, data=None):
         payment = PagSeguroPaymentFactory.create(purchase)
         db.session.add(payment)

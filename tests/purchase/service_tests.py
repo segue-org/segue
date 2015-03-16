@@ -5,7 +5,7 @@ from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
 from segue.errors import NotAuthorized
 
-from ..support import SegueApiTestCase
+from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
 
 
@@ -85,6 +85,48 @@ class PaymentServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(purchase.id, p2_id)
         self.assertEquals(retrieved.id, p2_id)
         self.assertEquals(retrieved.__class__, PagSeguroPayment)
+
+    def test_notification_that_pays_the_balance_of_purchase(self):
+        payload    = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=200)
+        transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
+        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+
+        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        self.assertEquals(result.status, 'paid')
+        self.assertEquals(payment.status, 'paid')
+
+    def test_notification_that_does_not_pay_the_balance_of_purchase(self):
+        payload    = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
+        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+
+        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        self.assertEquals(payment.status, 'paid')
+        self.assertEquals(result.status, 'pending')
+        self.assertEquals(result.outstanding_amount, 100)
+
+    def test_notification_that_is_not_to_a_paid_state(self):
+        payload    = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
+        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+
+        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        self.assertEquals(payment.status, 'pending')
+        self.assertEquals(result.status, 'pending')
+        self.assertEquals(result.outstanding_amount, 200)
+
+
+
+
 
 class PaymentFactoryTestCases(SegueApiTestCase):
     def setUp(self):

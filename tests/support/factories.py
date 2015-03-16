@@ -10,7 +10,7 @@ from segue.core import db
 from segue.models import Account
 from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product
-from segue.models import Purchase, Buyer, Payment, PagSeguroPayment
+from segue.models import Purchase, Buyer, Payment, PagSeguroPayment, Transition
 
 import logging
 logger = logging.getLogger('factory')
@@ -142,3 +142,16 @@ class ValidPagSeguroPaymentFactory(ValidPaymentFactory):
     class Meta:
         model = PagSeguroPayment
     reference = 'A00555-PU00444'
+
+class ValidTransitionFactory(SegueFactory):
+    class Meta:
+        model = Transition
+    payment = SubFactory(ValidPaymentFactory)
+
+class ValidTransitionToPaidFactory(ValidTransitionFactory):
+    old_status = 'pending'
+    new_status = 'paid'
+
+class ValidTransitionToPendingFactory(ValidTransitionFactory):
+    old_status = 'started'
+    new_status = 'pending'

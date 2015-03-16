@@ -45,6 +45,9 @@ class Purchase(JsonSerializable, db.Model):
     def outstanding_amount(self):
         return self.product.price - self.paid_amount
 
+    def update_status(self):
+        self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
+
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
 
@@ -56,11 +59,24 @@ class Payment(JsonSerializable, db.Model):
     status      = db.Column(db.Text, default='pending')
     amount      = db.Column(db.Numeric(precision=2))
 
+    transitions = db.relationship('Transition', backref='payment')
+
     __tablename__ = 'payment'
     __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'payment' }
+
+    def update_status(self, transition):
+        self.status = transition.new_status
 
 class PagSeguroPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
 
     reference = db.Column(db.String(50), name='ps_reference')
     code      = db.Column(db.String(32), name='ps_code')
+
+class Transition(db.Model):
+    id             = db.Column(db.Integer, primary_key=True)
+    payment_id     = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    old_status     = db.Column(db.Text)
+    new_status     = db.Column(db.Text)
+    source         = db.Column(db.Text)
+    created        = db.Column(db.DateTime, default=func.now())
