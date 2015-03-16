@@ -14,6 +14,13 @@ class SegueError(JsonSerializable, Exception):
 class BadConfiguration(SegueError):
     pass
 
+
+class ExternalServiceError(SegueError):
+    code = 500
+
+    def to_json(self):
+        return { 'message': 'could not connect to service: '+self.args }
+
 class SegueValidationError(SegueError):
     recognizers = []
 

@@ -15,9 +15,20 @@ class Config():
     def init_app(self, app):
         self._data = app.config
 
+class Logger():
+    def __init__(self):
+        self._logger = None
+
+    def init_app(self, app):
+        self._logger = app.logger
+
+    def __getattr__(self, name):
+        return getattr(self._logger, name)
+
 db = flask_sqlalchemy.SQLAlchemy()
 jwt = flask_jwt.JWT()
 mailer = flask_mail.Mail()
 config = Config()
+logger = Logger()
 
 jwt_required = flask_jwt.jwt_required

@@ -41,7 +41,8 @@ class Application(flask.Flask):
         handler.setFormatter(formatter)
 
         self.logger.addHandler(handler)
-        self.logger.info('SEGUE HAS STARTED (well, at least we have a logger to speak of)');
+        core.logger.init_app(self)
+        core.logger.info('SEGUE HAS STARTED (well, at least we have a logger to speak of)');
 
     def _load_cors(self):
         self.cors = CORS(self)
