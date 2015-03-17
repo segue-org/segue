@@ -1,4 +1,4 @@
-from segue.core import db
+from segue.core import db, logger
 from segue.errors import NotAuthorized
 
 from factories import BuyerFactory, PurchaseFactory
@@ -68,19 +68,23 @@ class PaymentService(object):
         return result.first()
 
     def notify(self, method, purchase_id, payment_id, payload):
-        processor = self.processor_for(method)
-        payment = self.get_one(purchase_id, payment_id)
-        purchase = payment.purchase
+        try:
+            processor = self.processor_for(method)
+            payment = self.get_one(purchase_id, payment_id)
+            purchase = payment.purchase
 
-        transition = processor.notify(purchase, payment, payload)
-        payment.recalculate_status()
-        purchase.recalculate_status()
+            transition = processor.notify(purchase, payment, payload)
+            payment.recalculate_status()
+            purchase.recalculate_status()
 
-        db.session.add(payment)
-        db.session.add(transition)
-        db.session.add(purchase)
-        db.session.commit()
-        return purchase
+            db.session.add(payment)
+            db.session.add(transition)
+            db.session.add(purchase)
+            db.session.commit()
+            return purchase
+        except Exception, e:
+            logger.error('Exception was thrown while processing payment notification! %s', e)
+            raise e
 
     def processor_for(self, method):
         if method in self.processors_overrides:

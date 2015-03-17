@@ -11,9 +11,11 @@ class SegueError(JsonSerializable, Exception):
     def to_json(self):
         return { 'args': self.args }
 
+    def __str__(self):
+        return "<{}:args={}>".format(self.__class__.__name__, self.args)
+
 class BadConfiguration(SegueError):
     pass
-
 
 class ExternalServiceError(SegueError):
     code = 500
@@ -51,6 +53,11 @@ class PaymentVerificationFailed(SegueError):
     code = 500
     def to_json(self):
         return { 'message': 'the fetching notification data from payment provider failed' }
+
+class InvalidPaymentNotification(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'the notification data from payment provider is not correct for this payment method' }
 
 class NotAuthorized(SegueError):
     code = 403

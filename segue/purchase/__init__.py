@@ -45,10 +45,8 @@ class PaymentController(object):
 
     @jsoned
     def notify(self, purchase_id=None, payment_id=None):
-        notification_code = request.args.get('notificationCode', None)
-        if not notification_code: flask.abort(400, "notificationCode is mandatory")
-
-        result = self.service.notify(purchase_id, payment_id, notification_code) or flask.abort(404)
+        payload = request.form.to_dict(True)
+        result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
         return result, 200
 
     def conclude(self):

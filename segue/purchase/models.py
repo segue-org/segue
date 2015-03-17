@@ -35,7 +35,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def valid_payments(self):
-        return self.payments.filter(Payment.status == 'paid')
+        return self.payments.filter(Payment.status.in_(Payment.VALID_PAYMENT_STATUSES))
 
     @property
     def paid_amount(self):
@@ -52,6 +52,8 @@ class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
 
 class Payment(JsonSerializable, db.Model):
+    VALID_PAYMENT_STATUSES = ['paid','confirmed']
+
     _serializers = [ PaymentJsonSerializer ]
     id          = db.Column(db.Integer, primary_key=True)
     type        = db.Column(db.String(20))
@@ -79,8 +81,17 @@ class PagSeguroPayment(Payment):
 
 class Transition(db.Model):
     id             = db.Column(db.Integer, primary_key=True)
+    type           = db.Column(db.String(20))
     payment_id     = db.Column(db.Integer, db.ForeignKey('payment.id'))
     old_status     = db.Column(db.Text)
     new_status     = db.Column(db.Text)
     source         = db.Column(db.Text)
     created        = db.Column(db.DateTime, default=func.now())
+
+    __tablename__ = 'transition'
+    __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'transition' }
+
+class PagSeguroTransition(Transition):
+    __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
+    notification_code = db.Column(db.String(39), name='ps_notification_code')
+    payload           = db.Column(db.Text,       name='ps_payload')

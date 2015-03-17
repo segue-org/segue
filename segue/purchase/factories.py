@@ -1,6 +1,6 @@
 from segue.factory import Factory
 
-from models import Buyer, Purchase, Payment
+from models import Buyer, Purchase, Payment, Transition
 
 class BuyerFactory(Factory):
     model = Buyer
@@ -27,3 +27,14 @@ class PaymentFactory(Factory):
         payment.amount   = purchase.outstanding_amount
         return payment
 
+
+class TransitionFactory(Factory):
+    model = Transition
+
+    @classmethod
+    def create(cls, payment, source, target_model=Transition):
+        transition = target_model()
+        transition.payment = payment
+        transition.source = source
+        transition.old_status = payment.status
+        return transition

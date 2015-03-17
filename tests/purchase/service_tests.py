@@ -3,7 +3,7 @@ import mockito
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
-from segue.errors import NotAuthorized
+from segue.errors import NotAuthorized, PaymentVerificationFailed, InvalidPaymentNotification
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
@@ -124,8 +124,20 @@ class PaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.status, 'pending')
         self.assertEquals(result.outstanding_amount, 200)
 
+    def test_notifications_that_cannot_be_processed_throws_its_errors(self):
+        payload    = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
 
+        mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(InvalidPaymentNotification)
+        with self.assertRaises(InvalidPaymentNotification):
+            self.service.notify('dummy', purchase.id, payment.id, payload)
 
+        mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(PaymentVerificationFailed)
+        with self.assertRaises(PaymentVerificationFailed):
+            self.service.notify('dummy', purchase.id, payment.id, payload)
 
 
 class PaymentFactoryTestCases(SegueApiTestCase):
@@ -136,8 +148,9 @@ class PaymentFactoryTestCases(SegueApiTestCase):
         product  = self.create_from_factory(ValidProductFactory, price=200)
         purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
         payment1 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=50)
-        payment2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=25, status='paid')
+        payment2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='paid')
+        payment3 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='confirmed')
 
-        payment3 = PaymentFactory.create(purchase)
+        payment4 = PaymentFactory.create(purchase)
 
-        self.assertEquals(payment3.amount, 175)
+        self.assertEquals(payment4.amount, 175)

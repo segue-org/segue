@@ -1,15 +1,24 @@
 from requests.exceptions import RequestException
-from segue.errors import ExternalServiceError
+from segue.errors import ExternalServiceError, InvalidPaymentNotification
 from segue.core import db, logger
 
-from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory
+from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory, PagSeguroTransitionFactory
 
 class PagSeguroPaymentService(object):
-    def __init__(self, session_factory=None):
-        self.session_factory = session_factory or PagSeguroSessionFactory()
+    def __init__(self, sessions=None):
+        self.sessions = sessions or PagSeguroSessionFactory()
 
-    def notify(self, purchase, payment, data=None):
-        pass
+    def notify(self, purchase, payment, payload=None, source='notification'):
+        logger.debug('received pagseguro notification with payload %s', payload)
+        notification_code = payload.get('notificationCode', None)
+        if not notification_code: raise InvalidPaymentNotification()
+
+        try:
+            xml_result = self.sessions.notification_session(notification_code).check()
+            return PagSeguroTransitionFactory.create(notification_code, payment, xml_result, source)
+        except RequestException, e:
+            logger.errror('connection error to pagseguro! %s', e)
+            raise ExternalServiceError('pagseguro')
 
     def create(self, purchase, data=None):
         payment = PagSeguroPaymentFactory.create(purchase)
@@ -18,10 +27,10 @@ class PagSeguroPaymentService(object):
         return payment
 
     def process(self, payment):
-        session = self.session_factory.create_session(payment)
+        payment_session = self.sessions.payment_session(payment)
         try:
             logger.debug('starting pagseguro checkout for %s...', payment.id)
-            result = session.checkout()
+            result = payment_session.checkout()
             logger.debug('completed checkout for %s. result is: %s', payment.id, result.payment_url)
             return self._build_instructions(result)
         except RequestException, e:

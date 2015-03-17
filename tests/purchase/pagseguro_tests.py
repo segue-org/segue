@@ -1,5 +1,6 @@
 import mockito
 
+import os
 from segue.purchase.pagseguro import PagSeguroPaymentService, PagSeguroSessionFactory
 from segue.purchase.models import PagSeguroPayment
 from segue.errors import ExternalServiceError
@@ -12,7 +13,25 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PagSeguroPaymentServiceTestCases, self).setUp()
         self.factory = mockito.Mock()
-        self.service = PagSeguroPaymentService(session_factory=self.factory)
+        self.service = PagSeguroPaymentService(sessions=self.factory)
+
+    def _load_response(self, filename):
+        path = os.path.join(os.path.dirname(__file__), 'fixtures', filename)
+        return open(path,'r').read()
+
+    def test_valid_notification_is_received(self):
+        purchase = self.create_from_factory(ValidPurchaseByPersonFactory)
+        payment  = self.create_from_factory(ValidPagSeguroPaymentFactory, purchase=purchase)
+        payload  = { 'notificationCode': 'DEAD-C0FFEE', 'notificationType': 'transaction' }
+
+        session = mockito.Mock()
+        mockito.when(self.factory).notification_session('DEAD-C0FFEE').thenReturn(session)
+        mockito.when(session).check().thenReturn(self._load_response('pagseguro_paid.xml'))
+
+        transition = self.service.notify(purchase, payment, payload)
+
+        self.assertEquals(transition.old_status, 'pending')
+        self.assertEquals(transition.new_status, 'paid')
 
     def test_creates_a_payment_on_db(self):
         account = self.create_from_factory(ValidAccountFactory, id=333)
@@ -30,7 +49,7 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         payment = self.create_from_factory(ValidPagSeguroPaymentFactory)
         session = mockito.Mock()
 
-        mockito.when(self.factory).create_session(payment).thenReturn(session)
+        mockito.when(self.factory).payment_session(payment).thenReturn(session)
         mockito.when(session).checkout().thenReturn(hashie(payment_url='https://songa'))
 
         result = self.service.process(payment)
@@ -41,7 +60,7 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         payment = self.create_from_factory(ValidPagSeguroPaymentFactory)
         session = mockito.Mock()
 
-        mockito.when(self.factory).create_session(payment).thenReturn(session)
+        mockito.when(self.factory).payment_session(payment).thenReturn(session)
         mockito.when(session).checkout().thenRaise(RequestException)
 
         with self.assertRaises(ExternalServiceError):
@@ -60,15 +79,15 @@ class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
 
     def test_builds_referencen_and_url_from_payment(self):
         payment, _, _ = self._build_payment()
-        result = self.factory.create_session(payment)
+        result = self.factory.payment_session(payment)
 
         self.assertEquals(result.reference,          'SEGUE-FISL16-A00555-PU00444-PA00999')
-        self.assertEquals(result.redirect_url,       'http://192.168.33.91:9001/api/purchases/444/payment/999/conclude')
-        self.assertEquals(result.notification_url,   'http://192.168.33.91:9001/api/purchases/444/payment/999/notify')
+        self.assertEquals(result.redirect_url,       'http://192.168.33.91:9001/api/purchases/444/payments/999/conclude')
+        self.assertEquals(result.notification_url,   'http://192.168.33.91:9001/api/purchases/444/payments/999/notify')
 
     def test_builds_a_sender_from_payment(self):
         payment, purchase, _ = self._build_payment()
-        result = self.factory.create_session(payment)
+        result = self.factory.payment_session(payment)
 
         self.assertEquals(result.sender['name'],      purchase.buyer.name)
         self.assertEquals(result.sender['email'],     purchase.customer.email)
@@ -77,7 +96,7 @@ class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
 
     def test_builds_a_shipping_from_payment(self):
         payment, purchase, _ = self._build_payment()
-        result = self.factory.create_session(payment)
+        result = self.factory.payment_session(payment)
 
         self.assertEquals(result.shipping['type'], 3)
         self.assertEquals(result.shipping['street'],      purchase.buyer.address_street)
@@ -89,7 +108,7 @@ class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
 
     def test_builds_a_product_from_payment(self):
         payment, _, product = self._build_payment()
-        result = self.factory.create_session(payment)
+        result = self.factory.payment_session(payment)
 
         self.assertEquals(len(result.items), 1)
         self.assertEquals(result.items[0]['id'], '0001')
