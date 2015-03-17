@@ -73,8 +73,8 @@ class PaymentService(object):
         purchase = payment.purchase
 
         transition = processor.notify(purchase, payment, payload)
-        payment.update_status(transition)
-        purchase.update_status()
+        payment.recalculate_status()
+        purchase.recalculate_status()
 
         db.session.add(payment)
         db.session.add(transition)
