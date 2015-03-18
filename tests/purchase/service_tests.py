@@ -152,7 +152,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
-        mockito.when(self.dummy).conclude(payment, payload).thenReturn(None)
+        mockito.when(self.dummy).conclude(payment, payload).thenReturn(transition)
 
         result = self.service.conclude(purchase.id, payment.id, payload)
 

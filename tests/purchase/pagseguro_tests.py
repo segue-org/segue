@@ -34,6 +34,21 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(transition.old_status, 'pending')
         self.assertEquals(transition.new_status, 'paid')
 
+    def test_pagseguro_conclude_checks_transaction_code(self):
+        transaction_id = 'DEAD-BABE'
+        account  = self.create_from_factory(ValidAccountFactory, id=555)
+        purchase = self.create_from_factory(ValidPurchaseByPersonFactory, id=666, customer=account)
+        payment  = self.create_from_factory(ValidPagSeguroPaymentFactory, id=777, purchase=purchase)
+        session = mockito.Mock()
+
+        mockito.when(self.factory).query_session(transaction_id).thenReturn(session)
+        mockito.when(session).get().thenReturn(self._load_response('pagseguro_paid.xml'))
+
+        transition = self.service.conclude(payment, {'transaction_id': transaction_id})
+
+        self.assertEquals(transition.old_status, 'pending')
+        self.assertEquals(transition.new_status, 'paid')
+
     def test_creates_a_payment_on_db(self):
         account = self.create_from_factory(ValidAccountFactory, id=333)
         purchase = self.create_from_factory(ValidPurchaseFactory, id=666, customer=account)
@@ -68,14 +83,7 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         with self.assertRaises(ExternalServiceError):
             self.service.process(payment)
 
-    def test_pagseguro_conclude_checks_transaction_code(self):
-        payment = self.create_from_factory(ValidPagSeguroPaymentFactory)
 
-        result = self.service.conclude(payment, {'transaction_id': payment.code })
-        self.assertEquals(result, True)
-
-        with self.assertRaises(NoSuchPayment):
-            result = self.service.conclude(payment, {'transaction_id': "birosca" })
 
 class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
     def setUp(self):
