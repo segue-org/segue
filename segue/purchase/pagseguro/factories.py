@@ -37,11 +37,11 @@ class PagSeguroTransitionFactory(TransitionFactory):
 
         if error_element:
             logger.error('pagseguro reported an error with our notification check: %s', error_element.text)
-            raise InvalidPaymentNotification(code, message)
+            raise InvalidPaymentNotification(error_element.text)
 
         if not status_element.text or not reference_element.text:
             logger.error('pagseguro reported a malformed response')
-            raise InvalidPaymentNotification(code, message)
+            raise InvalidPaymentNotification('malformed pagseguro response')
 
         resolved_status = cls.PAGSEGURO_STATUSES.get(int(status_element.text), 'unknown')
         return reference_element.text, resolved_status
