@@ -1,0 +1,3 @@
+#!/bin/bash
+
+pg_dump -cf /var/backups/segue/`date +%Y-%m-%d_%H:%M` {{ dbname }}

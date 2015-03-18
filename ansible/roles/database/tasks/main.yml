@@ -6,3 +6,6 @@
 - include: setup.yml
   sudo: yes
   sudo_user: postgres
+
+- include: backup.yml
+  tags: backup

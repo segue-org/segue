@@ -1,0 +1,36 @@
+---
+
+- name: ensure there is a backups directory
+  tags: backup
+  file: path=/var/backups
+        state=directory
+        mode=0755
+        owner=root
+
+- name: ensure there is a directory segue inside backups
+  tags: backup
+  file: path=/var/backups/segue/
+        state=directory
+        mode=0755
+        owner=postgres
+
+
+- name: Create script for database backup
+  tags:
+    - config
+    - backup
+  template: src=segue_backuper.sh.j2
+            owner=postgres
+            mode=0755
+            dest=/usr/local/sbin/segue_backuper.sh
+
+- name: adds database backup script to the cron every {{ backup_frequency }} min
+  tags:
+    - config
+    - backup
+  cron: name='segue backup job'
+        cron_file=segue_backuper
+        minute=*/{{ backup_frequency }}
+        hour=*
+        user=postgres
+        job="/usr/local/sbin/segue_backuper.sh"
