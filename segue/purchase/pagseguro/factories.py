@@ -65,7 +65,7 @@ class PagSeguroTransitionFactory(TransitionFactory):
         transition = TransitionFactory.create(payment, source, target_model=cls.model)
         transition.notification_code = notification_code
         transition.new_status        = status
-        transition.payload           = xml_payload
+        transition.payload           = xml_payload.decode('iso-8859-1')
         return transition
 
 class PagSeguroDetailsFactory(object):

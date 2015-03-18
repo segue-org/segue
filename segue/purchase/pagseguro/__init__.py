@@ -37,6 +37,8 @@ class PagSeguroPaymentService(object):
         try:
             logger.debug('starting pagseguro checkout for %s...', payment.id)
             result = payment_session.checkout()
+            logger.debug('pagseguro answered with xml... %s', result.xml)
+            if result.xml == 'Unauthorized': raise BadConfiguration('pagseguro is not correctly configurated')
             logger.debug('completed checkout for %s. result is: %s', payment.id, result.payment_url)
             instructions = self._build_instructions(result)
             payment.code = result.code
