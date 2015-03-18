@@ -45,6 +45,10 @@ class Purchase(JsonSerializable, db.Model):
     def outstanding_amount(self):
         return self.product.price - self.paid_amount
 
+    @property
+    def satisfied(self):
+        return self.status == 'paid'
+
     def recalculate_status(self):
         self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
 

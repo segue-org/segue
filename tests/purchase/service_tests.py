@@ -3,7 +3,8 @@ import mockito
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
-from segue.errors import NotAuthorized, PaymentVerificationFailed, InvalidPaymentNotification, NoSuchPayment
+from segue.errors import NotAuthorized, PaymentVerificationFailed, \
+                         InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
@@ -70,6 +71,12 @@ class PaymentServiceTestCases(SegueApiTestCase):
         result = self.service.create(purchase, 'dummy', data)
 
         self.assertEquals(result, instructions)
+
+    def test_cannot_create_a_payment_for_a_satisfied_purchase(self):
+        purchase = self.create_from_factory(ValidPurchaseFactory, status='paid')
+
+        with self.assertRaises(PurchaseAlreadySatisfied):
+            self.service.create(purchase, 'dummy', {})
 
     def test_retrieves_one_payment_autocasted_to_its_type(self):
         purchase = self.create_from_factory(ValidPurchaseFactory)

@@ -1,5 +1,5 @@
 from segue.core import db, logger
-from segue.errors import NotAuthorized, NoSuchPayment
+from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
@@ -58,6 +58,7 @@ class PaymentService(object):
         self.processors_overrides = processors_overrides
 
     def create(self, purchase, method, data):
+        if purchase.satisfied: raise PurchaseAlreadySatisfied()
         processor = self.processor_for(method)
         payment = processor.create(purchase, data)
         instructions = processor.process(payment)

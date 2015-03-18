@@ -1,7 +1,8 @@
 import json
 import mockito
 
-from segue.errors import NotAuthorized, PaymentVerificationFailed, InvalidPaymentNotification, NoSuchPayment
+from segue.errors import NotAuthorized, PaymentVerificationFailed,\
+                         InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -55,6 +56,13 @@ class PurchaseControllerTestCases(SegueApiTestCase):
         self.assertEquals(content['$type'], 'PagSeguroPayment.normal')
         self.assertEquals(content['status'], 'pending')
 
+
+    def test_starting_a_payment_for_a_purchase(self):
+        purchase = self.build_from_factory(ValidPurchaseFactory, status='paid')
+        mockito.when(self.mock_service).create_payment(123, 'pagseguro', {}, by=self.mock_owner).thenRaise(PurchaseAlreadySatisfied)
+
+        response = self.jpost('/purchases/123/pay/pagseguro', data="{}")
+        self.assertEquals(response.status_code, 400)
 
 class PaymentControllerTestCases(SegueApiTestCase):
     def setUp(self):

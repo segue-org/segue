@@ -54,6 +54,11 @@ class PaymentVerificationFailed(SegueError):
     def to_json(self):
         return { 'message': 'the fetching notification data from payment provider failed' }
 
+class PurchaseAlreadySatisfied(SegueError):
+    code = 400;
+    def to_json(self):
+        return { 'message': 'this purchase has already been paid completely' }
+
 class NoSuchPayment(SegueError):
     code = 404
     def to_json(self):
