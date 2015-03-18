@@ -42,7 +42,7 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         session = mockito.Mock()
 
         mockito.when(self.factory).query_session(transaction_id).thenReturn(session)
-        mockito.when(session).get().thenReturn(self._load_response('pagseguro_paid.xml'))
+        mockito.when(session).check().thenReturn(self._load_response('pagseguro_paid.xml'))
 
         transition = self.service.conclude(payment, {'transaction_id': transaction_id})
 
