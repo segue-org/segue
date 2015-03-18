@@ -114,15 +114,13 @@ class PagSeguroSessionFactory(object):
 
     def notification_session(self, notification_code):
         pg = PagSeguro(config.PAGSEGURO_EMAIL, config.PAGSEGURO_TOKEN)
-        # TODO: pick correct environment!
-        pg.config = ConfigSandbox
+        if self.use_env != 'production': pg.config = ConfigSandbox
         pg.check = lambda: pg.check_notification(notification_code).xml
         return pg
 
     def payment_session(self, payment):
         pg = PagSeguro(config.PAGSEGURO_EMAIL, config.PAGSEGURO_TOKEN)
-        # TODO: pick correct environment!
-        pg.config = ConfigSandbox
+        if self.use_env != 'production': pg.config = ConfigSandbox
 
         pg.sender    = self.details_factory.create_sender(payment.purchase.customer, payment.purchase.buyer)
         pg.shipping  = self.details_factory.create_shipping(payment.purchase.buyer)
