@@ -121,7 +121,7 @@ class PagSeguroSessionFactory(object):
     def query_session(self, transaction_id):
         pg = PagSeguro(config.PAGSEGURO_EMAIL, config.PAGSEGURO_TOKEN)
         if self.use_env != 'production': pg.config = ConfigSandbox
-        pg.transaction = lambda: pg.check_transaction(transaction_id).xml
+        pg.check = lambda: pg.check_transaction(transaction_id).xml
         return pg
 
     def payment_session(self, payment):

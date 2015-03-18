@@ -32,7 +32,7 @@ class PagSeguroPaymentService(object):
         if not transaction_id: raise InvalidPaymentNotification()
 
         try:
-            xml_result = self.sessions.query_session(transaction_id).get()
+            xml_result = self.sessions.query_session(transaction_id).check()
             return PagSeguroTransitionFactory.create(transaction_id, payment, xml_result, 'conclude')
         except RequestException, e:
             logger.error('connection error to pagseguro! %s', e)
