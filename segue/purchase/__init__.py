@@ -20,7 +20,7 @@ class PurchaseController(object):
     def list(self):
         parms = { c: request.args.get(c) for c in PurchaseFactory.QUERY_WHITELIST if c in request.args }
         result = self.service.query(by=self.current_user, **parms)
-        return JsonFor(result).using('ShortPurchaseJsonSerializer'), 200
+        return JsonFor(result).using('PurchaseJsonSerializer'), 200
 
     @jwt_required()
     @jsoned
