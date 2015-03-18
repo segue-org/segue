@@ -34,9 +34,10 @@ class ProposalController(object):
         return result, 200
 
     @jsoned
+    @jwt_required()
     def list(self):
         parms = { c: request.args.get(c) for c in ProposalFactory.QUERY_WHITELIST if c in request.args }
-        result = self.service.query(**parms)
+        result = self.service.query(as_user=self.current_user, **parms)
         return JsonFor(result).using('ShortChildProposalJsonSerializer'), 200
 
     @jsoned

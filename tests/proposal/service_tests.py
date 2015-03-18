@@ -80,15 +80,27 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(result[0].name_en, track1.name_en)
         self.assertEquals(result[1].name_en, track2.name_en)
 
-    def test_query_proposals_by_owner(self):
+    def test_query_proposals_with_auth_check(self):
         owner = self.create_from_factory(ValidAccountFactory)
         proposal1 = self.create_from_factory(ValidProposalFactory, owner=owner)
         proposal2 = self.create_from_factory(ValidProposalWithOwnerFactory)
 
-        result = self.service.query(owner_id = owner.id)
-
+        result = self.service.query(as_user=owner)
         self.assertEquals(len(result), 1)
         self.assertEquals(result[0].id, proposal1.id)
+
+    def test_query_proposals_by_owner_with_auth_check(self):
+        owner = self.create_from_factory(ValidAccountFactory)
+        proposal1 = self.create_from_factory(ValidProposalFactory, owner=owner)
+        proposal2 = self.create_from_factory(ValidProposalWithOwnerFactory)
+
+        result = self.service.query(owner_id = owner.id, as_user=owner)
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0].id, proposal1.id)
+
+        result = self.service.query(owner_id = owner.id, as_user=proposal2.owner)
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0].id, proposal2.id)
 
     def test_query_proposals_by_coauthor(self):
         account1 = self.create_from_factory(ValidAccountFactory)

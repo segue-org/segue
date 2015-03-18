@@ -98,8 +98,8 @@ class ProposalControllerTestCases(SegueApiTestCase):
         prop1 = ValidProposalFactory.build()
         prop2 = ValidProposalFactory.build()
 
-        mockito.when(self.mock_service).query().thenReturn([prop1, prop2])
-        mockito.when(self.mock_service).query(owner_id=u'123').thenReturn([prop1])
+        mockito.when(self.mock_service).query(as_user=self.mock_owner).thenReturn([prop1, prop2])
+        mockito.when(self.mock_service).query(owner_id=u'123', as_user=self.mock_owner).thenReturn([prop1])
 
         response = self.jget('/proposals')
         items = json.loads(response.data)['items']

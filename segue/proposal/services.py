@@ -19,17 +19,24 @@ class Hasher(object):
         return "{0:0{1}X}".format(value, self.length)
 
 class ProposalFilterStrategies(object):
-    def given(self, **criteria):
+    def given(self, as_user=None, **criteria):
         result = []
         for key, value in criteria.items():
             method = getattr(self, "by_"+key)
-            result.append(method(value))
+            result.append(method(value, as_user=as_user))
+        if not result:
+            result.append(self.enforce_user(as_user))
         return result
 
-    def by_owner_id(self, value):
+    def enforce_user(self, user):
+        return Proposal.owner == user
+
+    def by_owner_id(self, value, as_user=None):
+        value = as_user.id if as_user else value
         return Proposal.owner_id == value
 
-    def by_coauthor_id(self, value):
+    def by_coauthor_id(self, value, as_user=None):
+        value = as_user.id if as_user else value
         return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
 
 class ProposalService(object):
