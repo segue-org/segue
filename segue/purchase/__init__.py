@@ -52,5 +52,5 @@ class PaymentController(object):
     def conclude(self, purchase_id, payment_id):
         payload = request.args.to_dict(True)
         self.service.conclude(purchase_id, payment_id, payload) or flask.abort(404)
-        path = '/#/purchases/{}/invite/{}/conclude'.format(purchase_id, payment_id)
+        path = '/#/purchases/{}/payments/{}/conclude'.format(purchase_id, payment_id)
         return flask.redirect(config.FRONTEND_URL + path)

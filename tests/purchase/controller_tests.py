@@ -79,7 +79,7 @@ class PaymentControllerTestCases(SegueApiTestCase):
 
         response = self.client.get('/purchases/123/payments/456/conclude?'+raw_payload)
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.headers['Location'], 'http://localhost:9000/#/purchases/123/invite/456/conclude');
+        self.assertEquals(response.headers['Location'], 'http://localhost:9000/#/purchases/123/payments/456/conclude');
 
         response = self.client.get('/purchases/123/payments/789/conclude?'+raw_payload)
         self.assertEquals(response.status_code, 404)
