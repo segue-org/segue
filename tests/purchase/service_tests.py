@@ -3,7 +3,7 @@ import mockito
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment, PagSeguroPayment
-from segue.errors import NotAuthorized, PaymentVerificationFailed, InvalidPaymentNotification
+from segue.errors import NotAuthorized, PaymentVerificationFailed, InvalidPaymentNotification, NoSuchPayment
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
@@ -145,8 +145,22 @@ class PaymentServiceTestCases(SegueApiTestCase):
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
+        mockito.when(self.dummy).conclude(payment, payload).thenReturn(None)
 
         result = self.service.conclude(purchase.id, payment.id, payload)
+
+        self.assertEquals(result, purchase)
+
+    def test_conclude_payment_of_has_invalid_code(self):
+        payload = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
+        transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
+        mockito.when(self.dummy).conclude(payment, payload).thenRaise(NoSuchPayment)
+
+        with self.assertRaises(NoSuchPayment):
+            self.service.conclude(purchase.id, payment.id, payload)
 
 
 class PaymentFactoryTestCases(SegueApiTestCase):

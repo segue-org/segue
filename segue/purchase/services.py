@@ -70,7 +70,12 @@ class PaymentService(object):
         return result.first()
 
     def conclude(self, purchase_id, payment_id, payload):
-        return self
+        payment = self.get_one(purchase_id, payment_id)
+        if not payment: return None
+
+        processor = self.processor_for(payment.type)
+        processor.conclude(payment, payload)
+        return payment.purchase
 
     def notify(self, purchase_id, payment_id, payload):
         try:

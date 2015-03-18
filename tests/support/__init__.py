@@ -62,9 +62,6 @@ class SegueApiTestCase(unittest.TestCase):
     def jget(self, *args, **kw):
         return self.jrequest(self.client.get, *args, **kw)
 
-    def post(self, *args, **kw):
-        return self.client.post(*args, **kw)
-
     def jrequest(self, method, *args, **kw):
         kw.setdefault('content_type', 'application/json')
 
