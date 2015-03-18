@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 from segue.core import db
 from tests.support.factories import *
 from segue.models import Account, Proposal, ProposalInvite, Track
 
 def populate(clean=False):
     if clean:
+        Payment.query.delete()
+        Purchase.query.delete()
         ProposalInvite.query.delete()
         Proposal.query.delete()
         Account.query.delete()
-        populate_reference_data(True)
+        tracks, products = populate_reference_data(True)
 
     accounts = [
-        ValidAccountFactory.build(password='1234'),
+        ValidAccountFactory.build(password='1234', email='xxxx@sandbox.pagseguro.com.br'),
         ValidAccountFactory.build(password='1234'),
         ValidAccountFactory.build(password='1234'),
     ]
@@ -26,10 +29,21 @@ def populate(clean=False):
         ValidInviteFactory.build(proposal=proposals[0]),
         ValidInviteFactory.build(proposal=proposals[0]),
     ]
+    purchases = [
+        ValidPurchaseByPersonFactory.build(product=products[0], customer=accounts[0]),
+        ValidPurchaseByPersonFactory.build(product=products[0], customer=accounts[1])
+    ]
+    payments = [
+        ValidPagSeguroPaymentFactory.build(purchase=purchases[0], amount=products[0].price, status='pending'),
+        ValidPagSeguroPaymentFactory.build(purchase=purchases[0], amount=products[0].price, status='pending'),
+        ValidPagSeguroPaymentFactory.build(purchase=purchases[1], amount=products[1].price, status='paid'),
+    ]
 
     db.session.add_all(accounts)
     db.session.add_all(proposals)
     db.session.add_all(proposal_invites)
+    db.session.add_all(purchases)
+    db.session.add_all(payments)
     db.session.commit()
 
 def populate_reference_data(clean=False):
@@ -43,6 +57,7 @@ def populate_reference_data(clean=False):
     if not Product.query.all(): db.session.add_all(products)
 
     db.session.commit()
+    return tracks, products
 
 def _build_products():
     def _build_one(entry):
