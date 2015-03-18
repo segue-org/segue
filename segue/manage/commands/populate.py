@@ -51,7 +51,7 @@ def _build_products():
             category=entry[0],
             description="ingresso FISL16 - {} - lote {}".format(entry[1], entry[2]),
             sold_until=entry[3],
-            price=entry[4]
+            price=Decimal(entry[4])
         )
 
     data = [

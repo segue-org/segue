@@ -21,7 +21,7 @@ def upgrade():
             sa.Column('type', sa.String(length=20), nullable=True),
             sa.Column('purchase_id', sa.Integer(), nullable=True),
             sa.Column('status', sa.Text(), nullable=True),
-            sa.Column('amount', sa.Numeric(precision=2), nullable=True),
+            sa.Column('amount', sa.Numeric(), nullable=True),
             sa.Column('ps_code', sa.String(length=32), nullable=True),
             sa.Column('ps_reference', sa.String(length=50), nullable=True),
             sa.ForeignKeyConstraint(['purchase_id'], ['purchase.id'], ),

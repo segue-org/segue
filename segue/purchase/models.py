@@ -59,7 +59,7 @@ class Payment(JsonSerializable, db.Model):
     type        = db.Column(db.String(20))
     purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'))
     status      = db.Column(db.Text, default='pending')
-    amount      = db.Column(db.Numeric(precision=2))
+    amount      = db.Column(db.Numeric)
 
     transitions = db.relationship('Transition', backref='payment', lazy='dynamic')
 
