@@ -29,8 +29,7 @@ class PagSeguroTransitionFactory(TransitionFactory):
     }
 
     @classmethod
-    def create(cls, notification_code, payment, xml_payload, source):
-        logger.debug('received xml from pagseguro %s', xml_payload)
+    def parse_xml_payload(cls, payment, xml_payload):
         doc = ElementTree.fromstring(xml_payload)
         status_element    = doc.find('.//status')
         error_element     = doc.find('.//error')
@@ -44,7 +43,12 @@ class PagSeguroTransitionFactory(TransitionFactory):
             logger.error('pagseguro reported a malformed response')
             raise InvalidPaymentNotification(code, message)
 
-        reference_parts = re.findall(r'(\d{5})', reference_element.text)
+        resolved_status = cls.PAGSEGURO_STATUSES.get(int(status_element.text), 'unknown')
+        return reference_element.text, resolved_status
+
+    @classmethod
+    def check_reference(cls, payment, reference):
+        reference_parts = re.findall(r'(\d{5})', reference)
         if len(reference_parts) != 3: raise InvalidPaymentNotification('reference string is not valid!')
 
         account_id, purchase_id, payment_id = reference_parts
@@ -52,10 +56,16 @@ class PagSeguroTransitionFactory(TransitionFactory):
         if int(purchase_id) != payment.purchase.id: raise InvalidPaymentNotification('purchase id does not match')
         if int(account_id)  != payment.purchase.customer.id: raise InvalidPaymentNotification('account id does not match')
 
+    @classmethod
+    def create(cls, notification_code, payment, xml_payload, source):
+        logger.debug('received xml from pagseguro %s', xml_payload)
+        reference, status = cls.parse_xml_payload(payment, xml_payload)
+        cls.check_reference(payment, reference)
+
         transition = TransitionFactory.create(payment, source, target_model=cls.model)
         transition.notification_code = notification_code
-        transition.new_status = cls.PAGSEGURO_STATUSES.get(int(status_element.text))
-        transition.payload    = xml_payload
+        transition.new_status        = status
+        transition.payload           = xml_payload
         return transition
 
 class PagSeguroDetailsFactory(object):
