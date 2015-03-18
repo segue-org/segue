@@ -142,6 +142,7 @@ class ValidPagSeguroPaymentFactory(ValidPaymentFactory):
     class Meta:
         model = PagSeguroPayment
     reference = 'A00555-PU00444'
+    code      = 'LECODE'
 
 class ValidTransitionFactory(SegueFactory):
     class Meta:

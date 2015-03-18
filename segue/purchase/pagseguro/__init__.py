@@ -1,5 +1,5 @@
 from requests.exceptions import RequestException
-from segue.errors import ExternalServiceError, InvalidPaymentNotification
+from segue.errors import ExternalServiceError, InvalidPaymentNotification, NoSuchPayment
 from segue.core import db, logger
 
 from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory, PagSeguroTransitionFactory
@@ -25,6 +25,12 @@ class PagSeguroPaymentService(object):
         db.session.add(payment)
         db.session.commit()
         return payment
+
+    def conclude(self, payment, payload=None):
+        transaction_code = payload['transaction_id']
+        if payment.code != transaction_code:
+            raise NoSuchPayment(transaction_code, payment.id)
+        return True
 
     def process(self, payment):
         payment_session = self.sessions.payment_session(payment)

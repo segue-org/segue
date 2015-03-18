@@ -3,7 +3,7 @@ import mockito
 import os
 from segue.purchase.pagseguro import PagSeguroPaymentService, PagSeguroSessionFactory
 from segue.purchase.models import PagSeguroPayment
-from segue.errors import ExternalServiceError
+from segue.errors import ExternalServiceError, NoSuchPayment
 from requests.exceptions import RequestException
 
 from ..support import SegueApiTestCase, hashie
@@ -67,6 +67,15 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(ExternalServiceError):
             self.service.process(payment)
+
+    def test_pagseguro_conclude_checks_transaction_code(self):
+        payment = self.create_from_factory(ValidPagSeguroPaymentFactory)
+
+        result = self.service.conclude(payment, {'transaction_id': payment.code })
+        self.assertEquals(result, True)
+
+        with self.assertRaises(NoSuchPayment):
+            result = self.service.conclude(payment, {'transaction_id': "birosca" })
 
 class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
     def setUp(self):
