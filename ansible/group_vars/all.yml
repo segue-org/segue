@@ -14,4 +14,4 @@ threads: 15
 
 cors_origin: '*'
 mail_use_tls: False
-backup_frequency: 1
+backup_frequency: 5
