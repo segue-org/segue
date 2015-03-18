@@ -32,6 +32,7 @@ class PurchaseService(object):
     def create(self, buyer_data, product, account):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
         purchase = PurchaseFactory.create(buyer, product, account)
+        self.db.session.add(buyer)
         self.db.session.add(purchase)
         self.db.session.commit()
         return purchase
