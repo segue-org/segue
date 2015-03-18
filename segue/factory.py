@@ -1,5 +1,7 @@
 import jsonschema
 
+from segue.core import logger
+
 from errors import SegueValidationError
 
 class Factory(object):
@@ -14,7 +16,7 @@ class Factory(object):
         errors = list(validator.iter_errors(data))
         cleaned_data = cls.clean_for_insert(data)
         if errors:
-            print errors
+            logger.error('validation error for %s.from_json: %s', cls, errors)
             raise SegueValidationError(errors)
         return cls.model(**cleaned_data)
 

@@ -37,7 +37,7 @@ class Application(flask.Flask):
 
         handler = logging.handlers.RotatingFileHandler(self.config['LOGFILE'],
                                                        maxBytes=100000, backupCount=5, mode="a+")
-        handler.setLevel(logging.INFO)
+        handler.setLevel(getattr(logging, self.config['LOGLEVEL']))
         handler.setFormatter(formatter)
 
         self.logger.addHandler(handler)

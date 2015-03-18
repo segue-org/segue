@@ -7,13 +7,15 @@ user_home: /home/vagrant
 jwt_secret: sshh
 
 frontend_url: http://localhost:9000
-backend_url: http://192.168.33.91:9001
+backend_url: http://192.168.33.91
 
 debugging: True
 
 dbuser: segue
 dbname: segue
 dbpass: segue
+
+loglevel: DEBUG
 
 mail_server: localhost
 mail_port: 1025

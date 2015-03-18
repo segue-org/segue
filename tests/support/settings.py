@@ -10,6 +10,7 @@ SQLALCHEMY_POOL_RECYCLE = None
 SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 LOGFILE = '/tmp/segue.log'
+LOGLEVEL = 'DEBUG'
 
 FRONTEND_URL = 'http://localhost:9000'
 BACKEND_URL = 'http://192.168.33.91:9001'
