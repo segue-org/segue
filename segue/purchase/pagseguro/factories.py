@@ -37,9 +37,7 @@ class PagSeguroTransitionFactory(TransitionFactory):
         reference_element = doc.find('.//reference')
 
         if error_element:
-            code = error.find('./code').text
-            message = error.find('./message').text
-            logger.error('pagseguro reported an error with our notification check: %s: %s', code, message)
+            logger.error('pagseguro reported an error with our notification check: %s', error_element.text)
             raise InvalidPaymentNotification(code, message)
 
         if not status_element.text or not reference_element.text:
