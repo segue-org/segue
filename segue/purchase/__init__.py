@@ -2,7 +2,7 @@ import flask
 from flask.ext.jwt import current_user
 from flask import request
 
-from ..json import jsoned, JsonFor
+from ..json import jsoned, JsonFor, accepts_html
 from ..core import jwt_required
 
 from services import PurchaseService, PaymentService
@@ -49,7 +49,13 @@ class PaymentController(object):
         result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
         return result, 200
 
-    def conclude(self):
-        pass
-
-
+    @jsoned
+    @accepts_html
+    def conclude(self, purchase_id, payment_id, wants_html=False):
+        if wants_html:
+            path = '/#/purchases/{}/invite/{}/conclude'.format(purchase_id, payment_id)
+            return flask.redirect(config.FRONTEND_URL + path)
+        else:
+            payload = request.args.to_dict(True)
+            result = self.service.conclude(purchase_id, payment_id, payload) or flask.abort(404)
+            return result, 200

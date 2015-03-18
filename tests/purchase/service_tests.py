@@ -139,6 +139,15 @@ class PaymentServiceTestCases(SegueApiTestCase):
         with self.assertRaises(PaymentVerificationFailed):
             self.service.notify(purchase.id, payment.id, payload)
 
+    def test_conclude_payment_of_already_valid_payment(self):
+        payload = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
+        transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
+
+        result = self.service.conclude(purchase.id, payment.id, payload)
+
 
 class PaymentFactoryTestCases(SegueApiTestCase):
     def setUp(self):

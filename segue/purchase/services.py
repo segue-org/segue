@@ -67,6 +67,9 @@ class PaymentService(object):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
         return result.first()
 
+    def conclude(self, purchase_id, payment_id, payload):
+        return self
+
     def notify(self, purchase_id, payment_id, payload):
         try:
             payment = self.get_one(purchase_id, payment_id)

@@ -61,6 +61,28 @@ class PaymentControllerTestCases(SegueApiTestCase):
         super(PaymentControllerTestCases, self).setUp()
         self.mock_service = self.mock_controller_dep('purchase_payments', 'service')
 
+    def test_conclude_a_payment(self):
+        payment = { 'abc': 123 }
+        payload = { 'notificationType':'ABC-123-789', 'notificationType':'transaction' }
+
+        mockito.when(self.mock_service).notify(123, 456, payload).thenReturn(payment)
+        mockito.when(self.mock_service).notify(123, 789, payload).thenReturn(None)
+        mockito.when(self.mock_service).notify(123, 999, payload).thenRaise(PaymentVerificationFailed)
+        mockito.when(self.mock_service).notify(123, 666, {}).thenRaise(InvalidPaymentNotification)
+
+        response = self.post('/purchases/123/payments/456/notify', data=payload)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.post('/purchases/123/payments/789/notify', data=payload)
+        self.assertEquals(response.status_code, 404)
+
+        response = self.post('/purchases/123/payments/999/notify', data=payload)
+        self.assertEquals(response.status_code, 500)
+
+        response = self.post('/purchases/123/payments/666/notify', data={})
+        self.assertEquals(response.status_code, 400)
+
+
     def test_notify_a_payment_transitioned(self):
         payment = { 'abc': 123 }
         payload = { 'notificationType':'ABC-123-789', 'notificationType':'transaction' }
