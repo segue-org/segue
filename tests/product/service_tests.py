@@ -36,3 +36,7 @@ class ProductServiceTestCase(SegueApiTestCase):
         result = self.service.purchase(buyer_data, product.id, account=account)
 
         self.assertEquals(result, purchase)
+
+    def test_cannot_purchase_past_its_sold_date(self):
+        # TODO: write a test for blocking purchase of sold-out products
+        pass
