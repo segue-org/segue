@@ -1,5 +1,5 @@
 from segue.core import db, logger
-from segue.errors import NotAuthorized
+from segue.errors import NotAuthorized, NoSuchPayment
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
@@ -67,15 +67,18 @@ class PaymentService(object):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
         return result.first()
 
-    def notify(self, method, purchase_id, payment_id, payload):
+    def notify(self, purchase_id, payment_id, payload):
         try:
-            processor = self.processor_for(method)
             payment = self.get_one(purchase_id, payment_id)
+            if not payment: raise NoSuchPayment(purchase_id, payment_id)
+            processor = self.processor_for(payment.type)
             purchase = payment.purchase
+            logger.debug('selected processor for notification: %s', payment.type)
 
             transition = processor.notify(purchase, payment, payload)
             payment.recalculate_status()
             purchase.recalculate_status()
+            logger.debug('recalculated status: payment.status=%s, purchase.status=%s', payment.status, purchase.status)
 
             db.session.add(payment)
             db.session.add(transition)

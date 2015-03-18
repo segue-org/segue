@@ -1,11 +1,13 @@
+import re
+
 from xml.etree import ElementTree
 from pagseguro import PagSeguro
 from pagseguro.sandbox import ConfigSandbox
 
-from segue.core import config
+from segue.core import config, logger
 from segue.factory import Factory
 from segue.purchase.factories import PaymentFactory, TransitionFactory
-from segue.errors import BadConfiguration
+from segue.errors import BadConfiguration, InvalidPaymentNotification
 
 from ..models import PagSeguroPayment, PagSeguroTransition
 
@@ -28,12 +30,33 @@ class PagSeguroTransitionFactory(TransitionFactory):
 
     @classmethod
     def create(cls, notification_code, payment, xml_payload, source):
+        logger.debug('received xml from pagseguro %s', xml_payload)
         doc = ElementTree.fromstring(xml_payload)
-        new_status = doc.find('./status').text
+        status_element    = doc.find('.//status')
+        error_element     = doc.find('.//error')
+        reference_element = doc.find('.//reference')
+
+        if error_element:
+            code = error.find('./code').text
+            message = error.find('./message').text
+            logger.error('pagseguro reported an error with our notification check: %s: %s', code, message)
+            raise InvalidPaymentNotification(code, message)
+
+        if not status_element.text or not reference_element.text:
+            logger.error('pagseguro reported a malformed response')
+            raise InvalidPaymentNotification(code, message)
+
+        reference_parts = re.findall(r'(\d{5})', reference_element.text)
+        if len(reference_parts) != 3: raise InvalidPaymentNotification('reference string is not valid!')
+
+        account_id, purchase_id, payment_id = reference_parts
+        if int(payment_id)  != payment.id: raise InvalidPaymentNotification('payment id does not match!')
+        if int(purchase_id) != payment.purchase.id: raise InvalidPaymentNotification('purchase id does not match')
+        if int(account_id)  != payment.purchase.customer.id: raise InvalidPaymentNotification('account id does not match')
 
         transition = TransitionFactory.create(payment, source, target_model=cls.model)
         transition.notification_code = notification_code
-        transition.new_status = cls.PAGSEGURO_STATUSES.get(int(new_status))
+        transition.new_status = cls.PAGSEGURO_STATUSES.get(int(status_element.text))
         transition.payload    = xml_payload
         return transition
 

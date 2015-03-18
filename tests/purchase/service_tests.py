@@ -90,11 +90,11 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=200)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
         mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
 
-        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(result.status, 'paid')
         self.assertEquals(payment.status, 'paid')
 
@@ -102,11 +102,11 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
         mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
 
-        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(payment.status, 'paid')
         self.assertEquals(result.status, 'pending')
         self.assertEquals(result.outstanding_amount, 100)
@@ -115,11 +115,11 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
         mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
 
-        result = self.service.notify('dummy', purchase.id, payment.id, payload)
+        result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(payment.status, 'pending')
         self.assertEquals(result.status, 'pending')
         self.assertEquals(result.outstanding_amount, 200)
@@ -128,16 +128,16 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=100)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
 
         mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(InvalidPaymentNotification)
         with self.assertRaises(InvalidPaymentNotification):
-            self.service.notify('dummy', purchase.id, payment.id, payload)
+            self.service.notify(purchase.id, payment.id, payload)
 
         mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(PaymentVerificationFailed)
         with self.assertRaises(PaymentVerificationFailed):
-            self.service.notify('dummy', purchase.id, payment.id, payload)
+            self.service.notify(purchase.id, payment.id, payload)
 
 
 class PaymentFactoryTestCases(SegueApiTestCase):

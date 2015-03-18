@@ -17,7 +17,7 @@ class PagSeguroPaymentService(object):
             xml_result = self.sessions.notification_session(notification_code).check()
             return PagSeguroTransitionFactory.create(notification_code, payment, xml_result, source)
         except RequestException, e:
-            logger.errror('connection error to pagseguro! %s', e)
+            logger.error('connection error to pagseguro! %s', e)
             raise ExternalServiceError('pagseguro')
 
     def create(self, purchase, data=None):
@@ -38,7 +38,8 @@ class PagSeguroPaymentService(object):
             raise ExternalServiceError('pagseguro')
 
     def _build_instructions(self, result):
-        if result.payment_url and isinstance(result.payment_url, str) and result.payment_url.startswith('https'):
+        url = result.payment_url or ''
+        if url.startswith('https'):
             return dict(redirectUserTo=result.payment_url)
         logger.error('pagseguro error: invalid payment_url')
         raise ExternalServiceError('pagseguro')

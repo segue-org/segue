@@ -20,8 +20,9 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         return open(path,'r').read()
 
     def test_valid_notification_is_received(self):
-        purchase = self.create_from_factory(ValidPurchaseByPersonFactory)
-        payment  = self.create_from_factory(ValidPagSeguroPaymentFactory, purchase=purchase)
+        account  = self.create_from_factory(ValidAccountFactory, id=555)
+        purchase = self.create_from_factory(ValidPurchaseByPersonFactory, id=666, customer=account)
+        payment  = self.create_from_factory(ValidPagSeguroPaymentFactory, id=777, purchase=purchase)
         payload  = { 'notificationCode': 'DEAD-C0FFEE', 'notificationType': 'transaction' }
 
         session = mockito.Mock()
