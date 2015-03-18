@@ -3,6 +3,6 @@
   service: name=apache2
            state=restarted
 
-- name: restart papers
+- name: restart segue
   file: path={{ app_path }}/handler.wsgi
         state=touch

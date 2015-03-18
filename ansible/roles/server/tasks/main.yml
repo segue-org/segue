@@ -40,4 +40,4 @@
             mode=0755
   tags: config
   notify:
-    - restart papers
+    - restart segue
