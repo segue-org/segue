@@ -51,11 +51,12 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         session = mockito.Mock()
 
         mockito.when(self.factory).payment_session(payment).thenReturn(session)
-        mockito.when(session).checkout().thenReturn(hashie(payment_url='https://songa'))
+        mockito.when(session).checkout().thenReturn(hashie(payment_url='https://songa',code='ABC'))
 
         result = self.service.process(payment)
 
         self.assertEquals(result['redirectUserTo'], 'https://songa')
+        self.assertEquals(payment.code, 'ABC')
 
     def test_pagseguro_checkout_fails(self):
         payment = self.create_from_factory(ValidPagSeguroPaymentFactory)

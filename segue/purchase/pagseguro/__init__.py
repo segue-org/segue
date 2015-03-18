@@ -32,7 +32,9 @@ class PagSeguroPaymentService(object):
             logger.debug('starting pagseguro checkout for %s...', payment.id)
             result = payment_session.checkout()
             logger.debug('completed checkout for %s. result is: %s', payment.id, result.payment_url)
-            return self._build_instructions(result)
+            instructions = self._build_instructions(result)
+            payment.code = result.code
+            return instructions
         except RequestException, e:
             logger.error('connection error to pagseguro! %s', e)
             raise ExternalServiceError('pagseguro')

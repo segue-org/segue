@@ -61,6 +61,8 @@ class PaymentService(object):
         processor = self.processor_for(method)
         payment = processor.create(purchase, data)
         instructions = processor.process(payment)
+        db.session.add(payment)
+        db.session.commit()
         return instructions
 
     def get_one(self, purchase_id, payment_id):
