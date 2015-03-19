@@ -3,8 +3,12 @@ from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
+from ..account import AccountService
+from ..product import ProductService
 
 from .pagseguro import PagSeguroPaymentService
+from ..mailer import MailerService
+
 import schema
 
 class PurchaseFilterStrategies(object):
@@ -57,6 +61,8 @@ class PaymentService(object):
 
     def __init__(self, **processors_overrides):
         self.processors_overrides = processors_overrides
+        self.mailer               = MailerService()
+
 
     def create(self, purchase, method, data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
@@ -106,7 +112,12 @@ class PaymentService(object):
             payment.recalculate_status()
             purchase.recalculate_status()
             logger.debug('recalculated status: payment.status=%s, purchase.status=%s', payment.status, purchase.status)
-
+            
+            if purchase.satisfied:
+                customer = AccountService._get_account(purchase.customer_id)
+                product = ProductService.get_product(purchase.product_id)
+                self.mailer.notify_payment(customer, purchase, payment, product)
+            
             db.session.add(payment)
             db.session.add(transition)
             db.session.add(purchase)

@@ -1,0 +1,21 @@
+---
+
+template: purchase_confirmation
+language: pt
+subject: "#FISL16 - confirmação de pagamento"
+
+body: |
+
+    {customer.name},
+
+    **Ingresso confirmado!**
+
+    Seu pagamento foi recebido e processado com sucesso.
+    Código do ingresso: { purchase.id }
+    Tipo de ingresso: { product.description }
+    Valor: { product.price }
+    
+    
+    Saudações livres!
+    
+    Comissão Organizadora do #FISL16
