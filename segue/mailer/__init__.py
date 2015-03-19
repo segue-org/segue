@@ -20,8 +20,9 @@ class TemplatedMessage(object):
     def build(self):
         subject = self.template['subject'].format(**self.variables)
         body    = self.template['body'].format(**self.variables)
+        bcc     = list(config.MAIL_BCC)
 
-        return Message(subject, body=body, recipients=self.recipients)
+        return Message(subject, body=body, recipients=self.recipients, bcc=bcc)
 
 class MessageFactory(object):
     def __init__(self):

@@ -31,6 +31,7 @@ MAIL_DEFAULT_SENDER = 'teste@softwarelivre.org'
 MAIL_USERNAME = ''
 MAIL_PASSWORD = ''
 MAIL_USE_TLS = False
+MAIL_BCC = 'test@example.com'
 
 CORS_HEADERS = 'Content-Type,Authorization'
 CORS_ORIGINS = '*'
