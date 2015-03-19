@@ -3,8 +3,6 @@ from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
-from ..account import AccountService
-from ..product import ProductService
 
 from .pagseguro import PagSeguroPaymentService
 from ..mailer import MailerService
@@ -59,10 +57,9 @@ class PaymentService(object):
         pagseguro=PagSeguroPaymentService
     )
 
-    def __init__(self, **processors_overrides):
+    def __init__(self, mailer=None, **processors_overrides):
         self.processors_overrides = processors_overrides
-        self.mailer               = MailerService()
-
+        self.mailer               = mailer or MailerService()
 
     def create(self, purchase, method, data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
@@ -86,7 +83,6 @@ class PaymentService(object):
             logger.debug('selected processor for conclusion: %s', payment.type)
 
             transition = processor.conclude(payment, payload)
-            print transition
             payment.recalculate_status()
             purchase.recalculate_status()
             logger.debug('recalculated status: payment.status=%s, purchase.status=%s', payment.status, purchase.status)
@@ -112,16 +108,15 @@ class PaymentService(object):
             payment.recalculate_status()
             purchase.recalculate_status()
             logger.debug('recalculated status: payment.status=%s, purchase.status=%s', payment.status, purchase.status)
-            
-            if purchase.satisfied:
-                customer = AccountService._get_account(purchase.customer_id)
-                product = ProductService.get_product(purchase.product_id)
-                self.mailer.notify_payment(customer, purchase, payment, product)
-            
+
             db.session.add(payment)
             db.session.add(transition)
             db.session.add(purchase)
             db.session.commit()
+
+            if purchase.satisfied:
+                self.mailer.notify_payment(purchase, payment)
+
             return purchase
         except Exception, e:
             logger.error('Exception was thrown while processing payment notification! %s', e)

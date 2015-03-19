@@ -11,11 +11,10 @@ body: |
     **Ingresso confirmado!**
 
     Seu pagamento foi recebido e processado com sucesso.
-    Código do ingresso: { purchase.id }
-    Tipo de ingresso: { product.description }
-    Valor: { product.price }
-    
-    
+    Código do ingresso: {purchase.id}
+    Tipo de ingresso: {product.description}
+    Valor: {product.price}
+
     Saudações livres!
-    
+
     Comissão Organizadora do #FISL16

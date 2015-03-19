@@ -48,9 +48,12 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_payment(self, customer, purchase, payment, product):
+    def notify_payment(self, purchase, payment):
+        customer = purchase.customer
+        product  = purchase.product
+
         message = self.message_factory.from_template('purchase/confirmation')
         message.given(customer=customer, purchase=purchase, payment=payment, product=product)
         message.to(customer.name, customer.email)
-        
+
         return mailer.send(message.build())
