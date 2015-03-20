@@ -5,6 +5,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import segue, segue.core
 
 import populate
+import clean
 
 def _make_context():
     import segue.models
@@ -21,3 +22,4 @@ manager.add_command('shell', Shell(make_context=_make_context))
 
 manager.command(populate.populate)
 manager.command(populate.populate_reference_data)
+manager.command(clean.clean_bad_buyers)
