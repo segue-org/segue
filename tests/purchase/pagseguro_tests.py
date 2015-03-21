@@ -2,7 +2,7 @@ import mockito
 
 import os
 from segue.purchase.pagseguro import PagSeguroPaymentService, PagSeguroSessionFactory
-from segue.purchase.models import PagSeguroPayment
+from segue.purchase.pagseguro.models import PagSeguroPayment
 from segue.errors import ExternalServiceError, NoSuchPayment
 from requests.exceptions import RequestException
 

@@ -9,7 +9,7 @@ from segue.factory import Factory
 from segue.purchase.factories import PaymentFactory, TransitionFactory
 from segue.errors import BadConfiguration, InvalidPaymentNotification
 
-from ..models import PagSeguroPayment, PagSeguroTransition
+from models import PagSeguroPayment, PagSeguroTransition
 
 class PagSeguroPaymentFactory(Factory):
     model = PagSeguroPayment

@@ -80,12 +80,6 @@ class Payment(JsonSerializable, db.Model):
 class DummyPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'dummy' }
 
-class PagSeguroPayment(Payment):
-    __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
-
-    reference = db.Column(db.String(50), name='ps_reference')
-    code      = db.Column(db.String(32), name='ps_code')
-
 class Transition(db.Model):
     id             = db.Column(db.Integer, primary_key=True)
     type           = db.Column(db.String(20))
@@ -98,7 +92,3 @@ class Transition(db.Model):
     __tablename__ = 'transition'
     __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'transition' }
 
-class PagSeguroTransition(Transition):
-    __mapper_args__ = { 'polymorphic_identity': 'pagseguro' }
-    notification_code = db.Column(db.String(39), name='ps_notification_code')
-    payload           = db.Column(db.Text,       name='ps_payload')

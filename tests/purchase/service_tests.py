@@ -2,7 +2,8 @@ import mockito
 
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
-from segue.purchase.models import Payment, PagSeguroPayment
+from segue.purchase.models import Payment
+from segue.purchase.pagseguro.models import PagSeguroPayment
 from segue.errors import NotAuthorized, PaymentVerificationFailed, \
                          InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
 
