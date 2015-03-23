@@ -32,7 +32,7 @@ class Buyer(JsonSerializable, db.Model):
 
     @property
     def complete_address(self):
-        return "{street} {number} {extra} - {city} {country}".format(**self.address_fields)
+        return u"{street} {number} {extra} - {city} {country}".format(**self.address_fields)
 
 class Purchase(JsonSerializable, db.Model):
     _serializers = [ PurchaseJsonSerializer, ShortPurchaseJsonSerializer ]

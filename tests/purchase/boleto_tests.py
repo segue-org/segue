@@ -8,7 +8,7 @@ from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.models import BoletoPayment
 from segue.purchase.boleto.factories import BoletoFactory
 
-from ..support import SegueApiTestCase, hashie
+from ..support import SegueApiTestCase, hashie, settings
 from ..support.factories import *
 
 class BoletoPaymentServiceTestCases(SegueApiTestCase):
@@ -16,12 +16,15 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         super(BoletoPaymentServiceTestCases, self).setUp()
         self.boletos  = mockito.Mock()
         self.sequence = mockito.Mock()
+        self.hasher   = mockito.Mock()
         self.service  = BoletoPaymentService(boletos=self.boletos, sequence=self.sequence)
+        self.hasher = self.service.factory.hasher = mockito.Mock()
 
     def test_creates_a_payment_on_db(self):
         account = self.create_from_factory(ValidAccountFactory, id=333)
         purchase = self.create_from_factory(ValidPurchaseFactory, id=666, customer=account)
         mockito.when(self.sequence).nextval().thenReturn(5678)
+        mockito.when(self.hasher).generate().thenReturn('1111ABCD')
 
         result = self.service.create(purchase, {})
 
@@ -31,6 +34,22 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.amount, purchase.product.price)
         self.assertEquals(result.due_date, purchase.product.sold_until.date())
         self.assertEquals(result.our_number, 105678)
+        self.assertEquals(result.document_hash, '1111ABCD')
+
+    def test_process_a_boleto_into_a_pdf_an_serves_as_a_segue_document(self):
+        payment = self.create_from_factory(ValidBoletoPaymentFactory)
+
+        boleto = mockito.Mock()
+        mockito.when(self.boletos).create(payment).thenReturn(boleto)
+        mockito.when(self.boletos) \
+               .as_pdf(boleto, payment.document_hash, settings.STORAGE_DIR) \
+               .thenReturn('/tmp/le-pdf-file.pdf')
+
+        result = self.service.process(payment)
+
+        self.assertEquals(
+            result['redirectUserTo'], 'http://192.168.33.91:9001/api/documents/le-pdf-file.pdf'
+        )
 
 class BoletoFactoryTestCases(SegueApiTestCase):
     def setUp(self):
