@@ -5,6 +5,7 @@ from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
 
 from .pagseguro import PagSeguroPaymentService
+from .boleto    import BoletoPaymentService
 from ..mailer import MailerService
 
 import schema
@@ -54,7 +55,8 @@ class PurchaseService(object):
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
-        pagseguro=PagSeguroPaymentService
+        pagseguro = PagSeguroPaymentService,
+        boleto    = BoletoPaymentService
     )
 
     def __init__(self, mailer=None, **processors_overrides):

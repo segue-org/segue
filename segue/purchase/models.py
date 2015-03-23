@@ -21,6 +21,19 @@ class Buyer(JsonSerializable, db.Model):
     address_country = db.Column(db.Text)
     purchases       = db.relationship('Purchase', backref='buyer')
 
+    @property
+    def address_fields(self):
+        result = {}
+        for field in self.__mapper__.iterate_properties:
+            if field.key.startswith('address_'):
+                name = field.key.split("_")[-1]
+                result[name] = getattr(self, field.key)
+        return result
+
+    @property
+    def complete_address(self):
+        return "{street} {number} {extra} - {city} {country}".format(**self.address_fields)
+
 class Purchase(JsonSerializable, db.Model):
     _serializers = [ PurchaseJsonSerializer, ShortPurchaseJsonSerializer ]
     id             = db.Column(db.Integer, primary_key=True)
@@ -48,6 +61,10 @@ class Purchase(JsonSerializable, db.Model):
     @property
     def satisfied(self):
         return self.status == 'paid'
+
+    @property
+    def description(self):
+        return self.product.description
 
     def recalculate_status(self):
         self.status = 'paid' if self.outstanding_amount == 0 else 'pending'

@@ -1,16 +1,16 @@
-import datetime
+from datetime import datetime, date
 
 import factory
-
 from factory import Sequence, LazyAttribute, SubFactory
-from factory.fuzzy import FuzzyChoice, FuzzyNaiveDateTime, FuzzyDecimal
+from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyNaiveDateTime, FuzzyDecimal
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
 from segue.models import Account
 from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product
-from segue.models import Purchase, Buyer, Payment, PagSeguroPayment, Transition
+from segue.models import Purchase, Buyer, Payment, Transition
+from segue.models import PagSeguroPayment, BoletoPayment
 
 import logging
 logger = logging.getLogger('factory')
@@ -87,11 +87,12 @@ class ValidInviteFactory(SegueFactory):
 class ValidProductFactory(SegueFactory):
     class Meta:
         model = Product
-    kind       = FuzzyChoice(["ticket","swag"])
-    category   = FuzzyChoice(["student","normal"])
-    sold_until = FuzzyNaiveDateTime(datetime.datetime.now(), datetime.datetime(2015,12,1,0,0,0))
-    public     = True
-    price      = FuzzyDecimal(70, 400, 2)
+    kind        = FuzzyChoice(["ticket","swag"])
+    category    = FuzzyChoice(["student","normal"])
+    sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2015,12,1,0,0,0))
+    public      = True
+    price       = FuzzyDecimal(70, 400, 2)
+    description = "ingresso fisl16 - lote 1 - muggles"
 
 
 class ValidBuyerFactory(SegueFactory):
@@ -143,6 +144,13 @@ class ValidPagSeguroPaymentFactory(ValidPaymentFactory):
         model = PagSeguroPayment
     reference = 'A00555-PU00444'
     code      = 'LECODE'
+
+class ValidBoletoPaymentFactory(ValidPaymentFactory):
+    class Meta:
+        model = BoletoPayment
+    our_number    = 101234
+    due_date      = FuzzyDate(date.today())
+    document_hash = _Sequence("C0FFE#{:04d}")
 
 class ValidTransitionFactory(SegueFactory):
     class Meta:

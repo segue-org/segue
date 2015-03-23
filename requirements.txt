@@ -26,4 +26,7 @@ wsgiref==0.1.2
 Markdown==2.6
 PyYAML==3.10
 colorama==0.3.3
+pyboleto==0.2.14
+testfixtures==4.1.2
 -e git+https://github.com/dwolff/python-pagseguro@with_sandbox#egg=pagseguro-with_sandbox
+python-magic==0.4.6
