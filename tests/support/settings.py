@@ -49,3 +49,5 @@ BOLETO_CONVENIO      = "1600260"
 BOLETO_CNPJ          = "01.222.682/0001-01"
 BOLETO_ENDERECO      = "Rua Rufião Moura, 1234, cj 99 - Floresta - 90.920-008 - Porto Alegre/RS"
 BOLETO_EMPRESA       = "Empresa Organizadora de Eventos Ltda"
+
+STORAGE_DIR = '/tmp/'

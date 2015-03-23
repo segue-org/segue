@@ -24,3 +24,5 @@ mail_user: ""
 mail_pass: ""
 
 pagseguro_env: production
+
+storage_dir: /tmp/segue/data
