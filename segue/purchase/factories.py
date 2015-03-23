@@ -20,8 +20,10 @@ class PurchaseFactory(Factory):
 class PaymentFactory(Factory):
     model = Payment
 
-    @classmethod
-    def create(cls, purchase, target_model=Payment):
+    def __init__(self):
+        pass
+
+    def create(self, purchase, target_model=Payment):
         payment = target_model()
         payment.purchase = purchase
         payment.amount   = purchase.outstanding_amount

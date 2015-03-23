@@ -4,19 +4,12 @@ from sqlalchemy import and_
 from ..core import db
 from ..errors import NotAuthorized
 from ..mailer import MailerService
+from ..hasher import Hasher
 
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
 from ..account import AccountService, Account
-
-class Hasher(object):
-    def __init__(self, length=32):
-        self.length = length
-
-    def generate(self):
-        value = random.getrandbits(self.length * 4)
-        return "{0:0{1}X}".format(value, self.length)
 
 class ProposalFilterStrategies(object):
     def given(self, as_user=None, **criteria):

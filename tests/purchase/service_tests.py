@@ -196,6 +196,6 @@ class PaymentFactoryTestCases(SegueApiTestCase):
         payment2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='paid')
         payment3 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='confirmed')
 
-        payment4 = PaymentFactory.create(purchase)
+        payment4 = PaymentFactory().create(purchase)
 
         self.assertEquals(payment4.amount, 175)

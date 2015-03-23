@@ -5,11 +5,12 @@ from segue.core import db, logger
 from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory, PagSeguroTransitionFactory
 
 class PagSeguroPaymentService(object):
-    def __init__(self, sessions=None):
+    def __init__(self, sessions=None, factory=None):
         self.sessions = sessions or PagSeguroSessionFactory()
+        self.factory  = factory  or PagSeguroPaymentFactory()
 
     def create(self, purchase, data=None):
-        payment = PagSeguroPaymentFactory.create(purchase)
+        payment = self.factory.create(purchase)
         db.session.add(payment)
         db.session.commit()
         return payment

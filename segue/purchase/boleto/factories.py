@@ -6,21 +6,23 @@ from pyboleto.pdf import BoletoPDF
 
 from segue.factory import Factory
 from segue.core import config
+from segue.hasher import Hasher
 from ..factories import PaymentFactory
 
 from models import BoletoPayment
 
-class BoletoPaymentFactory(Factory):
+class BoletoPaymentFactory(PaymentFactory):
     model = BoletoPayment
 
-    @classmethod
-    def create(cls, purchase, payment_id):
-        payment = PaymentFactory.create(purchase, target_model=cls.model)
+    def __init__(self, hasher=None):
+        self.hasher = hasher or Hasher()
+
+    def create(self, purchase, payment_id):
+        payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model)
         payment.due_date = purchase.product.sold_until.date()
         payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
-        payment.document_hash = ""
+        payment.document_hash = self.hasher.generate()
         return payment
-
 
 class BoletoFactory(object):
     def __init__(self):
