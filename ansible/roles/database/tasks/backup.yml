@@ -14,7 +14,6 @@
         mode=0755
         owner=postgres
 
-
 - name: Create script for database backup
   tags:
     - config

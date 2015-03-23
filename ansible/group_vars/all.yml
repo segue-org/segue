@@ -15,3 +15,5 @@ threads: 15
 cors_origin: '*'
 mail_use_tls: False
 backup_frequency: 5
+
+storage_dir: /opt/segue/data

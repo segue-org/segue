@@ -13,11 +13,17 @@
 - service: name=apache2
            state=restarted
 
+- file: path={{ storage_dir }}
+        owner=www-data
+        mode=0777
+        state=directory
+  tags: folders
 
 - file: path=/var/log/segue/
         owner=www-data
         mode=0777
         state=directory
+  tags: folders
 
 - file: path=/var/log/segue/segue.log
         owner=www-data
