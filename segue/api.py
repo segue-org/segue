@@ -4,6 +4,7 @@ from proposal import ProposalController, ProposalInviteController
 from account import AccountController
 from product import ProductController
 from purchase import PurchaseController, PaymentController
+from document import DocumentController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -61,6 +62,12 @@ class PaymentBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
         self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)
 
+class DocumentBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(DocumentBlueprint, self).__init__('documents', __name__, url_prefix='/documents')
+        self.controller = DocumentController()
+        self.add_url_rule('/<string:kind>-<string:document_hash>', methods=['GET'], view_func=self.controller.get_by_hash)
+
 class SessionBlueprint(flask.Blueprint):
     def __init__(self):
         super(SessionBlueprint, self).__init__('sessions', __name__, url_prefix='/sessions')
@@ -74,5 +81,6 @@ blueprints = [
     ProductBlueprint(),
     PurchaseBlueprint(),
     PaymentBlueprint(),
+    DocumentBlueprint(),
     SessionBlueprint()
 ]

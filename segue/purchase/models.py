@@ -27,7 +27,7 @@ class Buyer(JsonSerializable, db.Model):
         for field in self.__mapper__.iterate_properties:
             if field.key.startswith('address_'):
                 name = field.key.split("_")[-1]
-                result[name] = getattr(self, field.key)
+                result[name] = getattr(self, field.key) or ''
         return result
 
     @property

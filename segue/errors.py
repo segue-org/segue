@@ -21,7 +21,12 @@ class ExternalServiceError(SegueError):
     code = 500
 
     def to_json(self):
-        return { 'message': 'could not connect to service: '+self.args }
+        return { 'message': 'could not connect to service: {}'.format(self.args) }
+
+class DocumentNotFound(SegueError):
+    code = 404
+    def to_json(self):
+        return { 'message': 'could not find document {}'.format(self.args) }
 
 class SegueValidationError(SegueError):
     recognizers = []
