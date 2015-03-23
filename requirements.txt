@@ -30,3 +30,4 @@ pyboleto==0.2.14
 testfixtures==4.1.2
 -e git+https://github.com/dwolff/python-pagseguro@with_sandbox#egg=pagseguro-with_sandbox
 python-magic==0.4.6
+pyPdf==1.13
