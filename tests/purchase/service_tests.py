@@ -10,6 +10,8 @@ from segue.errors import NotAuthorized, PaymentVerificationFailed, \
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
 
+class DummyPayment(Payment):
+    __mapper_args__ = { 'polymorphic_identity': 'dummy' }
 
 class PurchaseServiceTestCases(SegueApiTestCase):
     def setUp(self):

@@ -94,9 +94,6 @@ class Payment(JsonSerializable, db.Model):
     def recalculate_status(self):
         self.status = self.most_recent_transition.new_status
 
-class DummyPayment(Payment):
-    __mapper_args__ = { 'polymorphic_identity': 'dummy' }
-
 class Transition(db.Model):
     id             = db.Column(db.Integer, primary_key=True)
     type           = db.Column(db.String(20))
