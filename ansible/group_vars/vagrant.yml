@@ -23,6 +23,6 @@ mail_sender: teste@softwarelivre.org
 mail_user: ""
 mail_pass: ""
 
-pagseguro_env: production
+pagseguro_env: sandbox
 
 storage_dir: /tmp/segue/data
