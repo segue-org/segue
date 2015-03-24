@@ -65,8 +65,8 @@ class BoletoFactory(object):
 
     def _build_description(self, payment):
         return [
-            "produto: {}".format(payment.purchase.description),
-            "titular: {}".format(payment.purchase.customer.name)
+            u"produto: {}".format(payment.purchase.description),
+            u"titular: {}".format(payment.purchase.customer.name)
         ]
 
     def _build_sacado(self, payment):
@@ -77,6 +77,6 @@ class BoletoFactory(object):
 
     def _build_instructions(self):
         return [
-            "****NAO RECEBER APOS VENCIMENTO******",
-            "NAO UTILIZE PAGAMENTO VIA DOC, DEPOSITO OU TRANSFERENCIA."
+            u"****NAO RECEBER APOS VENCIMENTO******",
+            u"NAO UTILIZE PAGAMENTO VIA DOC, DEPOSITO OU TRANSFERENCIA."
         ]
