@@ -40,6 +40,8 @@ class JSONEncoder(flask.json.JSONEncoder):
             return "{0:0.2f}".format(obj)
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
+        if isinstance(obj, datetime.date):
+            return obj.isoformat()
         if isinstance(obj, JsonSerializable):
             return obj.serialize()
         return super(JSONEncoder, self).default(obj)
