@@ -72,7 +72,8 @@ class BoletoFactory(object):
     def _build_sacado(self, payment):
         return [
             payment.purchase.buyer.name,
-            payment.purchase.buyer.complete_address
+            payment.purchase.buyer.complete_address,
+            payment.purchase.buyer.document
         ]
 
     def _build_instructions(self):
