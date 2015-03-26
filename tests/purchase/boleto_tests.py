@@ -1,12 +1,16 @@
+import os
 import pyPdf
+from freezegun import freeze_time
 from magic import Magic
-from datetime import date
+from datetime import date, datetime
+from decimal import Decimal
 import mockito
 from testfixtures import TempDirectory
 
 from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.models import BoletoPayment
 from segue.purchase.boleto.factories import BoletoFactory
+from segue.purchase.boleto.parsers import BoletoFileParser
 
 from ..support import SegueApiTestCase, hashie, settings
 from ..support.factories import *
@@ -117,3 +121,27 @@ class BoletoFactoryTestCases(SegueApiTestCase):
         self.assertEquals(result.cedente_documento, "01.222.682/0001-01")
         self.assertEquals(result.cedente_endereco, "Rua Rufi\xc3\xa3o Moura, 1234, cj 99 - Floresta - 90.920-008 - Porto Alegre/RS")
         self.assertEquals(result.cedente, "Empresa Organizadora de Eventos Ltda")
+
+class BoletoFileParserTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(BoletoFileParserTestCases, self).setUp()
+        self.parser = BoletoFileParser()
+
+    def _load_file(self, filename):
+        path = os.path.join(os.path.dirname(__file__), 'fixtures', filename)
+        return open(path,'r').read()
+
+
+    @freeze_time("2015-03-26 07:33:55")
+    def test_parses_one_boleto_return_for_each_line(self):
+        content = self._load_file('boletos.bbt')
+
+        result = self.parser.parse(content)
+
+        self.assertEquals(len(result), 10)
+
+        self.assertEquals(result[0]['our_number'],   100561)
+        self.assertEquals(result[0]['payment_date'], date(2015,03,25))
+        self.assertEquals(result[0]['amount'],       Decimal(60))
+        self.assertEquals(result[0]['line'],         '04422;000000022345;18;027;00016002600001005616;            ;                                   ;00000000;25032015;LQB;00000000006000;0000000005856;*; 0000000000; 0000000144; 0000000000;01981')
+        self.assertEquals(result[0]['received_at'],  datetime(2015,3,26,7,33,55))
