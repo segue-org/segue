@@ -115,7 +115,8 @@ class BoletoFactoryTestCases(SegueApiTestCase):
         ])
         self.assertEquals(result.sacado, [
             purchase.buyer.name,
-            purchase.buyer.complete_address
+            purchase.buyer.complete_address,
+            purchase.buyer.document
         ])
 
         self.assertEquals(result.cedente_documento, "01.222.682/0001-01")
