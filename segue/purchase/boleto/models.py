@@ -11,7 +11,8 @@ class BoletoPayment(Payment):
 class BoletoTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'boleto' }
 
-    batch_file = db.Column(db.Text, name='bo_batch_file')
-    batch_line = db.Column(db.Text, name='bo_batch_line')
-
-
+    batch_file   = db.Column(db.Text,    name='bo_batch_file')
+    batch_line   = db.Column(db.Text,    name='bo_batch_line')
+    payment_date = db.Column(db.Date,    name='bo_payment_date')
+    paid_amount  = db.Column(db.Numeric, name='bo_paid_amount')
+    errors       = db.Column(db.Text,    name='bo_errors')

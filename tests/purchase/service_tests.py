@@ -105,7 +105,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
 
-        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
         mockito.when(self.mailer).notify_payment(purchase, payment)
 
         result = self.service.notify(purchase.id, payment.id, payload)
@@ -121,7 +121,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
 
-        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
         result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(payment.status, 'paid')
@@ -136,7 +136,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
 
-        mockito.when(self.dummy).notify(purchase, payment, payload).thenReturn(transition)
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
         result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(payment.status, 'pending')
@@ -151,11 +151,11 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
 
-        mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(InvalidPaymentNotification)
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenRaise(InvalidPaymentNotification)
         with self.assertRaises(InvalidPaymentNotification):
             self.service.notify(purchase.id, payment.id, payload)
 
-        mockito.when(self.dummy).notify(purchase, payment, payload).thenRaise(PaymentVerificationFailed)
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenRaise(PaymentVerificationFailed)
         with self.assertRaises(PaymentVerificationFailed):
             self.service.notify(purchase.id, payment.id, payload)
 

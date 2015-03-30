@@ -7,9 +7,9 @@ from pyboleto.pdf import BoletoPDF
 from segue.factory import Factory
 from segue.core import config
 from segue.hasher import Hasher
-from ..factories import PaymentFactory
+from ..factories import PaymentFactory, TransitionFactory
 
-from models import BoletoPayment
+from models import BoletoPayment, BoletoTransition
 
 class BoletoPaymentFactory(PaymentFactory):
     model = BoletoPayment
@@ -23,6 +23,30 @@ class BoletoPaymentFactory(PaymentFactory):
         payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
         payment.document_hash = self.hasher.generate()
         return payment
+
+class BoletoTransitionFactory(TransitionFactory):
+    model = BoletoTransition
+
+    @classmethod
+    def create(cls, payment, payload, source):
+        transition = TransitionFactory.create(payment, source, target_model=cls.model)
+        transition.payment_date = payload['payment_date']
+        transition.paid_amount  = payload['amount']
+        transition.batch_line   = payload['line']
+
+        if payment.due_date < transition.payment_date:
+            transition.new_status = 'pending'
+            transition.errors     = 'late-payment'
+
+        elif payment.amount > transition.paid_amount:
+            transition.new_status = 'pending'
+            transition.errors     = 'insufficient-amount'
+
+        else:
+            transition.new_status = 'paid'
+            transition.errors     = None
+
+        return transition
 
 class BoletoFactory(object):
     def __init__(self):

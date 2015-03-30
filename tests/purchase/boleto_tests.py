@@ -2,13 +2,13 @@ import os
 import pyPdf
 from freezegun import freeze_time
 from magic import Magic
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 import mockito
 from testfixtures import TempDirectory
 
 from segue.purchase.boleto import BoletoPaymentService
-from segue.purchase.boleto.models import BoletoPayment
+from segue.purchase.boleto.models import BoletoPayment, BoletoTransition
 from segue.purchase.boleto.factories import BoletoFactory
 from segue.purchase.boleto.parsers import BoletoFileParser
 
@@ -54,6 +54,51 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(
             result['redirectUserTo'], 'http://192.168.33.91:9001/api/documents/le-pdf-file.pdf'
         )
+
+    def test_notify_fully_valid_payment_payment(self):
+        payment, purchase, product = self._create_payment()
+        payload = self._build_payload(payment)
+
+        transition = self.service.notify(payment, payload, 'script')
+
+        self.assertEquals(transition.__class__, BoletoTransition)
+        self.assertEquals(transition.new_status, 'paid')
+        self.assertEquals(transition.errors,  None)
+
+    def test_notify_late_payment(self):
+        payment, purchase, product = self._create_payment()
+        payload = self._build_payload(payment, payment_date=payment.due_date + timedelta(days=1))
+
+        transition = self.service.notify(payment, payload, 'script')
+
+        self.assertEquals(transition.new_status, 'pending')
+        self.assertEquals(transition.errors,  'late-payment')
+
+    def test_notify_insufficient_payment(self):
+        payment, purchase, product = self._create_payment()
+        payload = self._build_payload(payment, amount=payment.amount - 10)
+
+        transition = self.service.notify(payment, payload, 'script')
+
+        self.assertEquals(transition.new_status, 'pending')
+        self.assertEquals(transition.errors,  'insufficient-amount')
+
+    def _create_payment(self):
+        product  = self.create_from_factory(ValidProductFactory, price=200)
+        purchase = self.create_from_factory(ValidPurchaseByPersonFactory, id=444, product=product)
+        payment  = self.create_from_factory(ValidBoletoPaymentFactory, id=999, amount=200, purchase=purchase)
+        return payment, purchase, product
+
+    def _build_payload(self, payment, **overrides):
+        payload = dict(
+            our_number   = payment.our_number,
+            payment_date = payment.due_date,
+            amount       = payment.amount,
+            received_at  = datetime.now(),
+            line         = 'le-line'
+        )
+        payload.update(**overrides)
+        return payload
 
 class BoletoFactoryTestCases(SegueApiTestCase):
     def setUp(self):
@@ -122,6 +167,8 @@ class BoletoFactoryTestCases(SegueApiTestCase):
         self.assertEquals(result.cedente_documento, "01.222.682/0001-01")
         self.assertEquals(result.cedente_endereco, "Rua Rufi\xc3\xa3o Moura, 1234, cj 99 - Floresta - 90.920-008 - Porto Alegre/RS")
         self.assertEquals(result.cedente, "Empresa Organizadora de Eventos Ltda")
+
+
 
 class BoletoFileParserTestCases(SegueApiTestCase):
     def setUp(self):

@@ -5,6 +5,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import segue, segue.core
 
 import populate
+import boletos
 import clean
 
 def _make_context():
@@ -23,3 +24,4 @@ manager.add_command('shell', Shell(make_context=_make_context))
 manager.command(populate.populate)
 manager.command(populate.populate_reference_data)
 manager.command(clean.clean_bad_buyers)
+manager.command(boletos.process_boletos)

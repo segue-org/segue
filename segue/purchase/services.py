@@ -98,7 +98,7 @@ class PaymentService(object):
             logger.error('Exception was thrown while processing payment conclusion! %s', e)
             raise e
 
-    def notify(self, purchase_id, payment_id, payload):
+    def notify(self, purchase_id, payment_id, payload, source='notification'):
         try:
             payment = self.get_one(purchase_id, payment_id)
             if not payment: raise NoSuchPayment(purchase_id, payment_id)
@@ -106,7 +106,7 @@ class PaymentService(object):
             purchase = payment.purchase
             logger.debug('selected processor for notification: %s', payment.type)
 
-            transition = processor.notify(purchase, payment, payload)
+            transition = processor.notify(purchase, payment, payload, source)
             payment.recalculate_status()
             purchase.recalculate_status()
             logger.debug('recalculated status: payment.status=%s, purchase.status=%s', payment.status, purchase.status)

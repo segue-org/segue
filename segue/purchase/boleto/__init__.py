@@ -1,6 +1,8 @@
 import os.path
+from segue.errors import NotAuthorized
 from segue.core import config, db
-from factories import BoletoFactory, BoletoPaymentFactory
+from factories import BoletoFactory, BoletoPaymentFactory, BoletoTransitionFactory
+from segue.purchase.boleto.models import BoletoTransition
 
 class BoletoSequence(object):
     def nextval(self):
@@ -22,6 +24,11 @@ class BoletoPaymentService(object):
         boleto = self.boletos.create(payment)
         pdf_path = self.boletos.as_pdf(boleto, payment.document_hash, config.STORAGE_DIR)
         return self._build_instructions(pdf_path)
+
+    def notify(self, payment, payload, source):
+        if source != 'script': raise NotAuthorized()
+
+        return BoletoTransitionFactory.create(payment, payload, source)
 
     def _build_instructions(self, pdf_path):
         filename = os.path.basename(pdf_path)
