@@ -1,3 +1,4 @@
+from datetime import datetime
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
@@ -15,4 +16,9 @@ class Product(JsonSerializable, db.Model):
     description = db.Column(db.Text)
 
     purchases  = db.relationship("Purchase", backref="product")
+
+    @property
+    def can_be_purchased(self):
+        return self.sold_until >= datetime.now()
+
 

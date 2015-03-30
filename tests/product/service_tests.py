@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import mockito
 
 from segue.product import ProductService, Product
+from segue.errors import ProductExpired
 
 from ..support import SegueApiTestCase
 from ..support.factories import ValidAccountFactory, ValidPurchaseFactory, ValidProductFactory
@@ -38,5 +39,13 @@ class ProductServiceTestCase(SegueApiTestCase):
         self.assertEquals(result, purchase)
 
     def test_cannot_purchase_past_its_sold_date(self):
-        # TODO: write a test for blocking purchase of sold-out products
-        pass
+        yesterday = datetime.now() - timedelta(days=1)
+        account = self.create_from_factory(ValidAccountFactory)
+        product = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
+        purchase = self.build_from_factory(ValidPurchaseFactory)
+
+        buyer_data = dict(mocked_data='that will be ignored')
+
+        with self.assertRaises(ProductExpired):
+            self.service.purchase(buyer_data, product.id, account=account)
+

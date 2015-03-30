@@ -7,6 +7,7 @@ from ..core import db, jwt_required
 from ..json import jsoned, JsonFor
 
 from models import Product
+from segue.errors import ProductExpired
 from segue.purchase.services import PurchaseService
 
 class ProductService(object):
@@ -22,6 +23,8 @@ class ProductService(object):
 
     def purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
+        if not product.can_be_purchased:
+            raise ProductExpired
         return self.purchases.create(buyer_data, product, account)
 
 class ProductController(object):

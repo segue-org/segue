@@ -28,6 +28,11 @@ class DocumentNotFound(SegueError):
     def to_json(self):
         return { 'message': 'could not find document {}'.format(self.args) }
 
+class ProductExpired(SegueError):
+    code = 403
+    def to_json(self):
+        return { 'message': 'product is no longer being sold' }
+
 class SegueValidationError(SegueError):
     recognizers = []
 
