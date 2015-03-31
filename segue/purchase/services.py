@@ -116,7 +116,7 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
 
-            if purchase.satisfied and transition.is_payment:
+            if purchase.satisfied:
                 logger.debug('transition is good payment! notifying customer via e-mail!')
                 self.mailer.notify_payment(purchase, payment)
 
