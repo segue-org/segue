@@ -59,7 +59,7 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         payment, purchase, product = self._create_payment()
         payload = self._build_payload(payment)
 
-        transition = self.service.notify(payment, payload, 'script')
+        transition = self.service.notify(purchase, payment, payload, 'script')
 
         self.assertEquals(transition.__class__, BoletoTransition)
         self.assertEquals(transition.new_status, 'paid')
@@ -69,7 +69,7 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         payment, purchase, product = self._create_payment()
         payload = self._build_payload(payment, payment_date=payment.due_date + timedelta(days=1))
 
-        transition = self.service.notify(payment, payload, 'script')
+        transition = self.service.notify(purchase, payment, payload, 'script')
 
         self.assertEquals(transition.new_status, 'pending')
         self.assertEquals(transition.errors,  'late-payment')
@@ -78,7 +78,7 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         payment, purchase, product = self._create_payment()
         payload = self._build_payload(payment, amount=payment.amount - 10)
 
-        transition = self.service.notify(payment, payload, 'script')
+        transition = self.service.notify(purchase, payment, payload, 'script')
 
         self.assertEquals(transition.new_status, 'pending')
         self.assertEquals(transition.errors,  'insufficient-amount')

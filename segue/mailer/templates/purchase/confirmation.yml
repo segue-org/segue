@@ -11,9 +11,10 @@ body: |
     **Ingresso confirmado!**
 
     Seu pagamento foi recebido e processado com sucesso.
+
     Código do ingresso: {purchase.id}
     Tipo de ingresso: {product.description}
-    Valor: {product.price}
+    Valor do ingresso: R$ {product.price}
 
     Saudações livres!
 

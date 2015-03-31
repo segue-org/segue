@@ -85,10 +85,11 @@ class PaymentControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_notify_a_payment_transitioned(self):
-        payment = { 'abc': 123 }
+        purchase = { 'def': 567 }
+        transition = { 'abc': 123 }
         payload = { 'notificationType':'ABC-123-789', 'notificationType':'transaction' }
 
-        mockito.when(self.mock_service).notify(123, 456, payload).thenReturn(payment)
+        mockito.when(self.mock_service).notify(123, 456, payload).thenReturn((purchase, transition,))
         mockito.when(self.mock_service).notify(123, 789, payload).thenReturn(None)
         mockito.when(self.mock_service).notify(123, 999, payload).thenRaise(PaymentVerificationFailed)
         mockito.when(self.mock_service).notify(123, 666, {}).thenRaise(InvalidPaymentNotification)

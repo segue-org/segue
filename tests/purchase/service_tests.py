@@ -110,7 +110,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
 
         result = self.service.notify(purchase.id, payment.id, payload)
 
-        self.assertEquals(result.status, 'paid')
+        self.assertEquals(result[0].status, 'paid')
         self.assertEquals(payment.status, 'paid')
         mockito.verify(self.mailer).notify_payment(purchase, payment)
 
@@ -124,9 +124,10 @@ class PaymentServiceTestCases(SegueApiTestCase):
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
         result = self.service.notify(purchase.id, payment.id, payload)
+
         self.assertEquals(payment.status, 'paid')
-        self.assertEquals(result.status, 'pending')
-        self.assertEquals(result.outstanding_amount, 100)
+        self.assertEquals(result[0].status, 'pending')
+        self.assertEquals(result[0].outstanding_amount, 100)
         mockito.verifyZeroInteractions(self.mailer)
 
     def test_notification_that_is_not_to_a_paid_state(self):
@@ -140,8 +141,8 @@ class PaymentServiceTestCases(SegueApiTestCase):
 
         result = self.service.notify(purchase.id, payment.id, payload)
         self.assertEquals(payment.status, 'pending')
-        self.assertEquals(result.status, 'pending')
-        self.assertEquals(result.outstanding_amount, 200)
+        self.assertEquals(result[0].status, 'pending')
+        self.assertEquals(result[0].outstanding_amount, 200)
         mockito.verifyZeroInteractions(self.mailer)
 
     def test_notifications_that_cannot_be_processed_throws_its_errors(self):

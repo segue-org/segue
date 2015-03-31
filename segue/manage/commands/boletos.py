@@ -2,30 +2,38 @@ from segue.purchase import PaymentService
 from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.parsers  import BoletoFileParser
 
+from colorama import init, Fore as F, Back as B
+init()
+LINE = "\n"
+
 def process_boletos(filename):
     content = open(filename, 'r').read()
-    boleto_service = BoletoService()
-    payment_service = PaymentService()
 
-    parser = BoletoParser()
-    for entry in parser.parse(filename):
+    boleto_service = BoletoPaymentService()
+    payment_service = PaymentService()
+    parser = BoletoFileParser()
+
+    for entry in parser.parse(content):
+        print F.RESET  + LINE
+        print F.YELLOW + entry['line']
+
         payment = boleto_service.get_by_our_number(entry.pop('our_number'))
 
         if not payment:
-            print "**** COULD NOT FIND PAYMENT FOR LINE: {0.line}".format(entry)
+            print F.RED + "**** COULD NOT FIND PAYMENT FOR LINE: {line}".format(**entry)
             continue
 
-        print "**** FOUND PAYMENT ****"
+        print F.RESET + "**** FOUND PAYMENT, applying transition"
 
-        transition = payment_service.notify(payment.purchase.id, payment.id, entry, 'script')
+        purchase, transition = payment_service.notify(payment.purchase.id, payment.id, entry, 'script')
+
+        print F.YELLOW + "id={0.id} {0.old_status}->{0.new_status}\tR$ {0.paid_amount} ".format(transition)
 
         if transition.errors:
-            print "**** BAD TRANSITION! errors were: {0.errors}".format(transition)
+            print F.RED + "**** BAD TRANSITION! errors were: {0.errors}".format(transition)
             continue;
-
-        if transition.is_payment:
-            print "******** NOTIFYING CUSTOMER! *******"
+        else:
+            print F.GREEN + "**** GOOD TRANSITION!"
             continue
-
 
 

@@ -106,3 +106,7 @@ class Transition(db.Model):
     __tablename__ = 'transition'
     __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'transition' }
 
+    @property
+    def is_payment(self):
+        return self.old_status != 'paid' and self.old_status == 'paid'
+

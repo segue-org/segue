@@ -47,7 +47,7 @@ class PaymentController(object):
     def notify(self, purchase_id=None, payment_id=None):
         payload = request.form.to_dict(True)
         result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
-        return result, 200
+        return result[0], 200
 
     def conclude(self, purchase_id, payment_id):
         payload = request.args.to_dict(True)

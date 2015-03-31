@@ -8,3 +8,4 @@ settings.py
 segue/settings.py
 ansible/secret/*.yml
 *backup.sql
+*.bbt

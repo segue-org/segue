@@ -116,10 +116,11 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
 
-            if purchase.satisfied:
+            if purchase.satisfied and transition.is_payment:
+                logger.debug('transition is good payment! notifying customer via e-mail!')
                 self.mailer.notify_payment(purchase, payment)
 
-            return purchase
+            return purchase, transition
         except Exception, e:
             logger.error('Exception was thrown while processing payment notification! %s', e)
             raise e
