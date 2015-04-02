@@ -48,6 +48,12 @@ class Account(JsonSerializable, db.Model):
     purchases     = db.relationship("Purchase", backref="customer")
     caravan_owned = db.relationship("Caravan",  backref="owner")
 
+    def can_be_acessed_by(self, alleged):
+        if not alleged: return False
+        if self.id == alleged.id: return True
+        if alleged.role == 'admin': return True
+        return False
+
 class Country(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
@@ -64,3 +70,4 @@ class City(db.Model):
     longitude = db.Column(db.Numeric)
     
     __tablename__ = 'cities'
+
