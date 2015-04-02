@@ -92,4 +92,3 @@ class AccountService(object):
         db.session.commit()
 
         return reset
-
