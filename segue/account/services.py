@@ -38,7 +38,7 @@ class AccountService(object):
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)
-        return account and alleged and account.id == alleged.id
+        return account and account.can_be_acessed_by(alleged)
 
     def create(self, data):
         try:
