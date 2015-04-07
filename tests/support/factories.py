@@ -11,6 +11,7 @@ from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
+from segue.models import Caravan, CaravanInvite
 
 import logging
 logger = logging.getLogger('factory')
@@ -164,3 +165,10 @@ class ValidTransitionToPaidFactory(ValidTransitionFactory):
 class ValidTransitionToPendingFactory(ValidTransitionFactory):
     old_status = 'started'
     new_status = 'pending'
+
+class ValidCaravanFactory(SegueFactory):
+    class Meta:
+        model = Caravan
+    name  = _Sequence('Caravana dos Enxutos #{:04d}')
+    city  = 'Enxutolandia'
+    owner = SubFactory(ValidAccountFactory)
