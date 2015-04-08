@@ -20,5 +20,5 @@ new_invite = {
 
 whitelist = dict(
     create = create,
-    new_invinte = new_invite
+    new_invite = new_invite
 )
