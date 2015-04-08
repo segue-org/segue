@@ -15,15 +15,18 @@ class ProductServiceTestCase(SegueApiTestCase):
 
     def test_listing_all_products_ignores_unavailable_products(self):
         yesterday = datetime.now() - timedelta(days=1)
-        product1 = self.create_from_factory(ValidProductFactory)
-        product2 = self.create_from_factory(ValidProductFactory)
+        tomorrow  = datetime.now() + timedelta(days=1)
+        next_week = datetime.now() + timedelta(weeks=1)
+
+        product1 = self.create_from_factory(ValidProductFactory, sold_until=next_week)
+        product2 = self.create_from_factory(ValidProductFactory, sold_until=tomorrow)
         product3 = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
 
         result = self.service.list()
 
         self.assertEquals(len(result), 2)
-        self.assertEquals(result[0], product1)
-        self.assertEquals(result[1], product2)
+        self.assertEquals(result[1], product1)
+        self.assertEquals(result[0], product2)
 
     def test_purchasing_a_product(self):
         account = self.create_from_factory(ValidAccountFactory)
