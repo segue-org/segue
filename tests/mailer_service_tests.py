@@ -44,3 +44,16 @@ class MailerServiceTestCases(SegueApiTestCase):
         self.assertEquals(len(outbox), 1)
         self.assertEquals(len(outbox[0].recipients), 1)
         self.assertIn(purchase.customer.email, outbox[0].recipients[0])
+
+    @record_messages
+    def test_caravan_invite(self, outbox):
+        invite = self.create_from_factory(ValidCaravanInviteFactory)
+        self.service.caravan_invite(invite)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+
+        self.assertIn(invite.recipient, outbox[0].recipients[0])
+
+        the_url = 'http://192.168.33.91:9001/api/caravans/{}/invites/{}'.format(invite.caravan.id, invite.hash)
+        self.assertIn(the_url, outbox[0].body)

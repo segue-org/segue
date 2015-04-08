@@ -5,7 +5,7 @@ from account import AccountController
 from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
-from caravan import CaravanController
+from caravan import CaravanController, CaravanInviteController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -83,6 +83,14 @@ class CaravanBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:caravan_id>',     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
+class CaravanInviteBluePrint(flask.Blueprint):
+    def __init__(self):
+        super(CaravanInviteBluePrint, self).__init__('caravan_invites', __name__, url_prefix='/caravans/<int:caravan_id>/invites')
+        self.controller = CaravanInviteController()
+        self.add_url_rule('',                             methods=['GET'],   view_func=self.controller.list)
+        self.add_url_rule('',                             methods=['POST'],  view_func=self.controller.create)
+        self.add_url_rule('/<string:hash_code>',          methods=['GET'],   view_func=self.controller.get_by_hash)
+
 blueprints = [
     ProposalBlueprint(),
     ProposalInviteBluePrint(),
@@ -92,5 +100,6 @@ blueprints = [
     PaymentBlueprint(),
     DocumentBlueprint(),
     SessionBlueprint(),
-    CaravanBlueprint()
+    CaravanBlueprint(),
+    CaravanInviteBluePrint()
 ]

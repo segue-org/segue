@@ -1,0 +1,31 @@
+---
+
+template: caravan_invite
+language: pt
+subject: "{caravan.owner.name} te convidou para o FISL16"
+
+body: |
+
+    Olá {invite.name}!
+
+    Você está sendo convidado por **{caravan.owner.name}** para
+    participar de sua caravana para o FISL 16:
+
+    * nome da caravana: **{caravan.name}**
+    * cidade de partida: **{caravan.city}**
+
+    Se você aceitar este convite, você ganha 50% de
+    desconto no valor da inscrição!
+
+    Para aceitar este convite, por favor utilize o link abaixo:
+
+    {backend_url}/api/caravans/{caravan.id}/invites/{invite.hash}
+
+    **Atenção**: a aceitação deste convite não garante participação
+    no evento. Para participar deste evento na condição de caravanista,
+    é necessário efetuar o pagamento da inscrição.
+
+    Atenciosamente,
+
+    --
+    Associação Software Livre.Org

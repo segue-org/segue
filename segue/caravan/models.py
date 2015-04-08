@@ -15,7 +15,9 @@ class Caravan(JsonSerializable, db.Model):
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     invites      = db.relationship("CaravanInvite", backref="caravan")
 
-class CaravanInvite(db.Model):
+class CaravanInvite(JsonSerializable, db.Model):
+    _serializers = [ CaravanInviteJsonSerializer, ShortCaravanInviteJsonSerializer ]
+
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
     caravan_id   = db.Column(db.Integer, db.ForeignKey('caravan.id'))

@@ -58,3 +58,10 @@ class MailerService(object):
         message.to(customer.name, customer.email)
 
         return mailer.send(message.build())
+
+    def caravan_invite(self, invite):
+        message = self.message_factory.from_template('caravan/invite')
+        message.given(invite=invite, caravan=invite.caravan, owner=invite.caravan.owner)
+        message.to(invite.name, invite.recipient)
+
+        return mailer.send(message.build())

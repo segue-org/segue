@@ -1,8 +1,9 @@
+import flask
 from flask import request
 from flask.ext.jwt import current_user
 
 from ..core import jwt_required
-from ..json import jsoned
+from ..json import jsoned, accepts_html, JsonFor
 
 import schema
 
@@ -29,3 +30,27 @@ class CaravanController(object):
     def schema(self, name):
         return schema.whitelist[name], 200
 
+class CaravanInviteController(object):
+    @jwt_required()
+    @jsoned
+    def list(self, caravan_id):
+        result = self.service.list(caravan_id, by=self.current_user)
+        print result
+        return JsonFor(result).using('ShortCaravanInviteJsonSerializer'), 200
+
+    @jsoned
+    @accepts_html
+    def get_by_hash(self, caravan_id, hash_code, wants_html=False):
+        invite = self.service.get_by_hash(hash_code) or flask.abort(404)
+        if wants_html:
+            path = '/#/caravan/{}/invite/{}/answer'.format(proposal_id, hash_code)
+            return flask.redirect(config.FRONTEND_URL + path)
+        else:
+            return invite, 200
+
+    @jwt_required()
+    @jsoned
+    def create(self, caravan_id):
+        data = request.get_json()
+        result = self.service.create(caravan_id, data, by=self.current_user)
+        return result, 200

@@ -3,8 +3,8 @@ from segue.errors import AccountAlreadyHasCaravan, NotAuthorized
 
 import schema
 
-from models import Caravan
-from factories import CaravanFactory
+from models import Caravan, CaravanInvite
+from factories import CaravanFactory, CaravanInviteFactory
 
 class CaravanService(object):
     def __init__(self):
@@ -31,4 +31,28 @@ class CaravanService(object):
         db.session.commit()
         return caravan
 
+class CaravanInviteService(object):
+    def __init__(self, caravans=None, hasher=None, accounts = None, mailer=None):
+        self.caravans  = caravans  or CaravanService()
+        self.hasher    = hasher    or Hasher()
+        self.mailer    = mailer    or MailerService()
 
+    def list(self, caravan_id, by=None):
+        return self.caravans.get_one(caravan_id, by).invites
+
+    def create(self, caravan_id, data, by=None):
+        caravan = self.caravans.get_one(caravan_id, by)
+
+        invite = CaravanInviteFactory.from_json(data, schema.new_invite)
+        invite.caravan = caravan
+        invite.hash    = self.hasher.generate()
+
+        db.session.add(invite)
+        db.session.commit()
+
+        self.mailer.caravan_invite(invite)
+
+        return invite
+
+    def get_by_hash(self, invite_hash):
+        return CaravanInvite.query.filter(CaravanInvite.hash == invite_hash).first()
