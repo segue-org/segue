@@ -7,16 +7,34 @@ from ..core import db, jwt_required
 from ..json import jsoned, JsonFor
 
 from models import Product
-from segue.errors import ProductExpired
+from segue.errors import ProductExpired, InvalidCaravan
 from segue.purchase.services import PurchaseService
+from segue.caravan.services import CaravanInviteService
+
+DEFAULT_ORDERING = Product.sold_until
 
 class ProductService(object):
-    def __init__(self, db_impl=None, purchases=None):
-        self.db        = db_impl or db
-        self.purchases = purchases or PurchaseService();
+    def __init__(self, db_impl=None, purchases=None, caravan_invites=None):
+        self.db              = db_impl or db
+        self.purchases       = purchases or PurchaseService()
+        self.caravan_invites = caravan_invites or CaravanInviteService()
+
+    def _in_time(self):
+        return Product.sold_until >= datetime.now()
+
+    def _is_public(self):
+        return Product.public == True
+
+    def _is_caravan(self):
+        return Product.category == 'caravan'
 
     def list(self):
-        return Product.query.filter(Product.sold_until >= datetime.now()).order_by(Product.sold_until).all()
+        return Product.query.filter(self._in_time(), self._is_public()).order_by(DEFAULT_ORDERING).all()
+
+    def caravan_products(self, hash_code):
+        if not self.caravan_invites.get_by_hash(hash_code):
+            raise InvalidCaravan()
+        return Product.query.filter(self._in_time(), self._is_caravan()).order_by(DEFAULT_ORDERING).all()
 
     def get_product(self, product_id):
         return Product.query.get(product_id)
@@ -43,3 +61,8 @@ class ProductController(object):
         data = request.get_json()
         result = self.service.purchase(data, product_id, account=self.current_user) or flask.abort(400)
         return result, 200
+
+    @jsoned
+    def caravan_products(self, hash_code):
+        result = self.service.caravan_products(hash_code)
+        return JsonFor(result).using('ProductJsonSerializer'), 200

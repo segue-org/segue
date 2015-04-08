@@ -23,6 +23,17 @@ class ProductControllerTestCases(SegueApiTestCase):
 
         self.assertEquals(len(items), 2)
 
+    def test_list_caravan_products(self):
+        product1 = ValidProductFactory.build()
+        product2 = ValidProductFactory.build()
+        mockito.when(self.mock_service).caravan_products("123ABC").thenReturn([product1, product2])
+
+        response = self.jget('/products/caravan/123ABC')
+        items = json.loads(response.data)['items']
+
+        self.assertEquals(len(items), 2)
+
+
     def test_purchase_product(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)

@@ -23,6 +23,11 @@ class ExternalServiceError(SegueError):
     def to_json(self):
         return { 'message': 'could not connect to service: {}'.format(self.args) }
 
+class InvalidCaravan(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'caravan code is not valid' }
+
 class AccountAlreadyHasCaravan(SegueError):
     code = 400
     def to_json(self):

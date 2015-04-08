@@ -1,5 +1,7 @@
 from segue.core import db
 from segue.errors import AccountAlreadyHasCaravan, NotAuthorized
+from segue.hasher import Hasher
+from segue.mailer import MailerService
 
 import schema
 
