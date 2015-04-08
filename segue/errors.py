@@ -23,6 +23,11 @@ class ExternalServiceError(SegueError):
     def to_json(self):
         return { 'message': 'could not connect to service: {}'.format(self.args) }
 
+class AccountAlreadyHasCaravan(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this account already has a caravan' }
+
 class DocumentNotFound(SegueError):
     code = 404
     def to_json(self):

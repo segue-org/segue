@@ -121,3 +121,7 @@ class AccountController(object):
     def list_purchases(self, account_id):
         query_string = "?customer_id={}".format(account_id)
         return redirect(url_for('purchases.list') + query_string)
+
+    def get_caravan(self, account_id):
+        query_string = "?owner_id={}".format(account_id)
+        return redirect(url_for('caravan.get_one') + query_string)

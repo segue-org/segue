@@ -80,6 +80,7 @@ class CaravanBlueprint(flask.Blueprint):
         super(CaravanBlueprint, self).__init__('caravans', __name__, url_prefix='/caravans')
         self.controller = CaravanController()
         self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('/<int:caravan_id>',     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
 
 blueprints = [

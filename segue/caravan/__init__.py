@@ -20,6 +20,11 @@ class CaravanController(object):
         data = request.get_json()
         return self.service.create(data, self.current_user), 201
 
+    @jwt_required()
+    @jsoned
+    def get_one(self, caravan_id):
+        return self.service.get_one(caravan_id, self.current_user), 200
+
     @jsoned
     def schema(self, name):
         return schema.whitelist[name], 200
