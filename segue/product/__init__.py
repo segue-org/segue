@@ -16,7 +16,7 @@ class ProductService(object):
         self.purchases = purchases or PurchaseService();
 
     def list(self):
-        return Product.query.filter(Product.sold_until >= datetime.now()).all()
+        return Product.query.filter(Product.sold_until >= datetime.now()).order_by(Product.sold_until).all()
 
     def get_product(self, product_id):
         return Product.query.get(product_id)
