@@ -21,13 +21,17 @@ class CaravanService(object):
     def _check_ownership(self, entity, alleged):
         return entity and alleged and entity.owner == alleged
 
-    def get_by_owner(self, owner):
-        return Caravan.query.filter(Caravan.owner == owner).first()
+    def get_by_owner(self, owner, by=None):
+        result = Caravan.query.filter(Caravan.owner == owner).first()
+        if self._check_ownership(result, by):
+            return result
+        elif result:
+            raise NotAuthorized()
 
     def create(self, data, owner):
-        if self.get_by_owner(owner): raise AccountAlreadyHasCaravan()
+        if self.get_by_owner(owner, owner): raise AccountAlreadyHasCaravan()
 
-        caravan = CaravanFactory.from_json(data, schema.create)
+        caravan = CaravanFactory.from_json(data, schema.new_caravan)
         caravan.owner = owner
         db.session.add(caravan)
         db.session.commit()

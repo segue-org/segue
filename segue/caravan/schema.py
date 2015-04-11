@@ -1,9 +1,10 @@
-create = {
+new_caravan = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
-        "name":     { "type": "string", "minLength": 5, "maxLength": 80 },
-        "city":     { "type": "string", "minLength": 5, "maxLength": 80 },
+        "name":        { "type": "string", "minLength": 5, "maxLength": 80 },
+        "city":        { "type": "string", "minLength": 5, "maxLength": 80 },
+        "description": { "type": "string", "minLength": 5, "maxLength": 400 }
     },
     "required": [ "name", "city" ]
 }
@@ -19,6 +20,6 @@ new_invite = {
 }
 
 whitelist = dict(
-    create = create,
+    new_caravan = new_caravan,
     new_invite = new_invite
 )

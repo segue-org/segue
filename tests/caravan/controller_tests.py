@@ -24,10 +24,11 @@ class CaravanControllerTestCases(SegueApiTestCase):
         mockito.verify(self.mock_service).create(data, self.mock_owner)
         self.assertEquals(response.status_code, 201)
 
-    def test_gets_accounts_caravan(self):
+    def test_gets_caravan_by_id(self):
         mock_caravan = ValidCaravanFactory.build()
         mockito.when(self.mock_service).get_one(123, self.mock_owner).thenReturn(mock_caravan)
         mockito.when(self.mock_service).get_one(456, self.mock_owner).thenRaise(NotAuthorized)
+        mockito.when(self.mock_service).get_one(666, self.mock_owner).thenReturn(None)
 
         response = self.jget('/caravans/123')
         content = json.loads(response.data)['resource']
@@ -38,6 +39,29 @@ class CaravanControllerTestCases(SegueApiTestCase):
 
         response = self.jget('/caravans/456')
         self.assertEquals(response.status_code, 403)
+
+        response = self.jget('/caravans/666')
+        self.assertEquals(response.status_code, 404)
+
+    def test_gets_caravan_by_owner(self):
+        mock_caravan = ValidCaravanFactory.build()
+        mockito.when(self.mock_service).get_by_owner(789, self.mock_owner).thenReturn(mock_caravan)
+        mockito.when(self.mock_service).get_by_owner(890, self.mock_owner).thenRaise(NotAuthorized)
+        mockito.when(self.mock_service).get_by_owner(666, self.mock_owner).thenReturn(None)
+
+        response = self.jget('/caravans', query_string={'owner_id': u'789'})
+        content = json.loads(response.data)['resource']
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(content['name'], mock_caravan.name)
+        self.assertEquals(content['city'], mock_caravan.city)
+
+        response = self.jget('/caravans', query_string={'owner_id': u'890'})
+        self.assertEquals(response.status_code, 403)
+
+        response = self.jget('/caravans/666')
+        self.assertEquals(response.status_code, 404)
+
 
 class CaravanInviteControllerTestCases(SegueApiTestCase):
     def setUp(self):

@@ -23,8 +23,13 @@ class CaravanController(object):
 
     @jwt_required()
     @jsoned
-    def get_one(self, caravan_id):
-        return self.service.get_one(caravan_id, self.current_user), 200
+    def get_one(self, caravan_id=None):
+        if caravan_id:
+            result = self.service.get_one(caravan_id, self.current_user) or flask.abort(404)
+        else:
+            owner_id = int(request.args.get('owner_id'))
+            result = self.service.get_by_owner(owner_id, self.current_user) or flask.abort(404)
+        return result, 200
 
     @jsoned
     def schema(self, name):

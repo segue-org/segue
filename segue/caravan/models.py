@@ -10,6 +10,7 @@ class Caravan(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     name         = db.Column(db.Text)
     city         = db.Column(db.Text)
+    description  = db.Column(db.Text)
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
