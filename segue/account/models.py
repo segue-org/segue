@@ -47,3 +47,20 @@ class Account(JsonSerializable, db.Model):
     proposals     = db.relationship("Proposal", backref="owner")
     purchases     = db.relationship("Purchase", backref="customer")
     caravan_owned = db.relationship("Caravan",  backref="owner")
+
+class Country(db.Model):
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text)
+    cctld = db.Column(db.Text)
+    iso = db.Column(db.Integer)
+    
+class City(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    state = db.Column(db.Text)
+    name = db.Column(db.Text)
+    latitude = db.Column(db.Numeric)
+    longitude = db.Column(db.Numeric)
+    
+    __tablename__ = 'cities'

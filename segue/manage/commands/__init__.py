@@ -7,6 +7,7 @@ import segue, segue.core
 import populate
 import boletos
 import clean
+import report
 
 def _make_context():
     import segue.models
@@ -25,3 +26,4 @@ manager.command(populate.populate)
 manager.command(populate.populate_reference_data)
 manager.command(clean.clean_bad_buyers)
 manager.command(boletos.process_boletos)
+manager.command(report.buyers_report)

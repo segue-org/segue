@@ -5,6 +5,7 @@ from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
 from caravan.models import Caravan, CaravanInvite
+from account.models import City, Country
 
 __all__ = [
     'Account',
@@ -14,4 +15,5 @@ __all__ = [
     'PagSeguroPayment',
     'BoletoPayment',
     'Caravan', 'CaravanInvite'
+    'City', 'Country'
 ]
