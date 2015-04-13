@@ -31,16 +31,25 @@ class CaravanServiceTestCases(SegueApiTestCase):
         with self.assertRaises(AccountAlreadyHasCaravan):
             self.service.create(data, self.mock_owner)
 
-    def test_retrieves_caravan_checking_ownership(self):
-        saved = self.create_from_factory(ValidCaravanFactory)
+    def test_retrieves_caravan_by_owner(self):
+        existing = self.create_from_factory(ValidCaravanFactory)
 
-        retrieved = self.service.get_one(saved.id, saved.owner)
+        retrieved = self.service.get_by_owner(existing.owner.id, existing.owner)
 
-        self.assertEquals(saved, retrieved)
+        self.assertEquals(existing, retrieved)
 
         with self.assertRaises(NotAuthorized):
-            other_owner = self.create_from_factory(ValidAccountFactory)
-            self.service.get_one(saved.id, other_owner)
+            self.service.get_by_owner(existing.owner.id, self.mock_owner)
+
+    def test_retrieves_caravan_checking_ownership(self):
+        existing = self.create_from_factory(ValidCaravanFactory)
+
+        retrieved = self.service.get_one(existing.id, existing.owner)
+
+        self.assertEquals(existing, retrieved)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.get_one(existing.id, self.mock_owner)
 
 class CaravanInviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
