@@ -46,6 +46,23 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.buyer.address_country, buyer_data['address_country'])
         self.assertEquals(result.buyer.address_zipcode, buyer_data['address_zipcode'])
 
+    def test_purchasing_a_caravan_product(self):
+        account    = self.create_from_factory(ValidAccountFactory)
+        product    = self.create_from_factory(ValidCaravanProductFactory)
+        caravan    = self.create_from_factory(ValidCaravanFactory)
+        buyer_data = self.build_from_factory(ValidBuyerPersonFactory).to_json()
+        buyer_data['caravan_invite_hash'] = '123XXX'
+
+        result = self.service.create(buyer_data, product, account, caravan=caravan)
+
+        self.assertEquals(result.customer, account)
+        self.assertEquals(result.product, product)
+        self.assertEquals(result.status, 'pending')
+        self.assertEquals(result.buyer.name, buyer_data['name'])
+        self.assertEquals(result.buyer.kind, buyer_data['kind'])
+        self.assertEquals(result.kind, 'caravan-rider')
+        self.assertEquals(result.caravan, caravan)
+
     def test_retrieving_a_purchase(self):
         other_account = self.create_from_factory(ValidAccountFactory)
         purchase      = self.create_from_factory(ValidPurchaseFactory)

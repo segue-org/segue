@@ -32,9 +32,9 @@ class PurchaseService(object):
         filter_list = self.filter_strategies.given(**kw)
         return Purchase.query.filter(*filter_list).all()
 
-    def create(self, buyer_data, product, account):
+    def create(self, buyer_data, product, account, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
-        purchase = PurchaseFactory.create(buyer, product, account)
+        purchase = PurchaseFactory.create(buyer, product, account, **extra)
         self.db.session.add(buyer)
         self.db.session.add(purchase)
         self.db.session.commit()

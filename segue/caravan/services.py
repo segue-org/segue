@@ -9,8 +9,8 @@ from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory
 
 class CaravanService(object):
-    def __init__(self):
-        pass
+    def __init__(self, invites=None):
+        self.invites = invites or CaravanInviteService(caravans=self)
 
     def get_one(self, caravan_id, by=None):
         result = Caravan.query.get(caravan_id)
@@ -36,6 +36,9 @@ class CaravanService(object):
         db.session.add(caravan)
         db.session.commit()
         return caravan
+
+    def invite_by_hash(self, hash_code):
+        return self.invites.get_by_hash(hash_code)
 
 class CaravanInviteService(object):
     def __init__(self, caravans=None, hasher=None, accounts = None, mailer=None):

@@ -44,7 +44,6 @@ class CaravanInviteController(object):
     @jsoned
     def list(self, caravan_id):
         result = self.service.list(caravan_id, by=self.current_user)
-        print result
         return JsonFor(result).using('ShortCaravanInviteJsonSerializer'), 200
 
     @jsoned

@@ -14,6 +14,7 @@ buyer = {
         "address_extra":   { "type": "string", "minLength": 1,  "maxLength": 40  },
         "address_city":    { "type": "string", "minLength": 2,  "maxLength": 60  },
         "address_country": { "type": "string", "minLength": 2,  "maxLength": 40  },
+        "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 10  },
     },
     "required": [
         "kind", "name", "document",

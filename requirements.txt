@@ -32,3 +32,4 @@ testfixtures==4.1.2
 python-magic==0.4.6
 pyPdf==1.13
 freezegun==0.3.1
+Unidecode==0.04.17

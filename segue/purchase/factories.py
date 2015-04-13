@@ -1,17 +1,26 @@
 from segue.factory import Factory
 
+import schema
 from models import Buyer, Purchase, Payment, Transition
 
 class BuyerFactory(Factory):
     model = Buyer
+
+    CREATE_WHITELIST = schema.buyer["properties"].keys()
+
+    @classmethod
+    def clean_for_insert(cls, data):
+        data = { c:v for c,v in data.items() if c in BuyerFactory.CREATE_WHITELIST }
+        return data;
 
 class PurchaseFactory(Factory):
     QUERY_WHITELIST = ('customer_id',)
     model = Purchase
 
     @classmethod
-    def create(cls, buyer, product, account):
-        result = cls.model()
+    def create(cls, buyer, product, account, **extra_fields):
+        effective_class = product.special_purchase_class() or cls.model
+        result = effective_class(**extra_fields)
         result.buyer = buyer
         result.product = product
         result.customer = account

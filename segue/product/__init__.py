@@ -9,15 +9,16 @@ from ..json import jsoned, JsonFor
 from models import Product
 from segue.errors import ProductExpired, InvalidCaravan
 from segue.purchase.services import PurchaseService
-from segue.caravan.services import CaravanInviteService
+from segue.caravan.services import CaravanService
+from segue.caravan.models import CaravanProduct
 
 DEFAULT_ORDERING = Product.sold_until
 
 class ProductService(object):
-    def __init__(self, db_impl=None, purchases=None, caravan_invites=None):
-        self.db              = db_impl or db
-        self.purchases       = purchases or PurchaseService()
-        self.caravan_invites = caravan_invites or CaravanInviteService()
+    def __init__(self, db_impl=None, purchases=None, caravans=None):
+        self.db         = db_impl or db
+        self.purchases  = purchases or PurchaseService()
+        self.caravans   = caravans or CaravanService()
 
     def _in_time(self):
         return Product.sold_until >= datetime.now()
@@ -25,25 +26,22 @@ class ProductService(object):
     def _is_public(self):
         return Product.public == True
 
-    def _is_caravan(self):
-        return Product.category == 'caravan'
-
     def list(self):
         return Product.query.filter(self._in_time(), self._is_public()).order_by(DEFAULT_ORDERING).all()
 
     def caravan_products(self, hash_code):
-        if not self.caravan_invites.get_by_hash(hash_code):
-            raise InvalidCaravan()
-        return Product.query.filter(self._in_time(), self._is_caravan()).order_by(DEFAULT_ORDERING).all()
+        if self.caravans.invite_by_hash(hash_code):
+            return CaravanProduct.query.filter(self._in_time()).order_by(DEFAULT_ORDERING).all()
+        raise InvalidCaravan()
 
     def get_product(self, product_id):
         return Product.query.get(product_id)
 
     def purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
-        if not product.can_be_purchased:
-            raise ProductExpired
-        return self.purchases.create(buyer_data, product, account)
+        product.check_eligibility(buyer_data)
+        extra_fields = product.extra_purchase_fields_for(buyer_data)
+        return self.purchases.create(buyer_data, product, account, **extra_fields)
 
 class ProductController(object):
     def __init__(self, service=None):

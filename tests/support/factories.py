@@ -8,7 +8,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 from segue.core import db
 from segue.models import Account
 from segue.models import Proposal, ProposalInvite, Track
-from segue.models import Product
+from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
 from segue.models import Caravan, CaravanInvite
@@ -89,12 +89,21 @@ class ValidProductFactory(SegueFactory):
     class Meta:
         model = Product
     kind        = FuzzyChoice(["ticket","swag"])
-    category    = FuzzyChoice(["student","normal"])
+    category    = "normal"
     sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2015,12,1,0,0,0))
     public      = True
     price       = FuzzyDecimal(70, 400, 2)
     description = "ingresso fisl16 - lote 1 - muggles"
 
+class ValidCaravanProductFactory(ValidProductFactory):
+    class Meta:
+        model = CaravanProduct
+    category    = "caravan"
+
+class ValidStudentProductFactory(ValidProductFactory):
+    class Meta:
+        model = StudentProduct
+    category    = "student"
 
 class ValidBuyerFactory(SegueFactory):
     class Meta:
@@ -180,3 +189,4 @@ class ValidCaravanInviteFactory(SegueFactory):
     recipient = _Sequence('beltrano{0}@example.com')
     name      = _Sequence('Beltrano {0}')
     status    = FuzzyChoice(['pending','accepted','declined', 'cancelled'])
+    hash      = _Sequence("C0FFE#{:04d}")

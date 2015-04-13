@@ -1,19 +1,19 @@
 from account.models  import Account
 from proposal.models import Proposal, ProposalInvite, Track
-from product.models  import Product
+from product.models  import Product, StudentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
-from caravan.models import Caravan, CaravanInvite
 from account.models import City, Country
+from caravan.models import Caravan, CaravanInvite, CaravanProduct
 
 __all__ = [
     'Account',
     'Proposal', 'ProposalInvite', 'Track',
-    'Product',
+    'Product', 'StudentProduct',
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
     'BoletoPayment',
-    'Caravan', 'CaravanInvite',
+    'Caravan', 'CaravanInvite', 'CaravanProduct',
     'City', 'Country'
 ]

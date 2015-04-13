@@ -2,6 +2,9 @@ import datetime
 from sqlalchemy.sql import functions as func
 from ..core import db
 from ..json import JsonSerializable
+from segue.product.models import Product
+from segue.purchase.models import Purchase
+from segue.errors import WrongBuyerForProduct
 
 from serializers import *
 
@@ -28,3 +31,27 @@ class CaravanInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+
+class CaravanRiderPurchase(Purchase):
+    __mapper_args__ = { 'polymorphic_identity': 'caravan-rider' }
+    caravan_id = db.Column(db.Integer, db.ForeignKey('caravan.id'))
+    caravan    = db.relationship('Caravan')
+
+class CaravanLeaderPurchase(CaravanRiderPurchase):
+    __mapper_args__ = { 'polymorphic_identity': 'caravan-leader' }
+
+class CaravanProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'caravan' }
+
+    def special_purchase_class(self):
+        return CaravanRiderPurchase
+
+    def check_eligibility(self, buyer_data):
+        super(CaravanProduct, self).check_eligibility(buyer_data)
+        invites = CaravanInvite.query.filter(CaravanInvite.hash == buyer_data['caravan_invite_hash']).all()
+        if not invites:
+            raise WrongBuyerForProduct()
+
+    def extra_purchase_fields_for(self, buyer_data):
+        invite = CaravanInvite.query.filter(CaravanInvite.hash == buyer_data['caravan_invite_hash']).first()
+        return { 'caravan': invite.caravan }

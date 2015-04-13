@@ -35,6 +35,7 @@ class Buyer(JsonSerializable, db.Model):
         return u"{street} {number} {extra} - {city} {country}".format(**self.address_fields)
 
 class Purchase(JsonSerializable, db.Model):
+
     _serializers = [ PurchaseJsonSerializer, ShortPurchaseJsonSerializer ]
     id             = db.Column(db.Integer, primary_key=True)
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
@@ -43,8 +44,12 @@ class Purchase(JsonSerializable, db.Model):
     status         = db.Column(db.Text, default='pending')
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    kind           = db.Column(db.Text, server_default='single')
 
     payments       = db.relationship('Payment', backref='purchase', lazy='dynamic')
+
+    __tablename__ = 'purchase'
+    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'single' }
 
     @property
     def valid_payments(self):
