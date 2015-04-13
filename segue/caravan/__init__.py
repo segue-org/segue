@@ -8,7 +8,7 @@ from ..json import jsoned, accepts_html, JsonFor
 import schema
 
 from models import Caravan, CaravanInvite
-from services import CaravanService
+from services import CaravanService, CaravanInviteService
 
 class CaravanController(object):
     def __init__(self, service=None):
@@ -36,6 +36,10 @@ class CaravanController(object):
         return schema.whitelist[name], 200
 
 class CaravanInviteController(object):
+    def __init__(self, service=None):
+        self.service = service or CaravanInviteService()
+        self.current_user = current_user
+
     @jwt_required()
     @jsoned
     def list(self, caravan_id):
