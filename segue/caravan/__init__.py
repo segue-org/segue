@@ -28,7 +28,7 @@ class CaravanController(object):
             result = self.service.get_one(caravan_id, self.current_user) or flask.abort(404)
         else:
             owner_id = int(request.args.get('owner_id'))
-            result = self.service.get_by_owner(owner_id, self.current_user) or flask.abort(404)
+            result = self.service.get_by_owner(owner_id, self.current_user)
         return result, 200
 
     @jsoned
