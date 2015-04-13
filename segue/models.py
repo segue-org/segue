@@ -14,6 +14,6 @@ __all__ = [
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
     'BoletoPayment',
-    'Caravan', 'CaravanInvite'
+    'Caravan', 'CaravanInvite',
     'City', 'Country'
 ]
