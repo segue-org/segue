@@ -124,4 +124,4 @@ class AccountController(object):
 
     def get_caravan(self, account_id):
         query_string = "?owner_id={}".format(account_id)
-        return redirect(url_for('caravan.get_one') + query_string)
+        return redirect(url_for('caravans.get_one') + query_string)
