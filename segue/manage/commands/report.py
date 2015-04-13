@@ -13,7 +13,7 @@ LINE = "\n"
 
 def buyers_report(out_file = "buyers_report"):
     sys.stdout = codecs.open('./' + out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%s")) + ".csv",'w','utf-8')
-    print u'"CODIGO DA INSCRICAO";"EMAIL";"NOME";"TELEFONE";"DOCUMENTO";"ENDERECO";"NUMERO";"COMPLEMENTO";"CIDADE";"ESTADO";"TIPO DE INSCRICAO";"FORMA DE PAGAMENTO";"VALOR";"DATA DA COMPRA"'
+    print u'"CODIGO DA INSCRICAO";"EMAIL";"NOME";"TELEFONE";"DOCUMENTO";"ENDERECO";"NUMERO";"COMPLEMENTO";"CIDADE";"CEP";"ESTADO";"TIPO DE INSCRICAO";"FORMA DE PAGAMENTO";"VALOR";"DATA DA COMPRA"'
     
     for account in Account.query.all():
         purchases = account.purchases
@@ -31,7 +31,7 @@ def buyers_report(out_file = "buyers_report"):
                 ongoing_payments = [ payment for payment in p.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES) ]
                 if ongoing_payments:
                     payment = ongoing_payments[0]
-                print u'"{1.id}";"{0.email}";"{0.name}";"{0.phone}";"{0.document}";"{2.address_street}";"{2.address_number}";"{2.address_extra}";"{2.address_city}";"{4}";"{5}";"{3.type}";"{1.product.price}";"{6}"'.format(account,purchase,buyer,payment,guessed_state,get_category(purchase.product.category),format_date(purchase.last_updated))
+                print u'"{1.id}";"{0.email}";"{0.name}";"{0.phone}";"{0.document}";"{2.address_street}";"{2.address_number}";"{2.address_extra}";"{2.address_city}";"{2.address_zipcode}";"{4}";"{5}";"{3.type}";{1.product.price};{6}'.format(account,purchase,buyer,payment,guessed_state,get_category(purchase.product.category),format_date(purchase.last_updated))
 
 def guess_state(city_name):
   found = City.query.filter_by(name = stripe_accents(city_name.upper())).all()
