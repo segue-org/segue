@@ -13,7 +13,7 @@ class CaravanServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(CaravanServiceTestCases, self).setUp()
         self.service = CaravanService()
-        self.mock_owner = ValidAccountFactory.create()
+        self.mock_owner = self.create_from_factory(ValidAccountFactory)
 
     def test_cannot_create_invalid_caravan(self):
         data = { "invalid": "data" }
@@ -32,7 +32,7 @@ class CaravanServiceTestCases(SegueApiTestCase):
             self.service.create(data, self.mock_owner)
 
     def test_retrieves_caravan_by_owner(self):
-        existing = self.create_from_factory(ValidCaravanFactory)
+        existing = self.create_from_factory(ValidCaravanWithOwnerFactory)
 
         retrieved = self.service.get_by_owner(existing.owner.id, existing.owner)
 
@@ -42,7 +42,7 @@ class CaravanServiceTestCases(SegueApiTestCase):
             self.service.get_by_owner(existing.owner.id, self.mock_owner)
 
     def test_retrieves_caravan_checking_ownership(self):
-        existing = self.create_from_factory(ValidCaravanFactory)
+        existing = self.create_from_factory(ValidCaravanWithOwnerFactory)
 
         retrieved = self.service.get_one(existing.id, existing.owner)
 

@@ -180,12 +180,14 @@ class ValidCaravanFactory(SegueFactory):
         model = Caravan
     name  = _Sequence('Caravana dos Enxutos #{:04d}')
     city  = 'Enxutolandia'
+
+class ValidCaravanWithOwnerFactory(ValidCaravanFactory):
     owner = SubFactory(ValidAccountFactory)
 
 class ValidCaravanInviteFactory(SegueFactory):
     class Meta:
         model = CaravanInvite
-    caravan   = SubFactory(ValidCaravanFactory)
+    caravan   = SubFactory(ValidCaravanWithOwnerFactory)
     recipient = _Sequence('beltrano{0}@example.com')
     name      = _Sequence('Beltrano {0}')
     status    = FuzzyChoice(['pending','accepted','declined', 'cancelled'])

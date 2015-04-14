@@ -27,10 +27,7 @@ class CaravanController(object):
         if caravan_id:
             result = self.service.get_one(caravan_id, self.current_user) or flask.abort(404)
         else:
-            if request.args.get('owner_id') is not None:
-                owner_id = request.args.get('owner_id')
-            else:
-                owner_id = self.current_user.id
+            owner_id = int(request.args.get('owner_id', self.current_user.id))
             result = self.service.get_by_owner(owner_id, self.current_user)
         return result, 200
 

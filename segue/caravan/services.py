@@ -17,7 +17,8 @@ class CaravanService(object):
         result = Caravan.query.get(caravan_id)
         if self._check_ownership(result, by):
             return result
-        raise NotAuthorized()
+        elif result:
+            raise NotAuthorized()
 
     def _check_ownership(self, entity, alleged):
         return entity and alleged and entity.owner == alleged
