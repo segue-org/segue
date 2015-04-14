@@ -9,10 +9,11 @@ body: |
     Olá {invite.name}!
 
     Você está sendo convidado por **{caravan.owner.name}** para
-    participar de sua caravana para o FISL 16:
+    participar de uma caravana para o FISL 16:
 
     * nome da caravana: **{caravan.name}**
     * cidade de partida: **{caravan.city}**
+    * descrição da caravana: **{caravan.description}**
 
     Se você aceitar este convite, você ganha 50% de
     desconto no valor da inscrição!
