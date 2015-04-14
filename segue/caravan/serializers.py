@@ -2,6 +2,9 @@ from ..json import SQLAlchemyJsonSerializer
 
 class CaravanJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
+    _child_serializers = dict(owner='SafeAccountJsonSerializer')
+    def serialize_child(self, child):
+        return self._child_serializers.get(child, False)
 
 class CaravanInviteJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

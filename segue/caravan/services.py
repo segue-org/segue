@@ -7,6 +7,7 @@ import schema
 
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory
+from ..account import AccountService, Account
 
 class CaravanService(object):
     def __init__(self, invites=None):
@@ -45,6 +46,7 @@ class CaravanInviteService(object):
         self.caravans  = caravans  or CaravanService()
         self.hasher    = hasher    or Hasher()
         self.mailer    = mailer    or MailerService()
+        self.accounts  = accounts  or AccountService()
 
     def list(self, caravan_id, by=None):
         return self.caravans.get_one(caravan_id, by).invites
@@ -65,3 +67,25 @@ class CaravanInviteService(object):
 
     def get_by_hash(self, invite_hash):
         return CaravanInvite.query.filter(CaravanInvite.hash == invite_hash).first()
+
+    def answer(self, hash_code, accepted=True, by=None):
+        invite = self.get_by_hash(hash_code)
+        if not invite:
+            return None
+        if self.accounts.is_email_registered(invite.recipient):
+            if not by or by.email != invite.recipient:
+                raise NotAuthorized
+
+        invite.status = 'accepted' if accepted else 'declined'
+        db.session.add(invite)
+        db.session.commit()
+        return invite
+
+    def register(self, hash_code, account_data):
+        invite = self.get_by_hash(hash_code)
+        if not invite:
+            return None
+        if invite.recipient != account_data['email']:
+            return NotAuthorized
+
+        return self.accounts.create(account_data)

@@ -1,6 +1,6 @@
 import flask
 from flask import request
-from flask.ext.jwt import current_user
+from flask.ext.jwt import current_user, verify_jwt, JWTError
 
 from ..core import jwt_required
 from ..json import jsoned, accepts_html, JsonFor
@@ -27,7 +27,10 @@ class CaravanController(object):
         if caravan_id:
             result = self.service.get_one(caravan_id, self.current_user) or flask.abort(404)
         else:
-            owner_id = int(request.args.get('owner_id'))
+            if request.args.get('owner_id') is not None:
+                owner_id = request.args.get('owner_id')
+            else:
+                owner_id = self.current_user.id
             result = self.service.get_by_owner(owner_id, self.current_user)
         return result, 200
 
@@ -51,7 +54,7 @@ class CaravanInviteController(object):
     def get_by_hash(self, caravan_id, hash_code, wants_html=False):
         invite = self.service.get_by_hash(hash_code) or flask.abort(404)
         if wants_html:
-            path = '/#/caravan/{}/invite/{}/answer'.format(proposal_id, hash_code)
+            path = '/#/caravan/{}/invite/{}/answer'.format(caravan_id, hash_code)
             return flask.redirect(config.FRONTEND_URL + path)
         else:
             return invite, 200
@@ -61,4 +64,25 @@ class CaravanInviteController(object):
     def create(self, caravan_id):
         data = request.get_json()
         result = self.service.create(caravan_id, data, by=self.current_user)
+        return result, 200
+
+    @jsoned
+    def accept(self, caravan_id, hash_code):
+        try:
+            verify_jwt()
+        except JWTError:
+            pass
+
+        result = self.service.answer(hash_code, accepted=True, by=self.current_user) or flask.abort(404)
+        return result, 200
+
+    @jsoned
+    def decline(self, caravan_id, hash_code):
+        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
+        return result, 200
+
+    @jsoned
+    def register(self, caravan_id, hash_code):
+        data = request.get_json()
+        result = self.service.register(hash_code, data) or flask.abort(404)
         return result, 200

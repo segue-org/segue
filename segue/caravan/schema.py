@@ -8,6 +8,7 @@ new_caravan = {
     },
     "required": [ "name", "city" ]
 }
+edit_caravan = new_caravan.copy()
 
 new_invite = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -21,5 +22,6 @@ new_invite = {
 
 whitelist = dict(
     new_caravan = new_caravan,
+    edit_caravan = edit_caravan,
     new_invite = new_invite
 )
