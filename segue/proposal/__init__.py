@@ -78,11 +78,6 @@ class ProposalInviteController(object):
         return result, 200
 
     @jsoned
-    def decline(self, proposal_id, hash_code):
-        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
-        return result, 200
-
-    @jsoned
     def accept(self, proposal_id, hash_code):
         try:
             verify_jwt()
@@ -90,6 +85,11 @@ class ProposalInviteController(object):
             pass
 
         result = self.service.answer(hash_code, accepted=True, by=self.current_user) or flask.abort(404)
+        return result, 200
+
+    @jsoned
+    def decline(self, proposal_id, hash_code):
+        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
         return result, 200
 
     @jsoned
