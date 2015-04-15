@@ -34,7 +34,7 @@ class CaravanInvite(JsonSerializable, db.Model):
 
 class CaravanRiderPurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'caravan-rider' }
-    caravan_id = db.Column(db.Integer, db.ForeignKey('caravan.id'))
+    caravan_id = db.Column(db.Integer, db.ForeignKey('caravan.id'), name='cr_caravan_id')
     caravan    = db.relationship('Caravan')
 
 class CaravanLeaderPurchase(CaravanRiderPurchase):
