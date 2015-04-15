@@ -1,10 +1,11 @@
+from datetime import timedelta, datetime
 import mockito
 
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment
 from segue.purchase.pagseguro.models import PagSeguroPayment
-from segue.errors import NotAuthorized, PaymentVerificationFailed, \
+from segue.errors import NotAuthorized, PaymentVerificationFailed, ProductExpired, \
                          InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
 
 from ..support import SegueApiTestCase, hashie
@@ -63,6 +64,7 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.kind, 'caravan-rider')
         self.assertEquals(result.caravan, caravan)
 
+
     def test_retrieving_a_purchase(self):
         other_account = self.create_from_factory(ValidAccountFactory)
         purchase      = self.create_from_factory(ValidPurchaseFactory)
@@ -73,13 +75,21 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         with self.assertRaises(NotAuthorized):
             self.service.get_one(purchase.id, by=other_account)
 
+    def test_cannot_create_a_payment_for_purchase_of_an_expired_product(self):
+        yesterday = datetime.now() - timedelta(days=1)
+        product = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+
+        with self.assertRaises(ProductExpired):
+            self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
+
+
 class PaymentServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PaymentServiceTestCases, self).setUp()
         self.dummy = mockito.Mock()
         self.mailer = mockito.Mock()
         self.service = PaymentService(mailer=self.mailer, dummy=self.dummy)
-
 
     def test_creating_a_payment_delegates_creation_and_processing_to_correct_payment_implementation(self):
         data = dict(got='mock?')

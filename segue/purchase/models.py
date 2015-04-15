@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from sqlalchemy.sql import functions as func
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
@@ -43,7 +43,7 @@ class Purchase(JsonSerializable, db.Model):
     buyer_id       = db.Column(db.Integer, db.ForeignKey('buyer.id'))
     status         = db.Column(db.Text, default='pending')
     created        = db.Column(db.DateTime, default=func.now())
-    last_updated   = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    last_updated   = db.Column(db.DateTime, onupdate=datetime.now)
     kind           = db.Column(db.Text, server_default='single')
 
     payments       = db.relationship('Payment', backref='purchase', lazy='dynamic')
@@ -73,6 +73,10 @@ class Purchase(JsonSerializable, db.Model):
 
     def recalculate_status(self):
         self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
+
+    @property
+    def can_start_payment(self):
+        return self.product.sold_until >= datetime.now()
 
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
