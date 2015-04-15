@@ -1,35 +1,34 @@
 import random
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 from ..core import db
 from ..errors import NotAuthorized
 from ..mailer import MailerService
 from ..hasher import Hasher
+from ..filters import FilterStrategies
 
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
 from ..account import AccountService, Account
 
-class ProposalFilterStrategies(object):
+class ProposalFilterStrategies(FilterStrategies):
     def given(self, as_user=None, **criteria):
         result = []
         for key, value in criteria.items():
             method = getattr(self, "by_"+key)
             result.append(method(value, as_user=as_user))
-        if not result:
+        if as_user and as_user.role != 'admin':
             result.append(self.enforce_user(as_user))
         return result
 
     def enforce_user(self, user):
-        return Proposal.owner == user
+        return or_(self.by_owner_id(user.id), self.by_coauthor_id(user.id))
 
     def by_owner_id(self, value, as_user=None):
-        value = as_user.id if as_user else value
         return Proposal.owner_id == value
 
     def by_coauthor_id(self, value, as_user=None):
-        value = as_user.id if as_user else value
         return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
 
 class ProposalService(object):
@@ -49,7 +48,6 @@ class ProposalService(object):
 
     def query(self, **kw):
         filter_list = self.filter_strategies.given(**kw)
-
         return Proposal.query.filter(*filter_list).all()
 
     def modify(self, proposal_id, data, by=None):

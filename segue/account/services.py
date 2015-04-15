@@ -1,8 +1,10 @@
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 
 from ..core import db
 from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
+from ..filters import FilterStrategies
 
 from jwt import Signer
 
@@ -10,10 +12,25 @@ from models import Account
 from factories import AccountFactory
 import schema
 
+class AccountFilterStrategies(FilterStrategies):
+    def by_id(self, value):
+        if value.isdigit():
+            return Account.id == value
+
+    def by_email(self, value):
+        return Account.email.like('%'+value+'%')
+
+    def by_name(self, value):
+        return Account.name.like('%'+value+'%')
+
+    def by_document(self, value):
+        return Account.document.like('%'+value+'%')
+
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None):
         self.db     = db_impl or db
         self.signer = signer or Signer()
+        self.filters = AccountFilterStrategies()
 
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
@@ -35,6 +52,10 @@ class AccountService(object):
         db.session.add(account)
         db.session.commit()
         return account
+
+    def lookup(self, needle):
+        filters = self.filters.needle(needle)
+        return Account.query.filter(or_(*filters)).all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)

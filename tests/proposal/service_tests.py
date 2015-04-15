@@ -99,8 +99,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(result[0].id, proposal1.id)
 
         result = self.service.query(owner_id = owner.id, as_user=proposal2.owner)
-        self.assertEquals(len(result), 1)
-        self.assertEquals(result[0].id, proposal2.id)
+        self.assertEquals(len(result), 0)
 
     def test_query_proposals_by_coauthor(self):
         account1 = self.create_from_factory(ValidAccountFactory)
