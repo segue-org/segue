@@ -7,11 +7,11 @@ class FilterStrategies(object):
         for method_name in dir(self):
             if not method_name.startswith("by_"): continue
             method = getattr(self, method_name)
-            filter_ = method(needle)
-            if filter_ is None: continue
-            result.append(filter)
+            criterium = method(needle)
+            if criterium is None: continue
+            result.append(criterium)
 
-        if not as_user or as_userl.role == 'admin':
+        if not as_user or as_user.role == 'admin':
             return or_(*result)
         else:
             return [ self.enforce_user(as_user), or_(*result)  ]

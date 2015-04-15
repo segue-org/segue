@@ -1,3 +1,8 @@
+<<<<<<< Updated upstream
+=======
+-e git+https://github.com/avelino/pycorreios@c3476174073ec888afbafb690de097dae6ce121e#egg=pycorreios-master
+-e git+https://github.com/dwolff/python-pagseguro@f7ab95c492a1a6dbfbee1798bf7b8c07cb72e9f9#egg=pagseguro-with_sandbox
+>>>>>>> Stashed changes
 BeautifulSoup==3.2.1
 Flask==0.10.1
 Flask-Cors==1.10.2
@@ -32,9 +37,24 @@ nosecomplete==0.1.0
 passlib==1.6.2
 psycopg2==2.5.4
 pyPdf==1.13
+<<<<<<< Updated upstream
 pyboleto==0.2.14
 pycorreios==0.1.1
 python-dateutil==2.4.2
+=======
+pyboleto==0.2.14
+python-dateutil==2.4.2
+python-magic==0.4.6
+reportlab==3.1.44
+requests==2.6.0
+six==1.9.0
+wsgiref==0.1.2
+Markdown==2.6
+PyYAML==3.10
+colorama==0.3.3
+pyboleto==0.2.14
+testfixtures==4.1.2
+>>>>>>> Stashed changes
 python-magic==0.4.6
 reportlab==3.1.44
 requests==2.6.0
