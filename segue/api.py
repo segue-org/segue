@@ -5,11 +5,8 @@ from account import AccountController
 from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
-<<<<<<< Updated upstream
 from caravan import CaravanController, CaravanInviteController
-=======
 from admin import AdminController
->>>>>>> Stashed changes
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -88,7 +85,6 @@ class SessionBlueprint(flask.Blueprint):
         self.controller = AccountController()
         self.add_url_rule('', methods=['POST'], view_func=self.controller.login)
 
-<<<<<<< Updated upstream
 class CaravanBlueprint(flask.Blueprint):
     def __init__(self):
         super(CaravanBlueprint, self).__init__('caravans', __name__, url_prefix='/caravans')
