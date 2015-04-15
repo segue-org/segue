@@ -5,7 +5,11 @@ from account import AccountController
 from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
+<<<<<<< Updated upstream
 from caravan import CaravanController, CaravanInviteController
+=======
+from admin import AdminController
+>>>>>>> Stashed changes
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -84,6 +88,7 @@ class SessionBlueprint(flask.Blueprint):
         self.controller = AccountController()
         self.add_url_rule('', methods=['POST'], view_func=self.controller.login)
 
+<<<<<<< Updated upstream
 class CaravanBlueprint(flask.Blueprint):
     def __init__(self):
         super(CaravanBlueprint, self).__init__('caravans', __name__, url_prefix='/caravans')
@@ -105,6 +110,12 @@ class CaravanInviteBluePrint(flask.Blueprint):
         self.add_url_rule('/<string:hash_code>/decline',  methods=['POST'],  view_func=self.controller.decline)
         self.add_url_rule('/<string:hash_code>/register', methods=['POST'],  view_func=self.controller.register)
 
+class AdminBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
+        self.controller = AdminController()
+        self.add_url_rule('/accounts', methods=['GET'], view_func=self.controller.lookup)
+
 blueprints = [
     ProposalBlueprint(),
     ProposalInviteBluePrint(),
@@ -115,5 +126,6 @@ blueprints = [
     DocumentBlueprint(),
     SessionBlueprint(),
     CaravanBlueprint(),
-    CaravanInviteBluePrint()
+    CaravanInviteBluePrint(),
+    AdminBlueprint()
 ]
