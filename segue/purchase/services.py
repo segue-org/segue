@@ -1,5 +1,5 @@
 from segue.core import db, logger
-from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied, ProductExpired
+from segue.errors import NotAuthorized, NoSuchPayment, NoSuchProduct, PurchaseAlreadySatisfied, ProductExpired
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
@@ -54,6 +54,23 @@ class PurchaseService(object):
         if purchase.can_start_payment:
             return self.payments.create(purchase, payment_method, payment_data)
         raise ProductExpired()
+
+    def clone_purchase(self, purchase_id, by=None):
+        purchase = self.get_one(purchase_id, by=by)
+        if not purchase: return None
+
+        if purchase.satisfied:
+            raise PurchaseAlreadySatisfied()
+
+        replacement_product = purchase.product.similar_products().first()
+        if not replacement_product:
+            raise NoSuchProduct()
+
+        cloned_purchase = purchase.clone()
+        cloned_purchase.product = replacement_product
+        db.session.add(cloned_purchase)
+        db.session.commit()
+        return cloned_purchase
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(

@@ -57,6 +57,7 @@ class PurchaseBlueprint(flask.Blueprint):
         self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
+        self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
 
 class PaymentBlueprint(flask.Blueprint):
     def __init__(self):

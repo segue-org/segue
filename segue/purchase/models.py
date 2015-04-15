@@ -71,12 +71,20 @@ class Purchase(JsonSerializable, db.Model):
     def description(self):
         return self.product.description
 
-    def recalculate_status(self):
-        self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
-
     @property
     def can_start_payment(self):
         return self.product.sold_until >= datetime.now()
+
+    def recalculate_status(self):
+        self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
+
+    def clone(self):
+        arguments = dict()
+        for name, column in self.__mapper__.columns.items():
+            if not (column.primary_key or column.unique):
+                arguments[name] = getattr(self, name)
+        return self.__class__(**arguments)
+
 
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

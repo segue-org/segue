@@ -31,6 +31,12 @@ class Product(JsonSerializable, db.Model):
     def special_purchase_class(self):
         return None
 
+    def similar_products(self):
+        return Product.query.filter(
+                Product.category   == self.category,
+                Product.kind       == self.kind,
+                Product.sold_until >  self.sold_until)
+
 class StudentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'student' }
 
