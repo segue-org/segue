@@ -75,6 +75,12 @@ class ResetPassword(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    def payments(self):
+        payments = []
+        for purchase in self.purchases:
+            payments.extend(purchase.payments)
+        return payments
+
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
