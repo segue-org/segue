@@ -23,6 +23,13 @@ class CaravanController(object):
 
     @jwt_required()
     @jsoned
+    def modify(self, caravan_id):
+        data = request.get_json()
+        result = self.service.modify(caravan_id, data, by=self.current_user) or flask.abort(404)
+        return result, 200
+
+    @jwt_required()
+    @jsoned
     def get_one(self, caravan_id=None):
         if caravan_id:
             result = self.service.get_one(caravan_id, self.current_user) or flask.abort(404)

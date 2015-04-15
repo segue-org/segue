@@ -39,6 +39,12 @@ class PurchaseController(object):
     def schema(self, name):
         return schema.whitelist[name], 200
 
+    @jwt_required()
+    @jsoned
+    def clone(self, purchase_id=None):
+        result = self.service.clone_purchase(purchase_id, by=self.current_user) or flask.abort(404)
+        return result, 200
+
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()

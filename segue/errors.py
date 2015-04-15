@@ -89,6 +89,11 @@ class NoSuchPayment(SegueError):
     def to_json(self):
         return { 'message': 'notification was sent to an invalid payment' }
 
+class NoSuchProduct(SegueError):
+    code = 404
+    def to_json(self):
+        return { 'message': 'cannot find a product like that' }
+
 class InvalidPaymentNotification(SegueError):
     code = 400
     def to_json(self):

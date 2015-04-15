@@ -20,8 +20,9 @@ class CaravanService(object):
         elif result:
             raise NotAuthorized()
 
-    def _check_ownership(self, entity, alleged):
-        return entity and alleged and entity.owner == alleged
+    def _check_ownership(self, caravan, alleged):
+        if isinstance(caravan, int): caravan = self.get_one(caravan)
+        return caravan and alleged and caravan.owner_id == alleged.id
 
     def get_by_owner(self, owner_id, by=None):
         result = Caravan.query.filter(Caravan.owner_id == owner_id).first()
@@ -35,6 +36,15 @@ class CaravanService(object):
 
         caravan = CaravanFactory.from_json(data, schema.new_caravan)
         caravan.owner = owner
+        db.session.add(caravan)
+        db.session.commit()
+        return caravan
+
+    def modify(self, caravan_id, data, by=None):
+        caravan = self.get_one(caravan_id, by)
+
+        for name, value in CaravanFactory.clean_for_update(data).items():
+            setattr(caravan, name, value)
         db.session.add(caravan)
         db.session.commit()
         return caravan

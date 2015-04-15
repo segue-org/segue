@@ -1,11 +1,13 @@
+from datetime import timedelta, datetime
 import mockito
 
 from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment
 from segue.purchase.pagseguro.models import PagSeguroPayment
-from segue.errors import NotAuthorized, PaymentVerificationFailed, \
-                         InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
+from segue.errors import NotAuthorized, PaymentVerificationFailed, ProductExpired, \
+                         InvalidPaymentNotification, NoSuchPayment, NoSuchProduct, \
+                         PurchaseAlreadySatisfied
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
@@ -63,6 +65,7 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.kind, 'caravan-rider')
         self.assertEquals(result.caravan, caravan)
 
+
     def test_retrieving_a_purchase(self):
         other_account = self.create_from_factory(ValidAccountFactory)
         purchase      = self.create_from_factory(ValidPurchaseFactory)
@@ -73,13 +76,51 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         with self.assertRaises(NotAuthorized):
             self.service.get_one(purchase.id, by=other_account)
 
+    def test_cannot_create_a_payment_for_purchase_of_an_expired_product(self):
+        yesterday = datetime.now() - timedelta(days=1)
+        product = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+
+        with self.assertRaises(ProductExpired):
+            self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
+
+    def test_clone_a_purchase(self):
+        yesterday = datetime.now() - timedelta(days=1)
+        tomorrow  = datetime.now() + timedelta(days=1)
+        product1 = self.create_from_factory(ValidProductFactory, kind="ticket", category='normal',  sold_until=yesterday)
+        product2 = self.create_from_factory(ValidProductFactory, kind="ticket", category='normal',  sold_until=tomorrow)
+        product3 = self.create_from_factory(ValidProductFactory, kind="ticket", category='student', sold_until=tomorrow)
+
+        purchase1 = self.create_from_factory(ValidPurchaseFactory, product=product1)
+        purchase2 = self.create_from_factory(ValidPurchaseFactory, product=product2)
+        purchase3 = self.create_from_factory(ValidPurchaseFactory, product=product2, status='paid')
+
+        result = self.service.clone_purchase(purchase1.id, by=purchase1.customer)
+        self.assertEquals(result.product.sold_until, tomorrow)
+        self.assertEquals(result.buyer, purchase1.buyer)
+        self.assertEquals(result.customer, purchase1.customer)
+        self.assertEquals(result.product, product2)
+
+        result = self.service.clone_purchase(888, by=purchase2.customer)
+        self.assertRaises(result, None)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.clone_purchase(purchase1.id, by=purchase2.customer)
+
+        with self.assertRaises(NoSuchProduct):
+            self.service.clone_purchase(purchase2.id, by=purchase2.customer)
+
+        with self.assertRaises(PurchaseAlreadySatisfied):
+            self.service.clone_purchase(purchase3.id, by=purchase3.customer)
+
+
+
 class PaymentServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PaymentServiceTestCases, self).setUp()
         self.dummy = mockito.Mock()
         self.mailer = mockito.Mock()
         self.service = PaymentService(mailer=self.mailer, dummy=self.dummy)
-
 
     def test_creating_a_payment_delegates_creation_and_processing_to_correct_payment_implementation(self):
         data = dict(got='mock?')
@@ -201,7 +242,6 @@ class PaymentServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(NoSuchPayment):
             self.service.conclude(purchase.id, payment.id, payload)
-
 
 class PaymentFactoryTestCases(SegueApiTestCase):
     def setUp(self):
