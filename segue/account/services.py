@@ -3,11 +3,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
 from ..core import db
-<<<<<<< HEAD
 from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 from ..hasher import Hasher
 
 from segue.mailer import MailerService
+from ..filters import FilterStrategies
 
 from jwt import Signer
 
@@ -15,6 +15,20 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 import schema
+
+class AccountFilterStrategies(FilterStrategies):
+    def by_id(self, value):
+        if value.isdigit():
+            return Account.id == value
+
+    def by_email(self, value):
+        return Account.email.like('%'+value+'%')
+
+    def by_name(self, value):
+        return Account.name.like('%'+value+'%')
+
+    def by_document(self, value):
+        return Account.document.like('%'+value+'%')
 
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None, mailer=None, hasher=None):
@@ -24,6 +38,7 @@ class AccountService(object):
         self.hasher = hasher or Hasher()
         self.filters = AccountFilterStrategies()
         self.hasher = hasher or Hasher()
+        self.filters = AccountFilterStrategies()
 
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0

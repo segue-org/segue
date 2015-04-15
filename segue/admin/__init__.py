@@ -21,7 +21,6 @@ def admin_only(fn):
         return fn(instance, *args, **kw)
     return wrapped
 
-
 class AdminController(object):
     def __init__(self, accounts=None, proposals=None):
         self.accounts = accounts or AccountService()
