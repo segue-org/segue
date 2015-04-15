@@ -110,7 +110,11 @@ class AdminBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
         self.controller = AdminController()
-        self.add_url_rule('/accounts', methods=['GET'], view_func=self.controller.lookup)
+        self.add_url_rule('/accounts',  methods=['GET'], view_func=self.controller.accounts)
+        self.add_url_rule('/proposals', methods=['GET'], view_func=self.controller.proposals)
+        self.add_url_rule('/purchases', methods=['GET'], view_func=self.controller.purchases)
+        self.add_url_rule('/caravans',  methods=['GET'], view_func=self.controller.caravans)
+        self.add_url_rule('/payments',  methods=['GET'], view_func=self.controller.payments)
 
 blueprints = [
     ProposalBlueprint(),

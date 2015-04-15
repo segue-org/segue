@@ -21,10 +21,10 @@ class AccountFilterStrategies(FilterStrategies):
             return Account.id == value
 
     def by_email(self, value):
-        return Account.email.like('%'+value+'%')
+        return Account.email.ilike('%'+value+'%')
 
     def by_name(self, value):
-        return Account.name.like('%'+value+'%')
+        return Account.name.ilike('%'+value+'%')
 
     def by_document(self, value):
         return Account.document.like('%'+value+'%')
