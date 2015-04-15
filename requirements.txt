@@ -33,6 +33,7 @@ nosecomplete==0.1.0
 passlib==1.6.2
 psycopg2==2.5.4
 pyPdf==1.13
+<<<<<<< Updated upstream
 pyboleto==0.2.14
 python-dateutil==2.4.2
 python-magic==0.4.6

@@ -21,6 +21,12 @@ def admin_only(fn):
         return fn(instance, *args, **kw)
     return wrapped
 
+class AccountDetailResponse(object):
+    def __init__(self, list_or_entity):
+        if isinstance(list_or_entity, list):
+            return [ Account(e) for e in list_or_entity ]
+        self.bla = 'bla'
+
 class AdminController(object):
     def __init__(self, accounts=None, proposals=None):
         self.accounts = accounts or AccountService()
