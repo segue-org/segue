@@ -66,6 +66,12 @@ class Account(JsonSerializable, db.Model):
     def has_valid_purchases(self):
         return any([ p.satisfied for p in self.purchases ])
 
+    def payments(self):
+        payments = []
+        for purchase in self.purchases:
+            payments.extend(purchase.payments)
+        return payments
+
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
