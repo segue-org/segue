@@ -16,20 +16,6 @@ from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 import schema
 
-class AccountFilterStrategies(FilterStrategies):
-    def by_id(self, value):
-        if value.isdigit():
-            return Account.id == value
-
-    def by_email(self, value):
-        return Account.email.ilike('%'+value+'%')
-
-    def by_name(self, value):
-        return Account.name.ilike('%'+value+'%')
-
-    def by_document(self, value):
-        return Account.document.like('%'+value+'%')
-
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None, mailer=None, hasher=None):
         self.db     = db_impl or db
