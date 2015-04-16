@@ -100,6 +100,7 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.buyer, purchase1.buyer)
         self.assertEquals(result.customer, purchase1.customer)
         self.assertEquals(result.product, product2)
+        self.assertIsNot(result.created, purchase1.created)
 
         result = self.service.clone_purchase(888, by=purchase2.customer)
         self.assertRaises(result, None)
