@@ -7,6 +7,7 @@ from models import Purchase, Payment
 from .pagseguro import PagSeguroPaymentService
 from .boleto    import BoletoPaymentService
 from ..mailer import MailerService
+from ..caravan import CaravanService
 
 import schema
 
@@ -78,9 +79,10 @@ class PaymentService(object):
         boleto    = BoletoPaymentService
     )
 
-    def __init__(self, mailer=None, **processors_overrides):
+    def __init__(self, mailer=None, caravans=None, **processors_overrides):
         self.processors_overrides = processors_overrides
         self.mailer               = mailer or MailerService()
+        self.caravans             = caravans or CaravanService()
 
     def create(self, purchase, method, data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
@@ -138,6 +140,11 @@ class PaymentService(object):
             if purchase.satisfied:
                 logger.debug('transition is good payment! notifying customer via e-mail!')
                 self.mailer.notify_payment(purchase, payment)
+
+                # TODO: improve this code, caravan concerns should never live here!
+                if purchase.kind == 'caravan-rider':
+                    logger.debug('attempting to exempt the leader of a caravan')
+                    self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
             return purchase, transition
         except Exception, e:

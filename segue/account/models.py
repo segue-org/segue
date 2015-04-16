@@ -61,6 +61,9 @@ class Account(JsonSerializable, db.Model):
             payments.extend(purchase.payments)
         return payments
 
+    def has_valid_purchases(self):
+        return any([ p.satisfied for p in self.purchases ])
+
 class Country(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)

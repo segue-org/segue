@@ -6,7 +6,7 @@ from segue.mailer import MailerService
 import schema
 
 from models import Caravan, CaravanInvite
-from factories import CaravanFactory, CaravanInviteFactory
+from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
 from ..account import AccountService, Account
 
 class CaravanService(object):
@@ -51,6 +51,16 @@ class CaravanService(object):
 
     def invite_by_hash(self, hash_code):
         return self.invites.get_by_hash(hash_code)
+
+    def update_leader_exemption(self, caravan_id, owner):
+        if owner.has_valid_purchases: return None
+
+        caravan = self.get_one(caravan_id, owner)
+        if caravan.paid_riders.count() >= 5:
+            purchase = CaravanLeaderPurchaseFactory.create(caravan)
+            db.session.add(purchase)
+            db.session.commit()
+            return purchase
 
 class CaravanInviteService(object):
     def __init__(self, caravans=None, hasher=None, accounts = None, mailer=None):

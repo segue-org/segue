@@ -11,7 +11,7 @@ from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
-from segue.models import Caravan, CaravanInvite
+from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
 
 import logging
 logger = logging.getLogger('factory')
@@ -192,3 +192,8 @@ class ValidCaravanInviteFactory(SegueFactory):
     name      = _Sequence('Beltrano {0}')
     status    = FuzzyChoice(['pending','accepted','declined', 'cancelled'])
     hash      = _Sequence("C0FFE#{:04d}")
+
+class ValidCaravanPurchaseFactory(ValidPurchaseFactory):
+    class Meta:
+        model = CaravanRiderPurchase
+    caravan = SubFactory(ValidCaravanWithOwnerFactory)
