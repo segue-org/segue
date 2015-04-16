@@ -120,7 +120,8 @@ class PaymentServiceTestCases(SegueApiTestCase):
         super(PaymentServiceTestCases, self).setUp()
         self.dummy = mockito.Mock()
         self.mailer = mockito.Mock()
-        self.service = PaymentService(mailer=self.mailer, dummy=self.dummy)
+        self.caravans = mockito.Mock()
+        self.service = PaymentService(mailer=self.mailer, caravans=self.caravans, dummy=self.dummy)
 
     def test_creating_a_payment_delegates_creation_and_processing_to_correct_payment_implementation(self):
         data = dict(got='mock?')
@@ -171,6 +172,24 @@ class PaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(result[0].status, 'paid')
         self.assertEquals(payment.status, 'paid')
         mockito.verify(self.mailer).notify_payment(purchase, payment)
+        mockito.verifyZeroInteractions(self.caravans)
+
+    def test_notification_that_pays_the_balance_of_a_caravan_rider_purchase(self):
+        payload    = mockito.Mock()
+        product    = self.create_from_factory(ValidProductFactory, price=200)
+        purchase   = self.create_from_factory(ValidCaravanPurchaseFactory, product=product)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
+        transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
+
+        mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
+        mockito.when(self.mailer).notify_payment(purchase, payment)
+
+        result = self.service.notify(purchase.id, payment.id, payload)
+
+        self.assertEquals(result[0].status, 'paid')
+        self.assertEquals(payment.status, 'paid')
+        mockito.verify(self.mailer).notify_payment(purchase, payment)
+        mockito.verify(self.caravans).update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
     def test_notification_that_does_not_pay_the_balance_of_purchase(self):
         payload    = mockito.Mock()

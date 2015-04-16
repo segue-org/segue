@@ -3,8 +3,9 @@ import sys;
 import json
 import mockito
 
-from segue.caravan.services import CaravanService, CaravanInviteService
 from segue.errors import AccountAlreadyHasCaravan, NotAuthorized, SegueValidationError
+from segue.caravan.services import CaravanService, CaravanInviteService
+from segue.caravan.models import CaravanLeaderPurchase
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -50,6 +51,31 @@ class CaravanServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(NotAuthorized):
             self.service.get_one(existing.id, self.mock_owner)
+
+    def def_test_gives_leader_an_exemption(self):
+        caravan = self.create_from_factory(ValidCaravanWithOwnerFactory)
+
+        result = self.service.update_leader_exemption(caravan.id, caravan.owner)
+        self.assertEquals(result, None)
+
+        rider1 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        rider2 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        rider3 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        rider4 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        rider5 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='pending')
+
+        result = self.service.update_leader_exemption(caravan.id, caravan.owner)
+        self.assertEquals(result, None)
+
+        rider6 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        result = self.service.update_leader_exemption(caravan.id, caravan.owner)
+        self.assertIsInstance(result, CaravanLeaderPurchase)
+        self.assertEquals(result.caravan, caravan)
+        self.assertEquals(result.status, 'paid')
+
+        rider7 = self.create_from_factory(ValidCaravanPurchaseFactory, caravan=caravan, status='paid')
+        result = self.service.update_leader_exemption(caravan.id, caravan.owner)
+        self.assertEquals(result, None)
 
 class CaravanInviteServiceTestCases(SegueApiTestCase):
     def setUp(self):

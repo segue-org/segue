@@ -17,7 +17,13 @@ class Caravan(JsonSerializable, db.Model):
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
     invites      = db.relationship("CaravanInvite", backref="caravan")
+    riders       = db.relationship("CaravanRiderPurchase", backref="caravan", lazy='dynamic')
+
+    @property
+    def paid_riders(self):
+        return self.riders.filter(Purchase.status == 'paid')
 
 class CaravanInvite(JsonSerializable, db.Model):
     _serializers = [ CaravanInviteJsonSerializer, ShortCaravanInviteJsonSerializer ]
@@ -35,7 +41,6 @@ class CaravanInvite(JsonSerializable, db.Model):
 class CaravanRiderPurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'caravan-rider' }
     caravan_id = db.Column(db.Integer, db.ForeignKey('caravan.id'), name='cr_caravan_id')
-    caravan    = db.relationship('Caravan')
 
 class CaravanLeaderPurchase(CaravanRiderPurchase):
     __mapper_args__ = { 'polymorphic_identity': 'caravan-leader' }

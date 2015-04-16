@@ -54,13 +54,17 @@ class Account(JsonSerializable, db.Model):
         if alleged.role == 'admin': return True
         return False
 
+    @property
+    def has_valid_purchases(self):
+        return any([ p.satisfied for p in self.purchases ])
+
 class Country(db.Model):
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     cctld = db.Column(db.Text)
     iso = db.Column(db.Integer)
-    
+
 class City(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +72,6 @@ class City(db.Model):
     name = db.Column(db.Text)
     latitude = db.Column(db.Numeric)
     longitude = db.Column(db.Numeric)
-    
+
     __tablename__ = 'cities'
 
