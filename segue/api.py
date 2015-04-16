@@ -110,11 +110,14 @@ class AdminBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
         self.controller = AdminController()
-        self.add_url_rule('/accounts',  methods=['GET'], view_func=self.controller.accounts)
-        self.add_url_rule('/proposals', methods=['GET'], view_func=self.controller.proposals)
-        self.add_url_rule('/purchases', methods=['GET'], view_func=self.controller.purchases)
-        self.add_url_rule('/caravans',  methods=['GET'], view_func=self.controller.caravans)
-        self.add_url_rule('/payments',  methods=['GET'], view_func=self.controller.payments)
+        self.add_url_rule('/accounts',  methods=['GET'], view_func=self.controller.list_accounts)
+        self.add_url_rule('/proposals', methods=['GET'], view_func=self.controller.list_proposals)
+        self.add_url_rule('/purchases', methods=['GET'], view_func=self.controller.list_purchases)
+        self.add_url_rule('/caravans',  methods=['GET'], view_func=self.controller.list_caravans)
+        self.add_url_rule('/payments',  methods=['GET'], view_func=self.controller.list_payments)
+
+        self.add_url_rule('/accounts/<int:account_id>',   methods=['GET'], view_func=self.controller.get_account)
+        self.add_url_rule('/proposals/<int:proposal_id>', methods=['GET'], view_func=self.controller.get_proposal)
 
 blueprints = [
     ProposalBlueprint(),
