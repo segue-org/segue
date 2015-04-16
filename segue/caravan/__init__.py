@@ -2,7 +2,7 @@ import flask
 from flask import request
 from flask.ext.jwt import current_user, verify_jwt, JWTError
 
-from ..core import jwt_required
+from ..core import jwt_required, config
 from ..json import jsoned, accepts_html, JsonFor
 
 import schema
