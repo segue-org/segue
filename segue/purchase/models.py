@@ -81,6 +81,7 @@ class Purchase(JsonSerializable, db.Model):
     def clone(self):
         arguments = dict()
         for name, column in self.__mapper__.columns.items():
+            if name == 'created': continue
             if not (column.primary_key or column.unique):
                 arguments[name] = getattr(self, name)
         return self.__class__(**arguments)
