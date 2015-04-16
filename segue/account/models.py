@@ -67,7 +67,6 @@ class Account(JsonSerializable, db.Model):
             payments.extend(purchase.payments)
         return payments
 
-
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
