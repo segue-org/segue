@@ -4,27 +4,13 @@ from sqlalchemy import or_
 
 from ..core import db
 from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
-from ..filters import FilterStrategies
 
 from jwt import Signer
 
 from models import Account
 from factories import AccountFactory
+from filters import AccountFilterStrategies
 import schema
-
-class AccountFilterStrategies(FilterStrategies):
-    def by_id(self, value):
-        if value.isdigit():
-            return Account.id == value
-
-    def by_email(self, value):
-        return Account.email.ilike('%'+value+'%')
-
-    def by_name(self, value):
-        return Account.name.ilike('%'+value+'%')
-
-    def by_document(self, value):
-        return Account.document.like('%'+value+'%')
 
 class AccountService(object):
     def __init__(self, db_impl=None, signer=None):

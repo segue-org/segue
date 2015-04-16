@@ -7,29 +7,12 @@ from ..mailer import MailerService
 from ..hasher import Hasher
 from ..filters import FilterStrategies
 
+from ..account import AccountService
+
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
-from ..account import AccountService, Account
-
-class ProposalFilterStrategies(FilterStrategies):
-    def given(self, as_user=None, **criteria):
-        result = []
-        for key, value in criteria.items():
-            method = getattr(self, "by_"+key)
-            result.append(method(value, as_user=as_user))
-        if as_user and as_user.role != 'admin':
-            result.append(self.enforce_user(as_user))
-        return result
-
-    def enforce_user(self, user):
-        return or_(self.by_owner_id(user.id), self.by_coauthor_id(user.id))
-
-    def by_owner_id(self, value, as_user=None):
-        return Proposal.owner_id == value
-
-    def by_coauthor_id(self, value, as_user=None):
-        return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
+from filters import ProposalFilterStrategies
 
 class ProposalService(object):
     def __init__(self, db_impl=None):
