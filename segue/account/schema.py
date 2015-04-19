@@ -22,7 +22,18 @@ signup = {
 edit_account = signup.copy()
 edit_account['required'] = ["email", "name", "country", "city", "phone" ]
 
+reset = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "hash_code": { "type": "string", "minLength": 5,  "maxLength": 64 },
+        "password":  { "type": "string", "minLength": 8,  "maxLength": 80 },
+    },
+    "required": ["hash_code", "password" ],
+}
+
 whitelist = dict(
   signup=signup,
-  edit_account=edit_account
+  edit_account=edit_account,
+  reset=reset
 )

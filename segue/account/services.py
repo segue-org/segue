@@ -3,14 +3,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
 from ..core import db
-from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount
+from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 from ..hasher import Hasher
 
 from segue.mailer import MailerService
 
 from jwt import Signer
 
-from models import Account
+from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 import schema
@@ -81,3 +81,22 @@ class AccountService(object):
         db.session.commit()
 
         return reset
+
+    def get_reset(self, account_id, hash_code):
+        reset = ResetPassword.query.filter(Account.id == account_id, ResetPassword.hash == hash_code).first()
+        if not reset: raise InvalidResetPassword()
+        return reset
+
+    def perform_reset(self, account_id, hash_code, new_password):
+        reset = self.get_reset(account_id, hash_code)
+        if reset.spent: raise InvalidResetPassword()
+
+        reset.spent = True
+        reset.account.password = new_password
+
+        db.session.add(reset)
+        db.session.add(reset.account)
+        db.session.commit()
+
+        return reset
+
