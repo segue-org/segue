@@ -30,9 +30,7 @@ class ProductService(object):
         return Product.query.filter(self._in_time(), self._is_public()).order_by(DEFAULT_ORDERING).all()
 
     def caravan_products(self, hash_code):
-        #if self.caravans.invite_by_hash(hash_code):
         return CaravanProduct.query.filter(self._in_time()).order_by(DEFAULT_ORDERING).all()
-        #raise InvalidCaravan()
 
     def get_product(self, product_id):
         return Product.query.get(product_id)

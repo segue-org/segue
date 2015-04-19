@@ -52,9 +52,6 @@ class ProductServiceTestCase(SegueApiTestCase):
         self.assertIsInstance(result[0], CaravanProduct)
         self.assertIsInstance(result[1], CaravanProduct)
 
-        with self.assertRaises(InvalidCaravan):
-            self.service.caravan_products('456DEF')
-
     def test_purchasing_a_product(self):
         account = self.create_from_factory(ValidAccountFactory)
         product = self.create_from_factory(ValidProductFactory)
