@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from flask.ext.jwt import current_user
 
-from ..core import db, jwt_required
+from ..core import db, jwt_required, config
 from ..factory import Factory
 from ..json import jsoned
 from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
@@ -65,3 +65,13 @@ class AccountController(object):
         self.service.ask_reset(data.get('email'))
         return '', 200
 
+    def get_reset(self, account_id, hash_code):
+        reset = self.service.get_reset(account_id, hash_code)
+        path = '/#/account/{}/reset/{}'.format(account_id, hash_code)
+        return flask.redirect(config.FRONTEND_URL + path)
+
+    @jsoned
+    def perform_reset(self, account_id, hash_code):
+        data = request.get_json()
+        result = self.service.perform_reset(account_id, hash_code, data['password'])
+        return dict(email=result.account.email), 200

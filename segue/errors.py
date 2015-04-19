@@ -23,6 +23,11 @@ class ExternalServiceError(SegueError):
     def to_json(self):
         return { 'message': 'could not connect to service: {}'.format(self.args) }
 
+class InvalidResetPassword(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'invalid reset password code' }
+
 class InvalidCaravan(SegueError):
     code = 400
     def to_json(self):

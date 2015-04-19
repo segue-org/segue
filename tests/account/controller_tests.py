@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -129,3 +129,31 @@ class AccountControllerTestCases(SegueApiTestCase):
 
         response = self.jpost('/accounts/reset', data=json.dumps({'email':'other@example.com'}))
         self.assertEquals(response.status_code, 404)
+
+    def test_proceed_with_reset_password(self):
+        account = self.build_from_factory(ValidAccountFactory, id=1234)
+        reset = self.build_from_factory(ValidResetFactory, account=account)
+        mockito.when(self.mock_service).get_reset(1234, 'ABCD1234').thenReturn(reset)
+        mockito.when(self.mock_service).get_reset(1234, 'XXXX9999').thenRaise(InvalidResetPassword)
+
+        response = self.client.get('/accounts/1234/reset/ABCD1234')
+        destination = response.headers['Location']
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(destination, 'http://localhost:9000/#/account/1234/reset/ABCD1234')
+
+        response = self.client.get('/accounts/1234/reset/XXXX9999')
+        self.assertEquals(response.status_code, 400)
+
+    def test_perform_password_reset(self):
+        data = { "hash_code": "ABCD1234", "password": "12345" }
+        raw_json = json.dumps(data)
+        reset = self.build_from_factory(ValidResetFactory)
+        mockito.when(self.mock_service).perform_reset(1234, 'ABCD1234', '12345').thenReturn(reset)
+        mockito.when(self.mock_service).perform_reset(7890, 'XXXX9999', '12345').thenRaise(InvalidResetPassword)
+
+        response = self.jpost('/accounts/1234/reset/ABCD1234', data=raw_json)
+        content = json.loads(response.data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(content['email'], reset.account.email)
+
+

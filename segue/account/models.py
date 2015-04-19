@@ -60,7 +60,7 @@ class Account(JsonSerializable, db.Model):
     def has_valid_purchases(self):
         return any([ p.satisfied for p in self.purchases ])
 
-class ResetPassword(db.Model):
+class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
     account_id   = db.Column(db.Integer, db.ForeignKey('account.id'))
