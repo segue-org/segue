@@ -48,6 +48,8 @@ class Account(JsonSerializable, db.Model):
     purchases     = db.relationship("Purchase", backref="customer")
     caravan_owned = db.relationship("Caravan",  backref="owner")
 
+    resets        = db.relationship("ResetPassword", backref="account")
+
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.id == alleged.id: return True
@@ -57,6 +59,14 @@ class Account(JsonSerializable, db.Model):
     @property
     def has_valid_purchases(self):
         return any([ p.satisfied for p in self.purchases ])
+
+class ResetPassword(db.Model):
+    id           = db.Column(db.Integer, primary_key=True)
+    hash         = db.Column(db.String(64))
+    account_id   = db.Column(db.Integer, db.ForeignKey('account.id'))
+    spent        = db.Column(db.Boolean, default=False)
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
 class Country(db.Model):
 

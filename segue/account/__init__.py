@@ -11,7 +11,7 @@ from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
 
 from jwt import Signer
 
-from models import Account
+from models import Account, ResetPassword
 from services import AccountService
 import schema
 
@@ -59,3 +59,9 @@ class AccountController(object):
     def get_caravan(self, account_id):
         query_string = "?owner_id={}".format(account_id)
         return redirect(url_for('caravans.get_one') + query_string)
+
+    def ask_reset(self):
+        data = request.get_json()
+        self.service.ask_reset(data.get('email'))
+        return '', 200
+

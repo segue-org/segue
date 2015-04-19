@@ -3,8 +3,8 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized
+from segue.account import AccountController, AccountService, Account, Signer, ResetPassword
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -13,7 +13,9 @@ class AccountServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(AccountServiceTestCases, self).setUp()
         self.mock_signer = mockito.Mock()
-        self.service = AccountService(signer=self.mock_signer)
+        self.mock_mailer = mockito.Mock()
+        self.mock_hasher = mockito.Mock()
+        self.service = AccountService(signer=self.mock_signer, mailer=self.mock_mailer, hasher=self.mock_hasher)
 
     def test_invalid_account_raises_validation_error(self):
         account = InvalidAccountFactory.build().to_json()
@@ -70,3 +72,17 @@ class AccountServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(InvalidLogin):
             self.service.login(email='random-email', password="right")
+
+    def test_start_reset_procedure(self):
+        account = self.create_from_factory(ValidAccountFactory)
+        mockito.when(self.mock_hasher).generate().thenReturn('1234')
+
+        result = self.service.ask_reset(account.email)
+        mockito.verify(self.mock_mailer).reset_password(account, result)
+        self.assertIsInstance(result, ResetPassword)
+        self.assertEquals(result.account, account)
+        self.assertEquals(result.hash, '1234')
+        self.assertEquals(result.spent, False)
+
+        with self.assertRaises(NoSuchAccount):
+            self.service.ask_reset("another@email.com")

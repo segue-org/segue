@@ -65,3 +65,11 @@ class MailerService(object):
         message.to(invite.name, invite.recipient)
 
         return mailer.send(message.build())
+
+    def reset_password(self, account, reset):
+        message = self.message_factory.from_template('account/reset_password')
+        message.given(account=account,reset=reset)
+        message.to(account.name, account.email)
+
+        return mailer.send(message.build())
+

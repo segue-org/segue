@@ -1,4 +1,4 @@
-from account.models  import Account
+from account.models  import Account, ResetPassword
 from proposal.models import Proposal, ProposalInvite, Track
 from product.models  import Product, StudentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
@@ -8,7 +8,7 @@ from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct
 
 __all__ = [
-    'Account',
+    'Account', 'ResetPassword',
     'Proposal', 'ProposalInvite', 'Track',
     'Product', 'StudentProduct',
     'Buyer', 'Purchase', 'Payment',

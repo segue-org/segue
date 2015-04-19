@@ -6,7 +6,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyNaiveDateTime, FuzzyDecim
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account
+from segue.models import Account, ResetPassword
 from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
@@ -47,6 +47,14 @@ class ValidAccountFactory(SegueFactory):
     phone        = "51 2345678"
     organization = "manos da quebrada"
     resume       = "um cara legal"
+
+class ValidResetFactory(SegueFactory):
+    class Meta:
+        model = ResetPassword
+    hash    = _Sequence('C0FFEE{0:04x}')
+    spent   = False
+    account = SubFactory(ValidAccountFactory)
+
 
 class InvalidAccountFactory(ValidAccountFactory):
     email    = "email"
