@@ -25,6 +25,9 @@ target_metadata = current_app.extensions['migrate'].db.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+def include_symbol(tablename, schema=None):
+    return tablename not in ('cities','country')
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -38,7 +41,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url)
+    context.configure(url=url, include_symbol=include_symbol)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -58,7 +61,8 @@ def run_migrations_online():
     connection = engine.connect()
     context.configure(
                 connection=connection,
-                target_metadata=target_metadata
+                target_metadata=target_metadata,
+                include_symbol=include_symbol
                 )
 
     try:
