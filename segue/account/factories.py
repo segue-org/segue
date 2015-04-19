@@ -1,6 +1,6 @@
 from segue.factory import Factory
 
-from models import Account
+from models import Account, ResetPassword
 
 import schema
 
@@ -23,4 +23,14 @@ class AccountFactory(Factory):
         data['document'] = data.pop('cpf', None) or data.pop('passport', None)
         return data;
 
+
+class ResetPasswordFactory(Factory):
+    model = ResetPassword
+
+    @classmethod
+    def create(cls, account, hash_code):
+        reset = cls.model()
+        reset.account = account
+        reset.hash    = hash_code
+        return reset
 

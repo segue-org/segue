@@ -33,6 +33,11 @@ class AccountAlreadyHasCaravan(SegueError):
     def to_json(self):
         return { 'message': 'this account already has a caravan' }
 
+class NoSuchAccount(SegueError):
+    code = 404
+    def to_json(self):
+        return { 'message': 'no such account' }
+
 class DocumentNotFound(SegueError):
     code = 404
     def to_json(self):

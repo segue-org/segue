@@ -4,7 +4,7 @@ import mockito
 from werkzeug.exceptions import NotFound
 
 from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized
+from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -118,3 +118,14 @@ class AccountControllerTestCases(SegueApiTestCase):
         response = self.jget('/accounts/456')
 
         self.assertEquals(response.status_code, 403)
+
+    def test_ask_for_reset_password(self):
+        mockito.when(self.mock_service).ask_reset('email@example.com').thenReturn(None)
+        mockito.when(self.mock_service).ask_reset('other@example.com').thenRaise(NoSuchAccount)
+
+        response = self.jpost('/accounts/reset', data=json.dumps({'email':'email@example.com'}))
+        self.assertEquals(response.data, '')
+        self.assertEquals(response.status_code, 200)
+
+        response = self.jpost('/accounts/reset', data=json.dumps({'email':'other@example.com'}))
+        self.assertEquals(response.status_code, 404)

@@ -57,3 +57,17 @@ class MailerServiceTestCases(SegueApiTestCase):
 
         the_url = 'http://192.168.33.91:9001/api/caravans/{}/invites/{}'.format(invite.caravan.id, invite.hash)
         self.assertIn(the_url, outbox[0].body)
+
+
+    @record_messages
+    def test_reset_password(self, outbox):
+        reset = self.create_from_factory(ValidResetFactory)
+        self.service.reset_password(reset.account, reset)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+
+        self.assertIn(reset.account.email, outbox[0].recipients[0])
+
+        the_url = 'http://192.168.33.91:9001/api/accounts/{}/reset/{}'.format(reset.account.id, reset.hash)
+        self.assertIn(the_url, outbox[0].body)

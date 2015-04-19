@@ -3,20 +3,25 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
 from ..core import db
-from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
+from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount
+from ..hasher import Hasher
+
+from segue.mailer import MailerService
 
 from jwt import Signer
 
 from models import Account
-from factories import AccountFactory
+from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 import schema
 
 class AccountService(object):
-    def __init__(self, db_impl=None, signer=None):
+    def __init__(self, db_impl=None, signer=None, mailer=None, hasher=None):
         self.db     = db_impl or db
+        self.mailer = mailer or MailerService()
         self.signer = signer or Signer()
         self.filters = AccountFilterStrategies()
+        self.hasher = hasher or Hasher()
 
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
@@ -65,3 +70,14 @@ class AccountService(object):
         except NoResultFound:
             raise InvalidLogin()
 
+    def ask_reset(self, email):
+        account = Account.query.filter(Account.email == email).first()
+        if not account: raise NoSuchAccount()
+
+        reset = ResetPasswordFactory.create(account, self.hasher.generate())
+        self.mailer.reset_password(account, reset)
+
+        db.session.add(reset)
+        db.session.commit()
+
+        return reset
