@@ -75,6 +75,14 @@ class ResetPassword(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+class ResetPassword(db.Model):
+    id           = db.Column(db.Integer, primary_key=True)
+    hash         = db.Column(db.String(64))
+    account_id   = db.Column(db.Integer, db.ForeignKey('account.id'))
+    spent        = db.Column(db.Boolean, default=False)
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
 class Country(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)

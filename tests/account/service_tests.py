@@ -121,3 +121,17 @@ class AccountServiceTestCases(SegueApiTestCase):
 
         result = self.service.lookup('@example.com')
         self.assertEquals(len(result), 3)
+
+    def test_start_reset_procedure(self):
+        account = self.create_from_factory(ValidAccountFactory)
+        mockito.when(self.mock_hasher).generate().thenReturn('1234')
+
+        result = self.service.ask_reset(account.email)
+        mockito.verify(self.mock_mailer).reset_password(account, result)
+        self.assertIsInstance(result, ResetPassword)
+        self.assertEquals(result.account, account)
+        self.assertEquals(result.hash, '1234')
+        self.assertEquals(result.spent, False)
+
+        with self.assertRaises(NoSuchAccount):
+            self.service.ask_reset("another@email.com")

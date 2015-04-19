@@ -22,6 +22,7 @@ class AccountService(object):
         self.signer = signer or Signer()
         self.hasher = hasher or Hasher()
         self.filters = AccountFilterStrategies()
+        self.hasher = hasher or Hasher()
 
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
