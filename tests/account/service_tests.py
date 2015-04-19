@@ -135,3 +135,26 @@ class AccountServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(NoSuchAccount):
             self.service.ask_reset("another@email.com")
+
+    def test_get_reset_password(self):
+        reset = self.create_from_factory(ValidResetFactory)
+
+        retrieved = self.service.get_reset(reset.account.id, reset.hash)
+        self.assertEquals(retrieved, reset)
+
+        with self.assertRaises(InvalidResetPassword):
+            self.service.get_reset(reset.account.id, "XAMAMA")
+
+    def test_perform_reset_password(self):
+        reset = self.create_from_factory(ValidResetFactory)
+
+        performed = self.service.perform_reset(reset.account.id, reset.hash, '12345678')
+        self.assertEquals(performed.id, reset.id)
+        self.assertEquals(performed.spent, True)
+        self.assert_(reset.account.password == '12345678')
+
+        with self.assertRaises(InvalidResetPassword):
+            self.service.perform_reset(reset.account.id, reset.hash, '12345678')
+
+        with self.assertRaises(InvalidResetPassword):
+            self.service.perform_reset(reset.account.id, "XAMAMA", {})
