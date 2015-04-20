@@ -24,6 +24,15 @@ class ProposalControllerTestCases(SegueApiTestCase):
         error_2 = hashie(validator='maxLength', relative_path=['other']);
         return SegueValidationError([error_1, error_2])
 
+    def test_cfp_state(self):
+        mockito.when(self.mock_service).cfp_state().thenReturn('xuranga')
+
+        response = self.jget('/proposals/cfp-state')
+        state = json.loads(response.data)['state']
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(state, 'xuranga')
+
     def test_invalid_entities_become_422_error(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
