@@ -3,8 +3,11 @@ import sys;
 import json
 import mockito
 
+from datetime import timedelta
+from freezegun import freeze_time
+
 from segue.proposal import ProposalService, InviteService
-from segue.errors import SegueValidationError, NotAuthorized
+from segue.errors import SegueValidationError, NotAuthorized, DeadlineReached
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -12,8 +15,19 @@ from ..support.factories import *
 class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(ProposalServiceTestCases, self).setUp()
-        self.service = ProposalService()
+        self.mock_deadline = mockito.Mock()
+        self.service = ProposalService(deadline=self.mock_deadline)
         self.mock_owner = ValidAccountFactory.create()
+
+    def test_cfp_state_open(self):
+        mockito.when(self.mock_deadline).is_past().thenReturn(False)
+        result = self.service.cfp_state()
+        self.assertEquals(result, 'open')
+
+    def test_cfp_state_closed(self):
+        mockito.when(self.mock_deadline).is_past().thenReturn(True)
+        result = self.service.cfp_state()
+        self.assertEquals(result, 'closed')
 
     def test_invalid_proposal_raises_validation_error(self):
         proposal = InvalidProposalFactory().to_json()
@@ -28,6 +42,17 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(saved.id)
 
         self.assertEquals(saved, retrieved)
+
+    def test_cannot_create_nor_modify_proposal_past_deadline(self):
+        proposal = ValidProposalFactory().to_json()
+        mockito.when(self.mock_deadline).enforce().thenRaise(DeadlineReached)
+
+        with self.assertRaises(DeadlineReached):
+            self.service.create(proposal, self.mock_owner)
+
+        existing = self.create_from_factory(ValidProposalFactory)
+        with self.assertRaises(DeadlineReached):
+            self.service.modify(existing.id, {}, by=existing.owner)
 
     def test_non_existing_entity_is_none(self):
         retrieved = self.service.get_one(1234)
@@ -123,7 +148,10 @@ class InviteServiceTestCases(SegueApiTestCase):
         self.mock_hasher = mockito.Mock()
         self.mock_mailer = mockito.Mock()
         self.mock_owner = ValidAccountFactory.create()
-        self.service = InviteService(hasher=self.mock_hasher, mailer=self.mock_mailer)
+        self.mock_deadline = mockito.Mock()
+        self.service = InviteService(hasher=self.mock_hasher,
+                                     mailer=self.mock_mailer,
+                                     deadline=self.mock_deadline)
         self.proposal = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
     def test_list_valid_owner(self):
@@ -176,5 +204,31 @@ class InviteServiceTestCases(SegueApiTestCase):
         result = self.service.answer(invite.hash, accepted=True, by=existing)
         retrieved = self.service.get_by_hash(invite.hash)
         self.assertEquals(retrieved.status, 'accepted')
+
+    def test_register_from_invite(self):
+        mock_accounts = self.service.accounts = mockito.Mock()
+        invite = self.create_from_factory(ValidInviteFactory)
+        fake_account = mockito.Mock()
+        fake_data = dict(email=invite.recipient)
+        mockito.when(mock_accounts).create(fake_data).thenReturn(fake_account)
+
+        result = self.service.register(invite.hash, fake_data)
+        mockito.verify(mock_accounts).create(fake_data)
+        self.assertEquals(result, fake_account)
+
+        with self.assertRaises(NotAuthorized):
+            self.service.register(invite.hash, dict(email='other@email.com'))
+
+    def test_cannot_invite_nor_answer_invite_nor_register_past_deadline(self):
+        mockito.when(self.mock_deadline).enforce().thenRaise(DeadlineReached)
+
+        with self.assertRaises(DeadlineReached):
+            self.service.create(self.proposal.id, {}, by=self.mock_owner)
+
+        with self.assertRaises(DeadlineReached):
+            self.service.answer('ANY', accepted=True)
+
+        with self.assertRaises(DeadlineReached):
+            self.service.register('ANY', {})
 
 

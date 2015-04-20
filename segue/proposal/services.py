@@ -1,8 +1,9 @@
+from datetime import datetime
 import random
 from sqlalchemy import and_
 
-from ..core import db
-from ..errors import NotAuthorized
+from ..core import db, config
+from ..errors import NotAuthorized, DeadlineReached
 from ..mailer import MailerService
 from ..hasher import Hasher
 
@@ -32,12 +33,29 @@ class ProposalFilterStrategies(object):
         value = as_user.id if as_user else value
         return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
 
+class CallForPapersDeadline(object):
+    def __init__(self, override_config=None):
+        self.config = override_config or config
+
+    def is_past(self):
+        return datetime.now() > self.config.CALL_FOR_PAPERS_DEADLINE
+
+    def enforce(self):
+        if self.is_past():
+            raise DeadlineReached()
+
 class ProposalService(object):
-    def __init__(self, db_impl=None):
+    def __init__(self, db_impl=None, deadline=None):
         self.db = db_impl or db
         self.filter_strategies = ProposalFilterStrategies()
+        self.deadline = deadline or CallForPapersDeadline()
+
+    def cfp_state(self):
+        return 'closed' if self.deadline.is_past() else 'open'
 
     def create(self, data, owner):
+        self.deadline.enforce()
+
         proposal = ProposalFactory.from_json(data, schema.new_proposal)
         proposal.owner = owner
         db.session.add(proposal)
@@ -53,6 +71,8 @@ class ProposalService(object):
         return Proposal.query.filter(*filter_list).all()
 
     def modify(self, proposal_id, data, by=None):
+        self.deadline.enforce()
+
         proposal = self.get_one(proposal_id)
         if not self.check_ownership(proposal, by): raise NotAuthorized
 
@@ -73,11 +93,12 @@ class ProposalService(object):
         return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
 
 class InviteService(object):
-    def __init__(self, proposals=None, hasher=None, accounts = None, mailer=None):
+    def __init__(self, proposals=None, hasher=None, accounts = None, mailer=None, deadline=None):
         self.proposals = proposals or ProposalService()
         self.hasher    = hasher    or Hasher()
         self.mailer    = mailer    or MailerService()
         self.accounts  = accounts  or AccountService()
+        self.deadline  = deadline  or CallForPapersDeadline()
 
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
@@ -92,6 +113,8 @@ class InviteService(object):
         return candidates[0] if len(candidates) else None
 
     def create(self, proposal_id, data, by=None):
+        self.deadline.enforce()
+
         proposal = self.proposals.get_one(proposal_id)
         if not self.proposals.check_ownership(proposal, by): raise NotAuthorized
 
@@ -107,6 +130,8 @@ class InviteService(object):
         return invite
 
     def answer(self, hash_code, accepted=True, by=None):
+        self.deadline.enforce()
+
         invite = self.get_by_hash(hash_code)
         if not invite:
             return None
@@ -120,11 +145,12 @@ class InviteService(object):
         return invite
 
     def register(self, hash_code, account_data):
+        self.deadline.enforce()
         invite = self.get_by_hash(hash_code)
         if not invite:
             return None
         if invite.recipient != account_data['email']:
-            return NotAuthorized
+            raise NotAuthorized
 
         return self.accounts.create(account_data)
 

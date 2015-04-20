@@ -46,7 +46,11 @@ class ProposalController(object):
 
     @jsoned
     def list_tracks(self):
-        return self.service.list_tracks()
+        return self.service.list_tracks(), 200
+
+    @jsoned
+    def cfp_state(self):
+        return { 'state': self.service.cfp_state() }, 200
 
 
 class ProposalInviteController(object):

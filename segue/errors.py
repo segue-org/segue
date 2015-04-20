@@ -17,6 +17,11 @@ class SegueError(JsonSerializable, Exception):
 class BadConfiguration(SegueError):
     pass
 
+class DeadlineReached(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'Proposals are no longer accepted after deadline has been reached' }
+
 class ExternalServiceError(SegueError):
     code = 500
 

@@ -17,3 +17,6 @@ mail_use_tls: False
 backup_frequency: 5
 
 storage_dir: /opt/segue/data
+
+call_for_papers_deadline: '2015-04-19 23:59:29'
+

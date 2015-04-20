@@ -17,6 +17,7 @@ class ProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>',    methods=['PUT'],  view_func=self.controller.modify)
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/tracks',               methods=['GET'],  view_func=self.controller.list_tracks)
+        self.add_url_rule('/cfp-state',            methods=['GET'],  view_func=self.controller.cfp_state)
 
 class ProposalInviteBluePrint(flask.Blueprint):
     def __init__(self):
