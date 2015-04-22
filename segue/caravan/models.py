@@ -36,7 +36,7 @@ class CaravanInvite(JsonSerializable, db.Model):
     account      = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+    status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='caravan_invite_statuses'),default='pending')
 
 class CaravanRiderPurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'caravan-rider' }
