@@ -43,6 +43,16 @@ class AccountAlreadyHasCaravan(SegueError):
     def to_json(self):
         return { 'message': 'this account already has a caravan' }
 
+class InvalidCorporate(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'corporate code is not valid' }
+
+class AccountAlreadyHasCorporate(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this account already has a corporate (??)' }
+
 class NoSuchAccount(SegueError):
     code = 404
     def to_json(self):
