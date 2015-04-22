@@ -23,15 +23,17 @@ def process_boletos(filename):
     good_payments = []
     late_payments = []
     bad_payments = []
+    unknown_payments = []
 
     for entry in parser.parse(content):
         print F.RESET  + LINE
         print F.YELLOW + entry['line']
 
-        payment = boleto_service.get_by_our_number(entry.pop('our_number'))
+        payment = boleto_service.get_by_our_number(entry.get('our_number'))
 
         if not payment:
             print F.RED + "**** COULD NOT FIND PAYMENT FOR LINE: {line}".format(**entry)
+            unknown_payments.append(entry)
             continue
 
         print F.RESET + "**** FOUND PAYMENT, applying transition"
@@ -48,7 +50,7 @@ def process_boletos(filename):
 
         if transition.errors:
             print F.RED + "**** BAD TRANSITION! errors were: {0.errors}".format(transition)
-            bad_payments.append(dict(entry=entry, payment=payment))
+            bad_payments.append(dict(entry=entry, payment=payment, errors=transition.errors))
             continue;
         else:
             print F.GREEN + "**** GOOD TRANSITION!"
@@ -61,16 +63,37 @@ def process_boletos(filename):
     print F.GREEN + u"valid payments {}".format(len(good_payments))
     print F.GREEN + u"late payments  {}".format(len(late_payments))
     print F.GREEN + u"bad payments   {}".format(len(bad_payments))
+    print F.GREEN + u"unrecognized payments {}".format(len(unknown_payments))
     print F.GREEN + u"total money R$ {:.2f}".format(float(total_money))
 
-    for case in late_payments:
-        print ""
+    print F.YELLOW + u"***** UNRECOGNIZED PAYEMNTS *****"
+    for entry in unknown_payments:
+        print_entry(entry)
+
+    print F.YELLOW + u"***** BAD PAYEMNTS *****"
+    for case in bad_payments:
         print F.RED   + u"*****************************"
-        print F.RESET + u"NOME:  {payment.purchase.customer.name}".format(**case)
-        print F.RESET + u"EMAIL: {payment.purchase.customer.email}".format(**case)
-        print F.RESET + u"VALOR: R$ {payment.amount:0.2f}".format(**case)
-        print F.RESET + u"TELEFONE: {payment.purchase.customer.phone}".format(**case)
-        print F.RESET + u"PRODUTO: {payment.purchase.product.description}".format(**case)
-        print F.RESET + u"CATEGORIA: {payment.purchase.product.category}".format(**case)
-        print F.RESET + u"DATA DE VENC: {payment.due_date}".format(**case)
-        print F.RESET + u"DATA DE PGTO: {entry[payment_date]}".format(**case)
+        print_payment(case['payment'])
+        print_entry(case['entry'])
+        print F.RED + "ERROR: {errors}".format(**case)
+        print ""
+
+    print F.YELLOW + u"***** LATE PAYEMNTS *****"
+    for case in late_payments:
+        print F.RED   + u"*****************************"
+        print_payment(case['payment'])
+        print_entry(case['entry'])
+        print F.RED + "ERROR: late payemnt"
+        print ""
+
+def print_entry(entry):
+    print F.RESET + u"NOSSO NUMERO: {our_number}".format(**entry)
+
+def print_payment(payment):
+    print F.RESET + u"NOME:  {0.purchase.customer.name}".format(payment)
+    print F.RESET + u"EMAIL: {0.purchase.customer.email}".format(payment)
+    print F.RESET + u"VALOR: R$ {0.amount:0.2f}".format(payment)
+    print F.RESET + u"TELEFONE: {0.purchase.customer.phone}".format(payment)
+    print F.RESET + u"PRODUTO: {0.purchase.product.description}".format(payment)
+    print F.RESET + u"CATEGORIA: {0.purchase.product.category}".format(payment)
+    print F.RESET + u"DATA DE VENC: {0.due_date}".format(payment)
