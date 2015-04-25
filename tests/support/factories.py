@@ -48,6 +48,9 @@ class ValidAccountFactory(SegueFactory):
     organization = "manos da quebrada"
     resume       = "um cara legal"
 
+class ValidAdminAccountFactory(ValidAccountFactory):
+    role = "admin"
+
 class ValidResetFactory(SegueFactory):
     class Meta:
         model = ResetPassword
