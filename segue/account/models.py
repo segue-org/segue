@@ -75,6 +75,7 @@ class ResetPassword(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    @property
     def payments(self):
         payments = []
         for purchase in self.purchases:

@@ -8,6 +8,9 @@ class DetailResponse(SimpleJson):
             return [ cls(e, *args, **kw) for e in list_or_entity ]
         cls(list_or_entity, *args, **kw)
 
+    def __init__(self):
+        self.__dict__["$type"] = self.__class__.__name__
+
     def add_link(self, name, collection, route='', **route_parms):
         if not hasattr(self, 'links'):
             self.links = {}
@@ -19,6 +22,7 @@ class DetailResponse(SimpleJson):
 
 class AccountDetailResponse(DetailResponse):
     def __init__(self, account, links=True):
+        super(AccountDetailResponse, self).__init__()
         self.name     = account.name
         self.email    = account.email
         self.id       = account.id

@@ -158,6 +158,7 @@ class AccountServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(InvalidResetPassword):
             self.service.perform_reset(reset.account.id, "XAMAMA", {})
+
     def test_lookup_by_email(self):
         account1 = self.create_from_factory(ValidAccountFactory, email='misinfin@example.com')
         account2 = self.create_from_factory(ValidAccountFactory, email='xaxanga@example.com')
