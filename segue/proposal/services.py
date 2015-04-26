@@ -26,6 +26,17 @@ class CallForPapersDeadline(object):
         if self.is_past():
             raise DeadlineReached()
 
+class CallForPapersDeadline(object):
+    def __init__(self, override_config=None):
+        self.config = override_config or config
+
+    def is_past(self):
+        return datetime.now() > self.config.CALL_FOR_PAPERS_DEADLINE
+
+    def enforce(self):
+        if self.is_past():
+            raise DeadlineReached()
+
 class ProposalService(object):
     def __init__(self, db_impl=None, deadline=None):
         self.db = db_impl or db

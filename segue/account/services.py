@@ -7,7 +7,6 @@ from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccou
 from ..hasher import Hasher
 
 from segue.mailer import MailerService
-from ..filters import FilterStrategies
 
 from jwt import Signer
 
@@ -21,7 +20,6 @@ class AccountService(object):
         self.db     = db_impl or db
         self.mailer = mailer or MailerService()
         self.signer = signer or Signer()
-        self.filters = AccountFilterStrategies()
         self.hasher = hasher or Hasher()
         self.filters = AccountFilterStrategies()
 
