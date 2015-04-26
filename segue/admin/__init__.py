@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import request, url_for
+from flask import request, url_for, abort
 from flask.ext.jwt import current_user
 
 from ..errors import NotAuthorized
@@ -40,7 +40,7 @@ class AdminController(object):
     @admin_only
     @jsoned
     def get_account(self, account_id=None):
-        result = self.accounts.get_one(account_id, check_owner=False)
+        result = self.accounts.get_one(account_id, check_owner=False) or abort(404)
         return AccountDetailResponse(result), 200
 
     @jwt_required()

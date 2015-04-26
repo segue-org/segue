@@ -30,10 +30,15 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
         account2 = self.create_from_factory(ValidAccountFactory, id=333, document="7890", name="Pedro Alvarenga")
         account3 = self.create_from_factory(ValidAccountFactory, id=444, document="3451", name="Hermano Neves")
 
-        caravan  = self.create_from_factory(ValidCaravanFactory, owner=account3)
-        proposal = self.create_from_factory(ValidProposalFactory, owner=account3)
-        purchase = self.create_from_factory(ValidPurchaseFactory, customer=account3)
-        payment  = self.create_from_factory(ValidPaymentFactory, purchase=purchase)
+        caravan   = self.create_from_factory(ValidCaravanFactory, owner=account3)
+        proposal  = self.create_from_factory(ValidProposalFactory, owner=account3)
+        purchase1 = self.create_from_factory(ValidPurchaseFactory, customer=account3)
+        purchase2 = self.create_from_factory(ValidPurchaseFactory, customer=account3)
+        purchase3 = self.create_from_factory(ValidPurchaseFactory, customer=account3, status='paid')
+        payment1  = self.create_from_factory(ValidPaymentFactory, purchase=purchase1)
+        payment2  = self.create_from_factory(ValidPaymentFactory, purchase=purchase2)
+        payment3  = self.create_from_factory(ValidPaymentFactory, purchase=purchase3)
+        payment4  = self.create_from_factory(ValidPaymentFactory, purchase=purchase3, status='paid')
         return locals()
 
     def test_needle_account_denies_access_to_non_admin(self):
@@ -82,6 +87,11 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
             response = self.jget('/admin/accounts/444')
             self.assertEquals(response.status_code, 403)
 
+    def test_get_account_404s_when_account_does_not_exist(self):
+        with self.admin_user():
+            response = self.jget('/admin/accounts/666')
+            self.assertEquals(response.status_code, 404)
+
     def test_get_account_has_links(self):
         ctx = self.setUpData()
 
@@ -93,10 +103,10 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
             self.assertEquals(item['$type'], 'AccountDetailResponse')
 
             self.assertItemsEqual(links.keys(), ["caravans", "payments", "proposals", "purchases"])
-            self.assertEquals(links['caravans']['count'], 1)
-            self.assertEquals(links['payments']['count'], 1)
+            self.assertEquals(links['caravans']['count'],  1)
             self.assertEquals(links['proposals']['count'], 1)
-            self.assertEquals(links['purchases']['count'], 1)
+            self.assertEquals(links['payments']['count'],  4)
+            self.assertEquals(links['purchases']['count'], 3)
 
 
 
