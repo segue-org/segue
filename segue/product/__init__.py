@@ -13,6 +13,7 @@ from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct
 from segue.corporate.services import CorporateService
 from segue.corporate.models import CorporateProduct
+from segue.corporate.factories import EmployeePurchaseFactory
 
 DEFAULT_ORDERING = Product.sold_until
 
@@ -49,20 +50,21 @@ class ProductService(object):
 
     def group_purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
-        # product.check_eligibility(buyer_data)
+        #product.check_eligibility(buyer_data)
         extra_fields = product.extra_purchase_fields_for(buyer_data)
-        print "************* dados do group_purchase ***************************"
-        print buyer_data
-        print account
-        print "************* /dados do group_purchase ***************************"
-        multiplier = len(buyer_data[u'invites'])
-        amount = multiplier * product.price
-        #extra_fields['amount'] = amount
-        
-        for i in buyer_data[u'invites']:
-            self.corporates.add_invite(int(buyer_data[u'corporate_id']), i, account)
-        
-        return self.purchases.create(buyer_data, product, account, **extra_fields)
+
+        purchase = self.purchases.create(buyer_data, product, account, **extra_fields)
+
+        for people in buyer_data[u'employees']:
+            self.corporates.add_people(int(buyer_data[u'corporate_id']), people, buyer_data, account)
+            p = EmployeePurchaseFactory.create(self.corporates.get_one(purchase.corporate_id, account))
+            p.product = purchase.product
+            p.buyer = purchase.buyer
+            p.corporate_id = purchase.corporate_id
+            self.db.session.add(p)
+            self.db.session.commit()
+
+        return purchase
 
 class ProductController(object):
     def __init__(self, service=None):
