@@ -6,18 +6,15 @@ class CorporateJsonSerializer(SQLAlchemyJsonSerializer):
     def serialize_child(self, child):
         return self._child_serializers.get(child, False)
 
-class CorporateInviteJsonSerializer(SQLAlchemyJsonSerializer):
+class CorporateEmployeeJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
     def serialize_child(self, child):
         return dict(corporate='CorporateJsonSerializer').get(child, False)
 
-class ShortCorporateInviteJsonSerializer(CorporateInviteJsonSerializer):
+class ShortCorporateEmployeeJsonSerializer(CorporateEmployeeJsonSerializer):
     _serializer_name = 'short'
 
     def hide_field(self, child):
-        return child not in ['name', 'recipient', 'document', 'status']
+        return child not in ['name', 'email', 'document', 'status']
     def serialize_child(self, child):
         return False;
-
-
-

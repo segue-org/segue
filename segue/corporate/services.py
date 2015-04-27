@@ -5,13 +5,13 @@ from segue.mailer import MailerService
 
 import schema
 
-from models import Corporate, CorporateInvite
-from factories import CorporateFactory, CorporateInviteFactory, CorporateLeaderPurchaseFactory
+from models import Corporate, CorporateEmployee
+from factories import CorporateFactory, CorporateEmployeeFactory, CorporatePurchaseFactory
 from ..account import AccountService, Account
 
 class CorporateService(object):
-    def __init__(self, invites=None):
-        self.invites = invites or CorporateInviteService(corporates=self)
+    def __init__(self, employees=None):
+        self.employees = employees or CorporateEmployeeService(corporates=self)
 
     def get_one(self, corporate_id, by=None):
         result = Corporate.query.get(corporate_id)
@@ -50,69 +50,48 @@ class CorporateService(object):
         db.session.commit()
         return corporate
 
-    def invite_by_hash(self, hash_code):
-        return self.invites.get_by_hash(hash_code)
-    
-    def add_invite(self, corporate_id, invite, by=None):
-        return self.invites.create(corporate_id, invite, by)
-        
-    def update_leader_exemption(self, corporate_id, owner):
-        if owner.has_valid_purchases: return None
+    def add_people(self, corporate_id, people, buyer_data, by=None):
+        return self.employees.create(corporate_id, people, buyer_data, by=by)
 
-        corporate = self.get_one(corporate_id, owner)
-        if corporate.paid_riders.count() >= 5:
-            purchase = CorporateLeaderPurchaseFactory.create(corporate)
-            db.session.add(purchase)
-            db.session.commit()
-            return purchase
+    def sum_employee_tickets(self, corporate_id, product_value, by):
+        value = 0
+        for employee in self.employees.list(corporate_id, by=by):
+            value += product_value
 
-class CorporateInviteService(object):
-    def __init__(self, corporates=None, hasher=None, accounts = None):
+        return value
+
+class CorporateEmployeeService(object):
+    def __init__(self, corporates=None, accounts = None, hasher=None):
         self.corporates  = corporates  or CorporateService()
-        self.hasher    = hasher    or Hasher()
         self.accounts  = accounts  or AccountService()
+        self.hasher = hasher or Hasher(10)
 
     def list(self, corporate_id, by=None):
-        return self.corporates.get_one(corporate_id, by).invites
+        return self.corporates.get_one(corporate_id, by).employees
 
-    def create(self, corporate_id, data, by=None):
-        print "******** dados do create em CorporateInviteService ************"
-        print data
-        print "**by "
-        print by
-        print "******** /dados do create em CorporateInviteService ************"
+    def create(self, corporate_id, data, buyer_data, by=None):
         corporate = self.corporates.get_one(corporate_id, by)
 
-        invite = CorporateInviteFactory.from_json(data, schema.new_invite)
-        invite.corporate = corporate
-        invite.hash    = self.hasher.generate()
+        data['document'] = str(data['document']).translate(None, './-')
 
-        db.session.add(invite)
+        account_data = {
+            'email': data['email'],
+            'name': data['name'],
+            'cpf': data['document'],
+            'country': buyer_data['address_country'],
+            'city': buyer_data['address_city'],
+            'phone': by.phone,
+            'password': self.hasher.generate()
+        }
+
+        account = self.accounts.create(account_data)
+
+        employee = CorporateEmployeeFactory.from_json(data, schema.new_employee)
+        employee.corporate = corporate
+
+        db.session.add(employee)
+        db.session.commit()
+        db.session.add(account)
         db.session.commit()
 
-        return invite
-
-    def get_by_hash(self, invite_hash):
-        return CorporateInvite.query.filter(CorporateInvite.hash == invite_hash).first()
-
-    def answer(self, hash_code, accepted=True, by=None):
-        invite = self.get_by_hash(hash_code)
-        if not invite:
-            return None
-        if self.accounts.is_email_registered(invite.recipient):
-            if not by or by.email != invite.recipient:
-                raise NotAuthorized
-
-        invite.status = 'accepted' if accepted else 'declined'
-        db.session.add(invite)
-        db.session.commit()
-        return invite
-
-    def register(self, hash_code, account_data):
-        invite = self.get_by_hash(hash_code)
-        if not invite:
-            return None
-        if invite.recipient != account_data['email']:
-            return NotAuthorized
-
-        return self.accounts.create(account_data)
+        return employee

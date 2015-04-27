@@ -13,19 +13,19 @@ new_corporate = {
 }
 edit_corporate = new_corporate.copy()
 
-new_invite = {
+new_employee = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
-        "recipient":     { "type": "string", "minLength": 5, "maxLength": 80, "format": "email" },
+        "email":         { "type": "string", "minLength": 5, "maxLength": 80, "format": "email" },
         "name":          { "type": "string", "minLength": 5, "maxLength": 80 },
         "document":      { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
     },
-    "required": [ "recipient", "name", "document" ]
+    "required": [ "email", "name", "document" ]
 }
 
 whitelist = dict(
     new_corporate = new_corporate,
     edit_corporate = edit_corporate,
-    new_invite = new_invite
+    new_employee = new_employee
 )
