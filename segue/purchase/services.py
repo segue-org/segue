@@ -22,6 +22,9 @@ class PurchaseFilterStrategies(object):
     def by_customer_id(self, value):
         return Purchase.customer_id == value
 
+    def by_no_employee(self, value):
+        return Purchase.kind != 'employee'
+
 class PurchaseService(object):
     def __init__(self, db_impl=None, payments=None, strategies=None):
         self.db = db_impl or db
@@ -30,6 +33,7 @@ class PurchaseService(object):
 
     def query(self, by=None, **kw):
         kw['customer_id'] = by.id
+        kw['no_employee'] = None;
         filter_list = self.filter_strategies.given(**kw)
         return Purchase.query.filter(*filter_list).all()
 
@@ -157,4 +161,3 @@ class PaymentService(object):
         if method in self.DEFAULT_PROCESSORS:
             return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
-
