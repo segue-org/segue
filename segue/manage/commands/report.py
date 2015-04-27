@@ -127,6 +127,8 @@ def get_category(name):
         return "Ingresso individual"
     elif name == 'student':
         return "Ingresso de estudante"
+    elif name == 'caravan':
+        return "Ingresso de caravana"
     elif name == 'corp':
         return "Ingresso corporativo"
     elif name == 'gov':
