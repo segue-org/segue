@@ -6,7 +6,7 @@ from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
 from caravan import CaravanController, CaravanInviteController
-from corporate import CorporateController, CorporateInviteController
+from corporate import CorporateController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -44,6 +44,7 @@ class AccountBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:account_id>/proposals', methods=['GET'], view_func=self.controller.list_proposals)
         self.add_url_rule('/<int:account_id>/purchases', methods=['GET'], view_func=self.controller.list_purchases)
         self.add_url_rule('/<int:account_id>/caravan',   methods=['GET'], view_func=self.controller.get_caravan)
+        self.add_url_rule('/<int:account_id>/corporate', methods=['GET'], view_func=self.controller.get_corporate)
 
         self.add_url_rule('/<int:account_id>/reset/<string:hash_code>', methods=['GET'],  view_func=self.controller.get_reset)
         self.add_url_rule('/<int:account_id>/reset/<string:hash_code>', methods=['POST'], view_func=self.controller.perform_reset)
@@ -62,11 +63,11 @@ class PurchaseBlueprint(flask.Blueprint):
     def __init__(self):
         super(PurchaseBlueprint, self).__init__('purchases', __name__, url_prefix='/purchases')
         self.controller = PurchaseController()
-        self.add_url_rule('',                                       methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
-        self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
-        self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
+        self.add_url_rule('',                                             methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<string:name>.schema',                        methods=['GET'],  view_func=self.controller.schema)
+        self.add_url_rule('/<int:purchase_id>',                           methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:purchase_id>/pay/<string:method>',       methods=['POST'], view_func=self.controller.pay)
+        self.add_url_rule('/<int:purchase_id>/clone',                     methods=['POST'], view_func=self.controller.clone)
 
 class PaymentBlueprint(flask.Blueprint):
     def __init__(self):
@@ -112,22 +113,13 @@ class CorporateBlueprint(flask.Blueprint):
     def __init__(self):
         super(CorporateBlueprint, self).__init__('corporates', __name__, url_prefix='/corporates')
         self.controller = CorporateController()
-        self.add_url_rule('',                        methods=['POST'], view_func=self.controller.create)
-        self.add_url_rule('',                        methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:corporate_id>',     methods=['PUT'],  view_func=self.controller.modify)
-        self.add_url_rule('/<int:corporate_id>',     methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<string:name>.schema',   methods=['GET'],  view_func=self.controller.schema)
-
-class CorporateInviteBluePrint(flask.Blueprint):
-    def __init__(self):
-        super(CorporateInviteBluePrint, self).__init__('corporate_invites', __name__, url_prefix='/corporates/<int:corporate_id>/invites')
-        self.controller = CorporateInviteController()
-        self.add_url_rule('',                             methods=['GET'],   view_func=self.controller.list)
-        self.add_url_rule('',                             methods=['POST'],  view_func=self.controller.create)
-        self.add_url_rule('/<string:hash_code>',          methods=['GET'],   view_func=self.controller.get_by_hash)
-        self.add_url_rule('/<string:hash_code>/accept',   methods=['POST'],  view_func=self.controller.accept)
-        self.add_url_rule('/<string:hash_code>/decline',  methods=['POST'],  view_func=self.controller.decline)
-        self.add_url_rule('/<string:hash_code>/register', methods=['POST'],  view_func=self.controller.register)
+        self.add_url_rule('',                           methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('',                           methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:corporate_id>',        methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/<int:corporate_id>',        methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:corporate_id>/people', methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:corporate_id>/people', methods=['POST'], view_func=self.controller.add_people)
+        self.add_url_rule('/<string:name>.schema',      methods=['GET'],  view_func=self.controller.schema)
 
 blueprints = [
     ProposalBlueprint(),
@@ -140,6 +132,5 @@ blueprints = [
     SessionBlueprint(),
     CaravanBlueprint(),
     CaravanInviteBluePrint(),
-    CorporateBlueprint(),
-    CorporateInviteBluePrint()
+    CorporateBlueprint()
 ]
