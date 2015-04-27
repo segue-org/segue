@@ -60,6 +60,10 @@ class AccountController(object):
         query_string = "?owner_id={}".format(account_id)
         return redirect(url_for('caravans.get_one') + query_string)
 
+    def get_corporate(self, account_id):
+        query_string = "?owner_id={}".format(account_id)
+        return redirect(url_for('corporates.get_one') + query_string)
+
     def ask_reset(self):
         data = request.get_json()
         self.service.ask_reset(data.get('email'))
