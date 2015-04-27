@@ -1,22 +1,61 @@
 # -*- coding: utf-8 -*-
-import sys, codecs
+import sys, codecs, os
 import itertools as it
 import requests
 import datetime
+import tablib
+import json
 
 from unidecode import unidecode
 from pycorreios import Correios
 from segue.models import *
 from segue.core import db
-from colorama import init, Fore as F, Back as B
-#init()
-LINE = "\n"
 c = Correios()
+ds = tablib.Dataset()
+cache_file = './states.cache'
+
+f_cache_content = codecs.open(cache_file, 'w+')
+if os.path.getsize(cache_file) == 0:
+    states_cache = {}
+else:
+    states_cache = json.load(f_cache_content)
+
+def caravan_report(out_file = "caravan_report"):
+    filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + ".xls"
+    print "generating report " + filename
+    f = codecs.open('./' + filename,'w')
+    ds.headers = ["NOME DA CARAVANA", "NOME DO LIDER", "EMAIL DO LIDER", "CIDADE", "ESTADO"]
+
+    class fakeBuyer(object):
+        def __init__(self, city):
+            self.address_zipcode = 'NONEXISTENT'
+            self.address_city = city
+
+    for caravan in Caravan.query.all():
+        buyer = fakeBuyer(caravan.city)
+
+        data_list = [
+            caravan.name,
+            caravan.owner.name,
+            caravan.owner.email,
+            caravan.city,
+            guess_state(buyer)
+        ]
+        ds.append(data_list)
+
+    print "fechando arquivo..."
+    f.write(ds.xls)
+    f.close()
+
+    print "done!"
+
 
 def buyers_report(out_file = "buyers_report"):
-    sys.stdout = codecs.open('./' + out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%s")) + ".csv",'w','utf-8')
-    print u'"CODIGO DA INSCRICAO";"EMAIL";"NOME";"TELEFONE";"DOCUMENTO";"ENDERECO";"NUMERO";"COMPLEMENTO";"CIDADE";"CEP";"ESTADO";"TIPO DE INSCRICAO";"FORMA DE PAGAMENTO";"VALOR";"DATA DA COMPRA"'
-    
+    filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + ".xls"
+    print "generating report " + filename
+    f = codecs.open('./' + filename,'w')
+    ds.headers = ["CODIGO DA INSCRICAO","EMAIL","NOME","TELEFONE","DOCUMENTO","ENDERECO","NUMERO","COMPLEMENTO","CIDADE","CEP","ESTADO","TIPO DE INSCRICAO","FORMA DE PAGAMENTO","VALOR","DATA DA COMPRA","NOSSO NUMERO"]
+
     for account in Account.query.all():
         purchases = account.purchases
         buyers      = [ p.buyer for p in purchases ]
@@ -29,23 +68,57 @@ def buyers_report(out_file = "buyers_report"):
             if p.status == 'paid':
                 purchase = p
                 buyer = purchase.buyer
-                guessed_state = guess_state(buyer.address_city, buyer.address_zipcode)
+                if not buyer:
+                    continue
+                guessed_state = guess_state(buyer)
                 ongoing_payments = [ payment for payment in p.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES) ]
                 if ongoing_payments:
                     payment = ongoing_payments[0]
-                print u'"{1.id}";"{0.email}";"{0.name}";"{0.phone}";"{0.document}";"{2.address_street}";"{2.address_number}";"{2.address_extra}";"{2.address_city}";"{2.address_zipcode}";"{4}";"{5}";"{3.type}";{1.product.price};{6}'.format(account,purchase,buyer,payment,guessed_state,get_category(purchase.product.category),format_date(purchase.last_updated))
 
-def guess_state(city_name, address_zipcode=None):
-    result = c.cep(address_zipcode)
-    if 'uf' in result:
-        return result['uf']
+                data_list = [
+                    purchase.id,
+                    account.email,
+                    account.name,
+                    account.phone,
+                    account.document,
+                    buyer.address_street,
+                    buyer.address_number,
+                    buyer.address_extra,
+                    buyer.address_city,
+                    buyer.address_zipcode,
+                    guessed_state,
+                    get_category(purchase.product.category),
+                    payment.type,
+                    purchase.product.price,
+                    purchase.last_updated,
+                    get_our_number(payment)
+                ]
+                ds.append(data_list)
+
+    print "fechando arquivo..."
+    f.write(ds.xls)
+    f.close()
+
+    print "escrevendo arquivo states_cache..."
+    json.dump(states_cache, f_cache_content)
+    f_cache_content.close()
+    print "done!"
+
+def guess_state(buyer):
+    if buyer.address_zipcode in states_cache.keys():
+        return states_cache[buyer.address_zipcode]
     else:
-        found = City.query.filter_by(name = stripe_accents(city_name.upper())).all()
-        if len(found):
-            return found[0].state
+        result = c.cep(buyer.address_zipcode)
+        if 'uf' in result:
+            states_cache[buyer.address_zipcode] = result['uf']
+            return result['uf']
         else:
-            return ""
-  
+            found = City.query.filter_by(name = stripe_accents(buyer.address_city.upper())).all()
+            if len(found):
+                return found[0].state
+            else:
+                return ""
+
 def stripe_accents(item):
     return unidecode(item)
 
@@ -61,5 +134,5 @@ def get_category(name):
     else:
         return "Tipo de ingresso desconhecido"
 
-def format_date(date):
-    return date.strftime("%d/%m/%Y %H:%M:%S")
+def get_our_number(payment):
+    return payment.our_number if getattr(payment, 'our_number', None) is not None else ''
