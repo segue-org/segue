@@ -42,3 +42,4 @@ six==1.9.0
 testfixtures==4.1.2
 wsgiref==0.1.2
 xmltodict==0.9.2
+tablib==0.10.0
