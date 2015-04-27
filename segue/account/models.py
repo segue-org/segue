@@ -44,9 +44,10 @@ class Account(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    proposals     = db.relationship("Proposal", backref="owner")
-    purchases     = db.relationship("Purchase", backref="customer")
-    caravan_owned = db.relationship("Caravan",  backref="owner")
+    proposals       = db.relationship("Proposal",  backref="owner")
+    purchases       = db.relationship("Purchase",  backref="customer")
+    caravan_owned   = db.relationship("Caravan",   backref="owner")
+    corporate_owned = db.relationship("Corporate", backref="owner")
 
     resets        = db.relationship("ResetPassword", backref="account")
 
@@ -84,4 +85,3 @@ class City(db.Model):
     longitude = db.Column(db.Numeric)
 
     __tablename__ = 'cities'
-
