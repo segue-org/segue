@@ -7,12 +7,14 @@ from ..core import jwt_required, config
 
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
+from ..corporate import CorporateService
 
 import schema
 
 class PurchaseController(object):
-    def __init__(self, service=None):
+    def __init__(self, service=None, corporate_service=None):
         self.service = service or PurchaseService()
+        self.corporate_service = corporate_service or CorporateService()
         self.current_user = current_user
 
     @jsoned
@@ -32,6 +34,10 @@ class PurchaseController(object):
     @jsoned
     def pay(self, purchase_id=None, method=None):
         payload = request.get_json()
+        purchase = self.service.get_one(purchase_id, self.current_user)
+        if getattr(purchase, 'corporate_id', None) is not None:
+            corporate = self.corporate_service.get_one(purchase.corporate_id, self.current_user)
+            payload['amount'] = self.corporate_service.sum_employee_tickets(corporate.id, purchase.product.price, by=self.current_user)
         result = self.service.create_payment(purchase_id, method, payload, by=self.current_user)
         return result, 200
 
