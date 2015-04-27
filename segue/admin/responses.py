@@ -27,6 +27,9 @@ class AccountDetailResponse(DetailResponse):
         self.email    = account.email
         self.id       = account.id
         self.document = account.document
+        self.city     = account.city
+
+        self.has_valid_purchases = account.has_valid_purchases
 
         if links:
             self.add_link('proposals', account.proposals,     'admin.list_proposals', owner_id   =account.id)
