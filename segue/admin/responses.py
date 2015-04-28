@@ -23,11 +23,18 @@ class DetailResponse(SimpleJson):
 class AccountDetailResponse(DetailResponse):
     def __init__(self, account, links=True):
         super(AccountDetailResponse, self).__init__()
-        self.name     = account.name
-        self.email    = account.email
-        self.id       = account.id
-        self.document = account.document
-        self.city     = account.city
+        self.id           = account.id
+        self.name         = account.name
+        self.email        = account.email
+        self.role         = account.role
+        self.document     = account.document
+        self.country      = account.country
+        self.state        = account.state
+        self.city         = account.city
+        self.phone        = account.phone
+        self.organization = account.organization
+        self.created      = account.created
+        self.last_updated = account.last_updated
 
         self.has_valid_purchases = account.has_valid_purchases
 
