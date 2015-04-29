@@ -70,7 +70,12 @@ class CaravanInviteService(object):
         self.accounts  = accounts  or AccountService()
 
     def list(self, caravan_id, by=None):
-        return self.caravans.get_one(caravan_id, by).invites
+        #return self.caravans.get_one(caravan_id, by).invites
+        invites = self.caravans.get_one(caravan_id, by).invites
+        for invite in invites:
+            invite.paid = self.check_paid()
+
+        return invites
 
     def create(self, caravan_id, data, by=None):
         caravan = self.caravans.get_one(caravan_id, by)
@@ -110,3 +115,7 @@ class CaravanInviteService(object):
             return NotAuthorized
 
         return self.accounts.create(account_data)
+
+    def check_paid(self):
+        # TODO: implement the verification to see if this invitee had already paid or not.
+        return True

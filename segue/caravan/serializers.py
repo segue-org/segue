@@ -15,9 +15,6 @@ class ShortCaravanInviteJsonSerializer(CaravanInviteJsonSerializer):
     _serializer_name = 'short'
 
     def hide_field(self, child):
-        return child not in ['name', 'recipient', 'status']
+        return child not in ['name', 'recipient', 'status', 'paid']
     def serialize_child(self, child):
         return False;
-
-
-
