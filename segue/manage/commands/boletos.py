@@ -38,12 +38,14 @@ def process_boletos(filename):
 
         print F.RESET + "**** FOUND PAYMENT, applying transition"
 
-        if entry['payment_date'] > payment.due_date:
+        if entry['payment_date'] == payment.legal_due_date:
+            print F.RED + "**** NEXT BUSINESS DAY PAYMENT TOLERATED ****"
+        elif entry['payment_date'] > payment.legal_due_date:
             print F.RED + "**** LATE PAYMENT!!! ****"
             late_payments.append(dict(entry=entry, payment=payment))
             continue
 
-
+        print F.RESET
         purchase, transition = payment_service.notify(payment.purchase.id, payment.id, entry, 'script')
 
         print F.YELLOW + "id={0.id} {0.old_status}->{0.new_status}\tR$ {0.paid_amount} ".format(transition)
@@ -60,17 +62,17 @@ def process_boletos(filename):
     total_money = sum([ p['payment'].amount for p in good_payments])
 
     print F.GREEN + u"==============================================================="
-    print F.GREEN + u"valid payments {}".format(len(good_payments))
-    print F.GREEN + u"late payments  {}".format(len(late_payments))
-    print F.GREEN + u"bad payments   {}".format(len(bad_payments))
-    print F.GREEN + u"unrecognized payments {}".format(len(unknown_payments))
-    print F.GREEN + u"total money R$ {:.2f}".format(float(total_money))
+    print F.GREEN + u"VALIDOS             {}".format(len(good_payments))
+    print F.GREEN + u"ATRASADOS           {}".format(len(late_payments))
+    print F.GREEN + u"ERRADOS             {}".format(len(bad_payments))
+    print F.GREEN + u"NAO-RECONHECIDOS    {}".format(len(unknown_payments))
+    print F.GREEN + u"RECEITA TOTAL    R$ {:.2f}".format(float(total_money))
 
-    print F.YELLOW + u"***** UNRECOGNIZED PAYEMNTS *****"
+    print F.YELLOW + u"***** PAGAMENTOS NAO-RECONHECIDOS *****"
     for entry in unknown_payments:
         print_entry(entry)
 
-    print F.YELLOW + u"***** BAD PAYEMNTS *****"
+    print F.YELLOW + u"***** PAGAMENTOS ERRADOS *****"
     for case in bad_payments:
         print F.RED   + u"*****************************"
         print_payment(case['payment'])
@@ -78,7 +80,7 @@ def process_boletos(filename):
         print F.RED + "ERROR: {errors}".format(**case)
         print ""
 
-    print F.YELLOW + u"***** LATE PAYEMNTS *****"
+    print F.YELLOW + u"***** PAGAMENTOS ATRASADOS *****"
     for case in late_payments:
         print F.RED   + u"*****************************"
         print_payment(case['payment'])
@@ -88,6 +90,8 @@ def process_boletos(filename):
 
 def print_entry(entry):
     print F.RESET + u"NOSSO NUMERO: {our_number}".format(**entry)
+    print F.RESET + u"VALOR: R$ {amount:0.2f}".format(**entry)
+    print F.RESET + u"DATA DE PAGAMENTO: {payment_date}".format(**entry)
 
 def print_payment(payment):
     print F.RESET + u"NOME:  {0.purchase.customer.name}".format(payment)
