@@ -67,7 +67,7 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
 
     def test_notify_late_payment(self):
         payment, purchase, product = self._create_payment()
-        payload = self._build_payload(payment, payment_date=payment.due_date + timedelta(days=1))
+        payload = self._build_payload(payment, payment_date=payment.legal_due_date + timedelta(days=1))
 
         transition = self.service.notify(purchase, payment, payload, 'script')
 
@@ -167,6 +167,22 @@ class BoletoFactoryTestCases(SegueApiTestCase):
         self.assertEquals(result.cedente_documento, "01.222.682/0001-01")
         self.assertEquals(result.cedente_endereco, "Rua Rufi\xc3\xa3o Moura, 1234, cj 99 - Floresta - 90.920-008 - Porto Alegre/RS")
         self.assertEquals(result.cedente, "Empresa Organizadora de Eventos Ltda")
+
+    def test_boletos_due_on_weekend_tolerate_next_biz_day_payment(self):
+        friday   = date(2015,04,24)
+        saturday = date(2015,04,25)
+        sunday   = date(2015,04,26)
+        monday   = date(2015,04,27)
+
+        payment1 = self.build_from_factory(ValidBoletoPaymentFactory, due_date=friday)
+        payment2 = self.build_from_factory(ValidBoletoPaymentFactory, due_date=saturday)
+        payment3 = self.build_from_factory(ValidBoletoPaymentFactory, due_date=sunday)
+        payment4 = self.build_from_factory(ValidBoletoPaymentFactory, due_date=monday)
+
+        self.assertEquals(payment1.legal_due_date, friday)
+        self.assertEquals(payment2.legal_due_date, monday)
+        self.assertEquals(payment3.legal_due_date, monday)
+        self.assertEquals(payment4.legal_due_date, monday)
 
 
 
