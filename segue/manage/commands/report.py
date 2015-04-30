@@ -5,6 +5,8 @@ import requests
 import datetime
 import tablib
 import json
+import xmltodict
+import dateutil.parser
 
 from unidecode import unidecode
 from pycorreios import Correios
@@ -54,7 +56,7 @@ def buyers_report(out_file = "buyers_report"):
     filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + ".xls"
     print "generating report " + filename
     f = codecs.open('./' + filename,'w')
-    ds.headers = ["CODIGO DA INSCRICAO","EMAIL","NOME","TELEFONE","DOCUMENTO","ENDERECO","NUMERO","COMPLEMENTO","CIDADE","CEP","ESTADO","TIPO DE INSCRICAO","FORMA DE PAGAMENTO","VALOR","DATA DA COMPRA","NOSSO NUMERO"]
+    ds.headers = ["CODIGO DA INSCRICAO","EMAIL","NOME","TELEFONE","DOCUMENTO","ENDERECO","NUMERO","COMPLEMENTO","CIDADE","CEP","ESTADO","TIPO DE INSCRICAO","FORMA DE PAGAMENTO","VALOR","DATA DO PAGAMENTO","NOSSO NUMERO"]
 
     for account in Account.query.all():
         purchases = account.purchases
@@ -90,7 +92,7 @@ def buyers_report(out_file = "buyers_report"):
                     get_category(purchase.product.category),
                     payment.type,
                     purchase.product.price,
-                    purchase.last_updated,
+                    get_transition_data(payment),
                     get_our_number(payment)
                 ]
                 ds.append(data_list)
@@ -103,6 +105,21 @@ def buyers_report(out_file = "buyers_report"):
     json.dump(states_cache, f_cache_content)
     f_cache_content.close()
     print "done!"
+
+def get_transition_data(payment):
+    if payment.type == 'pagseguro':
+        transition = [ transition for transition in payment.transitions if (transition.new_status in Payment.VALID_PAYMENT_STATUSES) ]
+        transition = transition[0]
+        return get_date_pagseguro(transition)
+    else:
+        transition = payment.most_recent_transition
+        return transition.payment_date
+
+def get_date_pagseguro(transition):
+    pagseguro_data = xmltodict.parse(transition.payload)
+    date = dateutil.parser.parse(pagseguro_data['transaction']['lastEventDate'])
+    naive = date.replace(tzinfo=None)
+    return naive
 
 def guess_state(buyer):
     if buyer.address_zipcode in states_cache.keys():
