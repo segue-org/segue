@@ -41,6 +41,15 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
         payment4  = self.create_from_factory(ValidPaymentFactory, purchase=purchase3, status='paid')
         return locals()
 
+    def test_lookup_purchases_by_customer(self):
+        ctx = self.setUpData()
+        with self.admin_user():
+            response = self.jget('/admin/purchases', query_string={"customer_id": ctx['account3'].id})
+            items = json.loads(response.data)['items']
+
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(len(items), 3)
+
     def test_needle_account_denies_access_to_non_admin(self):
         with self.normal_user():
             response = self.jget('/admin/accounts', query_string={"q":"eira"})

@@ -3,6 +3,7 @@ from segue.errors import NotAuthorized, NoSuchPayment, NoSuchProduct, PurchaseAl
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
+from filters import PurchaseFilterStrategies
 
 from .pagseguro import PagSeguroPaymentService
 from .boleto    import BoletoPaymentService
@@ -11,26 +12,14 @@ from ..caravan import CaravanService
 
 import schema
 
-class PurchaseFilterStrategies(object):
-    def given(self, **criteria):
-        result = []
-        for key, value in criteria.items():
-            method = getattr(self, "by_"+key)
-            result.append(method(value))
-        return result
-
-    def by_customer_id(self, value):
-        return Purchase.customer_id == value
-
 class PurchaseService(object):
-    def __init__(self, db_impl=None, payments=None, strategies=None):
+    def __init__(self, db_impl=None, payments=None, filters=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
-        self.filter_strategies = strategies or PurchaseFilterStrategies()
+        self.filters = filters or PurchaseFilterStrategies()
 
     def query(self, by=None, **kw):
-        kw['customer_id'] = by.id
-        filter_list = self.filter_strategies.given(**kw)
+        filter_list = self.filters.given(**kw)
         return Purchase.query.filter(*filter_list).all()
 
     def create(self, buyer_data, product, account, **extra):
