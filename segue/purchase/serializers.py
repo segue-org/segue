@@ -1,6 +1,6 @@
 from ..json import SQLAlchemyJsonSerializer
 
-__all__ = ['BuyerJsonSerializer','PurchaseJsonSerializer','ShortPurchaseJsonSerializer']
+__all__ = ['BuyerJsonSerializer','PurchaseJsonSerializer','ShortPurchaseJsonSerializer', 'TransitionJsonSerializer' ]
 
 class BuyerJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -17,3 +17,6 @@ class ShortPurchaseJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'short'
     def serialize_child(self, child):
         return False
+
+class TransitionJsonSerializer(SQLAlchemyJsonSerializer):
+    _serializer_name = 'normal'

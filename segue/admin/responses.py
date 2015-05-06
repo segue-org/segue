@@ -97,4 +97,11 @@ class BuyerDetailResponse(DetailResponse):
         self.address_city    = buyer.address_city
         self.address_country = buyer.address_country
 
+class PaymentDetailResponse(DetailResponse):
+    def __init__(self, payment, links=True):
+        self.__dict__    = payment.to_json();
+        self.transitions = TransitionDetailResponse.create(payment.transitions.all())
 
+class TransitionDetailResponse(DetailResponse):
+    def __init__(self, transition, links=True):
+        self.__dict__ = transition.to_json()
