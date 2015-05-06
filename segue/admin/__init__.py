@@ -9,9 +9,9 @@ from ..json import jsoned, SimpleJson
 
 from segue.account import AccountService
 from segue.proposal import ProposalService
-from segue.purchase import PurchaseService
+from segue.purchase import PurchaseService, PaymentService
 
-from responses import AccountDetailResponse, ProposalDetailResponse, PurchaseDetailResponse
+from responses import *
 
 def admin_only(fn):
     @wraps(fn)
@@ -24,10 +24,11 @@ def admin_only(fn):
 
 
 class AdminController(object):
-    def __init__(self, accounts=None, proposals=None, purchases=None):
+    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None):
         self.accounts = accounts or AccountService()
         self.proposals = proposals or ProposalService()
         self.purchases = purchases or PurchaseService()
+        self.payments = payments or PaymentService()
         self.current_user = current_user
 
     @jwt_required()
@@ -78,4 +79,6 @@ class AdminController(object):
     @admin_only
     @jsoned
     def list_payments(self):
-        return [], 200
+        parms = request.args.to_dict()
+        result = self.payments.query(as_user=self.current_user, **parms)
+        return PaymentDetailResponse.create(result), 200

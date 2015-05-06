@@ -3,7 +3,7 @@ from segue.errors import NotAuthorized, NoSuchPayment, NoSuchProduct, PurchaseAl
 
 from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
-from filters import PurchaseFilterStrategies
+from filters import PurchaseFilterStrategies, PaymentFilterStrategies
 
 from .pagseguro import PagSeguroPaymentService
 from .boleto    import BoletoPaymentService
@@ -68,10 +68,15 @@ class PaymentService(object):
         boleto    = BoletoPaymentService
     )
 
-    def __init__(self, mailer=None, caravans=None, **processors_overrides):
+    def __init__(self, mailer=None, caravans=None, filters=None, **processors_overrides):
         self.processors_overrides = processors_overrides
         self.mailer               = mailer or MailerService()
         self.caravans             = caravans or CaravanService()
+        self.filters              = filters or PaymentFilterStrategies()
+
+    def query(self, by=None, **kw):
+        filter_list = self.filters.given(**kw)
+        return Payment.query.filter(*filter_list).all()
 
     def create(self, purchase, method, data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
