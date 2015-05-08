@@ -1,7 +1,7 @@
 from flask import url_for
 from segue.json import SimpleJson
 
-class DetailResponse(SimpleJson):
+class BaseResponse(SimpleJson):
     @classmethod
     def create(cls, list_or_entity, *args, **kw):
         if isinstance(list_or_entity, list):
@@ -19,7 +19,15 @@ class DetailResponse(SimpleJson):
         if isinstance(collection_or_entity, list):
             self.links[name]['count'] = len(collection_or_entity)
 
-class AccountDetailResponse(DetailResponse):
+class ProposalInviteResponse(BaseResponse):
+    def __init__(self, invite, links=False):
+        super(ProposalInviteResponse, self).__init__()
+        self.id         = invite.id
+        self.account_id = invite.account.id if invite.account else None
+        self.name       = invite.name
+        self.email      = invite.recipient
+
+class AccountDetailResponse(BaseResponse):
     def __init__(self, account, links=True):
         super(AccountDetailResponse, self).__init__()
         self.id           = account.id
@@ -43,19 +51,30 @@ class AccountDetailResponse(DetailResponse):
             self.add_link('payments',  account.payments,      'admin.list_payments',  customer_id=account.id)
             self.add_link('caravans',  account.caravan_owned, 'admin.list_caravans',  owner_id   =account.id)
 
-class ProposalDetailResponse(DetailResponse):
+class TrackDetailResponse(BaseResponse):
+    def __init__(self, track, links=False):
+        self.id      = track.id
+        self.name_pt = track.name_pt
+        self.name_en = track.name_en
+        self.public  = track.public
+        self.zone    = track.name_pt.split(" - ")[0]
+        self.track   = track.name_pt.split(" - ")[1]
+
+class ProposalDetailResponse(BaseResponse):
     def __init__(self, proposal):
+        self.id           = proposal.id
         self.title        = proposal.title
         self.full         = proposal.full
         self.level        = proposal.level
         self.language     = proposal.language
         self.created      = proposal.created
         self.last_updated = proposal.last_updated
+        self.track     = TrackDetailResponse.create(proposal.track, links=False)
 
-        self.owner   = AccountDetailResponse(proposal.owner, links=False)
-        # self.invites = AccountDetailResponse(proposal.invies, links=False)
+        self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
+        self.owner     = AccountDetailResponse.create(proposal.owner, links=False)
 
-class PurchaseDetailResponse(DetailResponse):
+class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):
         self.id             = purchase.id
         self.product_id     = purchase.product_id
@@ -73,7 +92,7 @@ class PurchaseDetailResponse(DetailResponse):
             self.add_link('payments', purchase.payments.all(), 'admin.list_payments', purchase_id = purchase.id)
             self.add_link('customer', purchase.customer,       'admin.get_account',   account_id  = purchase.customer.id)
 
-class ProductDetailResponse(DetailResponse):
+class ProductDetailResponse(BaseResponse):
     def __init__(self, product, links=True):
         self.id          = product.id
         self.kind        = product.kind
@@ -83,7 +102,7 @@ class ProductDetailResponse(DetailResponse):
         self.sold_until  = product.sold_until
         self.description = product.description
 
-class BuyerDetailResponse(DetailResponse):
+class BuyerDetailResponse(BaseResponse):
     def __init__(self, buyer, links=True):
         self.id              = buyer.id
         self.kind            = buyer.kind
@@ -97,11 +116,11 @@ class BuyerDetailResponse(DetailResponse):
         self.address_city    = buyer.address_city
         self.address_country = buyer.address_country
 
-class PaymentDetailResponse(DetailResponse):
+class PaymentDetailResponse(BaseResponse):
     def __init__(self, payment, links=True):
         self.__dict__    = payment.to_json();
         self.transitions = TransitionDetailResponse.create(payment.transitions.all())
 
-class TransitionDetailResponse(DetailResponse):
+class TransitionDetailResponse(BaseResponse):
     def __init__(self, transition, links=True):
         self.__dict__ = transition.to_json()
