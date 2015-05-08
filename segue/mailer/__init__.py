@@ -19,8 +19,8 @@ class TemplatedMessage(object):
         self.recipients.append((name, email,))
 
     def build(self):
-        subject = self.template['subject'].format(**self.variables)
-        body    = self.template['body'].format(**self.variables)
+        subject = self.template['subject'].decode('utf-8').format(**self.variables)
+        body    = self.template['body'].decode('utf-8').format(**self.variables)
         bcc     = list(config.MAIL_BCC)
 
         return Message(subject, body=body, recipients=self.recipients, bcc=bcc)
