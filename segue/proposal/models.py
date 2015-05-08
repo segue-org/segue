@@ -19,8 +19,12 @@ class Proposal(JsonSerializable, db.Model):
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    invites      = db.relationship("ProposalInvite", backref="proposal")
+    invites      = db.relationship("ProposalInvite", backref="proposal", lazy='dynamic')
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
+
+    @property
+    def coauthors(self):
+        return self.invites.filter(ProposalInvite.status == 'accepted')
 
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
@@ -33,6 +37,11 @@ class ProposalInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+
+    account = db.relation('Account', uselist=False,
+        backref=db.backref('proposal_invites', uselist=True),
+        primaryjoin='Account.email == ProposalInvite.recipient',
+        foreign_keys='Account.email')
 
 class Track(JsonSerializable, db.Model):
     _serializers = [ TrackSerializer, ShortTrackSerializer ]
