@@ -1,6 +1,7 @@
 import yaml
 import os.path
 import glob
+import codecs
 
 from segue.core import mailer, config
 from flask_mail import Message
@@ -32,7 +33,7 @@ class MessageFactory(object):
         self._templates = {}
         for template_path in glob.glob(pattern):
             template_name = template_path.replace(base, '').replace('.yml','')[1:]
-            self._templates[template_name] = yaml.load(open(template_path))
+            self._templates[template_name] = yaml.load(codecs.open(template_path, "r", "utf-8"))
 
     def from_template(self, template_name):
         return TemplatedMessage(self._templates[template_name])
