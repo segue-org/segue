@@ -19,8 +19,8 @@ class TemplatedMessage(object):
         self.recipients.append((name, email,))
 
     def build(self):
-        subject = self.template['subject'].decode('utf-8').format(**self.variables)
-        body    = self.template['body'].decode('utf-8').format(**self.variables)
+        subject = self.template['subject'].format(**self.variables)
+        body    = self.template['body'].format(**self.variables)
         bcc     = list(config.MAIL_BCC)
 
         return Message(subject, body=body, recipients=self.recipients, bcc=bcc)
@@ -33,7 +33,7 @@ class MessageFactory(object):
         self._templates = {}
         for template_path in glob.glob(pattern):
             template_name = template_path.replace(base, '').replace('.yml','')[1:]
-            self._templates[template_name] = yaml.load(codecs.open(template_path, "r", "utf-8"))
+            self._templates[template_name] = yaml.load(codecs.open(template_path))
 
     def from_template(self, template_name):
         return TemplatedMessage(self._templates[template_name])
