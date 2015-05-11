@@ -51,6 +51,11 @@ class ProposalService(object):
         filter_list = self.filter_strategies.given(**kw)
         return Proposal.query.filter(*filter_list).all()
 
+    def lookup(self, as_user=None, **kw):
+        needle = kw.pop('q',None)
+        filter_list = self.filter_strategies.needle(needle, as_user, **kw)
+        return Proposal.query.filter(*filter_list).all()
+
     def modify(self, proposal_id, data, by=None):
         self.deadline.enforce()
 
@@ -84,7 +89,7 @@ class InviteService(object):
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
         if not self.proposals.check_ownership(proposal, by): raise NotAuthorized
-        return proposal.invites
+        return proposal.invites[:]
 
     def get_one(self, invite_id):
         return ProposalInvite.query.get(invite_id)

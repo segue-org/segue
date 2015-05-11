@@ -63,7 +63,6 @@ class ProposalServiceTestCases(SegueApiTestCase):
         track2 = ValidTrackFactory.create()
         existing = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
 
-
         new_data = {}
         new_data['title']    = 'ma new title'
         new_data['full']     = 'ma new full'

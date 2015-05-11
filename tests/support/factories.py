@@ -28,8 +28,8 @@ class SegueFactory(SQLAlchemyModelFactory):
 class ValidTrackFactory(SegueFactory):
     class Meta:
         model = Track
-    name_en = _Sequence('track {0}')
-    name_pt = _Sequence('track {0}')
+    name_en = _Sequence('zona - track {0}')
+    name_pt = _Sequence('zone - track {0}')
     public  = True
 
 class ValidAccountFactory(SegueFactory):
