@@ -51,7 +51,7 @@ class AdminController(object):
     @jsoned
     def list_proposals(self):
         parms = request.args.to_dict()
-        result = self.proposals.query(as_user=self.current_user, **parms)
+        result = self.proposals.lookup(as_user=self.current_user, **parms)
         return ProposalDetailResponse.create(result), 200
 
     @jwt_required()
