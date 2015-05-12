@@ -40,8 +40,4 @@ reportlab==3.1.44
 requests==2.6.0
 six==1.9.0
 wsgiref==0.1.2
-Markdown==2.6
-PyYAML==3.10
-colorama==0.3.3
-pyboleto==0.2.14
 testfixtures==4.1.2
