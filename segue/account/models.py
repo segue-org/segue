@@ -57,6 +57,13 @@ class Account(JsonSerializable, db.Model):
         return False
 
     @property
+    def payments(self):
+        payments = []
+        for purchase in self.purchases:
+            payments.extend(purchase.payments)
+        return payments
+
+    @property
     def has_valid_purchases(self):
         return any([ p.satisfied for p in self.purchases ])
 

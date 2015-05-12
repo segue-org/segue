@@ -74,6 +74,17 @@ class AccountServiceTestCases(SegueApiTestCase):
         with self.assertRaises(InvalidLogin):
             self.service.login(email='random-email', password="right")
 
+    def test_lookup_by_email(self):
+        account1 = self.create_from_factory(ValidAccountFactory, email='misinfin@example.com')
+        account2 = self.create_from_factory(ValidAccountFactory, email='xaxanga@example.com')
+        account3 = self.create_from_factory(ValidAccountFactory, email='vetusto@example.com')
+
+        result = self.service.lookup('xaxa')
+        self.assertEquals(len(result), 1)
+
+        result = self.service.lookup('@example.com')
+        self.assertEquals(len(result), 3)
+
     def test_start_reset_procedure(self):
         account = self.create_from_factory(ValidAccountFactory)
         mockito.when(self.mock_hasher).generate().thenReturn('1234')
