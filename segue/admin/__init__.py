@@ -57,9 +57,16 @@ class AdminController(object):
     @jwt_required()
     @admin_only
     @jsoned
+    def list_proposal_invites(self, proposal_id=None):
+        proposal = self.proposals.get_one(proposal_id) or abort(404)
+        return ProposalInviteResponse.create(proposal.invites.all()), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
     def get_proposal(self, proposal_id=None):
         result = self.proposals.get_one(proposal_id)
-        return ProposalDetailResponse(result), 200
+        return ProposalDetailResponse.create(result), 200
 
     @jwt_required()
     @admin_only

@@ -26,6 +26,16 @@ class ProposalInviteResponse(BaseResponse):
         self.account_id = invite.account.id if invite.account else None
         self.name       = invite.name
         self.email      = invite.recipient
+        self.status     = invite.status
+
+class AccountShortResponse(BaseResponse):
+    def __init__(self, account, links=False):
+        super(AccountShortResponse, self).__init__()
+        self.id           = account.id
+        self.name         = account.name
+        self.email        = account.email
+
+        self.has_valid_purchases = account.has_valid_purchases
 
 class AccountDetailResponse(BaseResponse):
     def __init__(self, account, links=True):
@@ -61,7 +71,7 @@ class TrackDetailResponse(BaseResponse):
         self.track   = track.name_pt.split(" - ")[1]
 
 class ProposalDetailResponse(BaseResponse):
-    def __init__(self, proposal):
+    def __init__(self, proposal, links=True):
         self.id           = proposal.id
         self.title        = proposal.title
         self.full         = proposal.full
@@ -72,7 +82,11 @@ class ProposalDetailResponse(BaseResponse):
         self.track     = TrackDetailResponse.create(proposal.track, links=False)
 
         self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
-        self.owner     = AccountDetailResponse.create(proposal.owner, links=False)
+        self.owner     = AccountShortResponse.create(proposal.owner, links=False)
+
+        if links:
+            self.add_link('invites', proposal.invites.all(), 'admin.list_proposal_invites', proposal_id=proposal.id)
+            self.add_link('owner',   proposal.owner,         'admin.get_account',           account_id =proposal.owner.id)
 
 class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):
