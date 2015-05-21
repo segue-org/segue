@@ -6,7 +6,7 @@ from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
 from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanLeaderPurchase, CaravanRiderPurchase
-from corporate.models import Corporate, CorporateEmployee, CorporateProduct
+from corporate.models import Corporate, CorporateAccount, CorporateProduct, CorporatePurchase
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -17,6 +17,6 @@ __all__ = [
     'BoletoPayment',
     'Caravan', 'CaravanInvite', 'CaravanProduct',
     'CaravanLeaderPurchase', 'CaravanRiderPurchase',
-    'Corporate', 'CorporateEmployee', 'CorporateProduct',
+    'Corporate', 'CorporateAccount', 'CorporateProduct', 'CorporatePurchase',
     'City', 'Country'
 ]
