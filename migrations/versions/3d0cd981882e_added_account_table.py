@@ -24,7 +24,7 @@ def upgrade():
     sa.Column('email', sa.Text(), nullable=True),
     sa.Column('name', sa.Text(), nullable=True),
     sa.Column('password', PasswordType(schemes=['pbkdf2_sha512']), nullable=True),
-    sa.Column('role', sa.Enum('user', 'operator', 'admin', name="account_roles"), nullable=True),
+    sa.Column('role', sa.Enum('user', 'operator', 'admin', 'employee', name="account_roles"), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###
