@@ -8,6 +8,7 @@ import populate
 import boletos
 import clean
 import report
+import import_caravan
 
 def _make_context():
     import segue.models
@@ -28,4 +29,4 @@ manager.command(clean.clean_bad_buyers)
 manager.command(boletos.process_boletos)
 manager.command(report.buyers_report)
 manager.command(report.caravan_report)
-manager.command(report.import_caravan)
+manager.command(import_caravan.import_caravan)
