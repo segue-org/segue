@@ -16,7 +16,7 @@ class CaravanControllerTestCases(SegueApiTestCase):
     def test_json_input_is_sent_to_service_for_creation(self):
         data = { "arbitrary": "json that will be mocked out anyway" }
         raw_json = json.dumps(data)
-        mock_caravan = ValidCaravanFactory.build()
+        mock_caravan = ValidCaravanFactory.create()
         mockito.when(self.mock_service).create(data, self.mock_owner).thenReturn(mock_caravan)
 
         response = self.jpost('/caravans', data=raw_json)
@@ -25,7 +25,7 @@ class CaravanControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 201)
 
     def test_gets_caravan_by_id(self):
-        mock_caravan = ValidCaravanFactory.build()
+        mock_caravan = ValidCaravanFactory.create()
         mockito.when(self.mock_service).get_one(123, self.mock_owner).thenReturn(mock_caravan)
         mockito.when(self.mock_service).get_one(456, self.mock_owner).thenRaise(NotAuthorized)
         mockito.when(self.mock_service).get_one(666, self.mock_owner).thenReturn(None)
@@ -44,7 +44,7 @@ class CaravanControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_gets_caravan_by_owner(self):
-        mock_caravan = ValidCaravanFactory.build()
+        mock_caravan = ValidCaravanFactory.create()
         mockito.when(self.mock_service).get_by_owner(789, self.mock_owner).thenReturn(mock_caravan)
         mockito.when(self.mock_service).get_by_owner(890, self.mock_owner).thenRaise(NotAuthorized)
         mockito.when(self.mock_service).get_by_owner(666, self.mock_owner).thenReturn(None)
@@ -86,7 +86,7 @@ class CaravanInviteControllerTestCases(SegueApiTestCase):
     def test_invite(self):
         data = { "email": "fulano@example.com" }
         raw_json = json.dumps(data)
-        mock_invite = ValidCaravanInviteFactory.build()
+        mock_invite = ValidCaravanInviteFactory.create()
         mockito.when(self.mock_service).create(123, data, by=self.mock_owner).thenReturn(mock_invite)
         mockito.when(self.mock_service).create(456, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
@@ -98,7 +98,7 @@ class CaravanInviteControllerTestCases(SegueApiTestCase):
         self.assertEquals(response.status_code, 403)
 
     def test_invite_check(self):
-        mock_invite = ValidCaravanInviteFactory.build(hash='123ABC')
+        mock_invite = ValidCaravanInviteFactory.create(hash='123ABC')
         mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(mock_invite)
         mockito.when(self.mock_service).get_by_hash('FFFFFF').thenReturn(None)
 

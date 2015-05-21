@@ -23,6 +23,7 @@ class CaravanServiceTestCases(SegueApiTestCase):
 
     def test_creates_upto_one_caravan_and_retrieves_it(self):
         data = ValidCaravanFactory().to_json()
+        del data['paid_riders']
 
         saved = self.service.create(data, self.mock_owner)
         retrieved = self.service.get_one(saved.id, self.mock_owner)

@@ -8,10 +8,11 @@ from factory.alchemy import SQLAlchemyModelFactory
 from segue.core import db
 from segue.models import Account, ResetPassword
 from segue.models import Proposal, ProposalInvite, Track
-from segue.models import Product, CaravanProduct, StudentProduct
+from segue.models import Product, CaravanProduct, StudentProduct, CorporateProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
-from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
+from segue.models import Caravan, CaravanRiderPurchase, CaravanInvite
+from segue.models import Corporate, CorporatePurchase
 
 import logging
 logger = logging.getLogger('factory')
@@ -205,3 +206,18 @@ class ValidCaravanPurchaseFactory(ValidPurchaseFactory):
     class Meta:
         model = CaravanRiderPurchase
     caravan = SubFactory(ValidCaravanWithOwnerFactory)
+
+class ValidCorporateFactory(SegueFactory):
+    class Meta:
+        model = Corporate
+    name  = _Sequence('Corporate mock testing #{:04d}')
+    city  = 'Enxutolandia'
+    document = '12345678910'
+
+class ValidCorporateWithOwnerFactory(ValidCorporateFactory):
+    owner = SubFactory(ValidAccountFactory)
+
+class ValidCorporatePurchaseFactory(ValidPurchaseFactory):
+    class Meta:
+        model = CorporatePurchase
+    corporate = SubFactory(ValidCorporateWithOwnerFactory)
