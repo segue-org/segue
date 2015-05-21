@@ -53,11 +53,11 @@ class ProductBlueprint(flask.Blueprint):
     def __init__(self):
         super(ProductBlueprint, self).__init__('products', __name__, url_prefix='/products')
         self.controller = ProductController()
-        self.add_url_rule('',                                  methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:product_id>/purchase',        methods=['POST'], view_func=self.controller.purchase)
-        self.add_url_rule('/<int:product_id>/group_purchase',  methods=['POST'], view_func=self.controller.group_purchase)
-        self.add_url_rule('/caravan/<string:hash_code>',       methods=['GET'],  view_func=self.controller.caravan_products)
-        self.add_url_rule('/corporate',                        methods=['GET'],  view_func=self.controller.corporate_products)
+        self.add_url_rule('',                                      methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:product_id>/purchase',            methods=['POST'], view_func=self.controller.purchase)
+        self.add_url_rule('/<int:product_id>/corporate_purchase',  methods=['POST'], view_func=self.controller.corporate_purchase)
+        self.add_url_rule('/caravan/<string:hash_code>',           methods=['GET'],  view_func=self.controller.caravan_products)
+        self.add_url_rule('/corporate',                            methods=['GET'],  view_func=self.controller.corporate_products)
 
 class PurchaseBlueprint(flask.Blueprint):
     def __init__(self):
