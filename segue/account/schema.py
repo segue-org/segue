@@ -1,4 +1,4 @@
-ACCOUNT_ROLES = [ "user","operator","admin" ]
+ACCOUNT_ROLES = [ "user","operator","admin","employee" ]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 
 signup = {
@@ -11,7 +11,7 @@ signup = {
         "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
         "passport":     { "type": "string", "minLength": 5,  "maxLength": 15 },
         "country":      { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "city":         { "type": "string", "minLength": 5,  "maxLength": 30 },
+        "city":         { "type": "string", "minLength": 2,  "maxLength": 60 },
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
         "organization": { "type": "string", "minLength": 5,  "maxLength": 30 },
         "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
