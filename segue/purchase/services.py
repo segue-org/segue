@@ -54,9 +54,9 @@ class PurchaseService(object):
     def check_ownership(self, purchase, alleged):
         return purchase and alleged and purchase.customer_id == alleged.id
 
-    def create_payment(self, purchase_id, payment_method, payment_data, by=None):
+    def create_payment(self, purchase_id, payment_method, payment_data, by=None, force_product=False):
         purchase = self.get_one(purchase_id, by=by)
-        if purchase.can_start_payment:
+        if purchase.can_start_payment or force_product:
             return self.payments.create(purchase, payment_method, payment_data)
         raise ProductExpired()
 
