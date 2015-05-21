@@ -18,8 +18,8 @@ class TemplatedMessage(object):
         self.recipients.append((name, email,))
 
     def build(self):
-        subject = self.template['subject'].format(**self.variables)
-        body    = self.template['body'].format(**self.variables)
+        subject = unicode(self.template['subject']).format(**self.variables)
+        body    = unicode(self.template['body']).format(**self.variables)
         bcc     = list(config.MAIL_BCC)
 
         return Message(subject, body=body, recipients=self.recipients, bcc=bcc)
@@ -72,4 +72,3 @@ class MailerService(object):
         message.to(account.name, account.email)
 
         return mailer.send(message.build())
-
