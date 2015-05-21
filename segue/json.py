@@ -3,6 +3,7 @@ from functools import wraps
 import flask
 import decimal
 import datetime
+import itertools
 
 import core
 
@@ -74,10 +75,13 @@ class JsonSerializer(object):
         self.serializer_overrides = overrides
 
     def hide_field(self, child):
-        return False;
+        return False
 
     def serialize_child(self, child):
         return False
+
+    def extra_fields(self):
+        return []
 
     def emit_json_for(self, target, **kw):
         if hasattr(target, 'to_json'):
@@ -108,7 +112,10 @@ class PropertyJsonSerializer(JsonSerializer):
         # WORST CODE EVER
         overrides.update(self.serializer_overrides)
         result = {}
-        for key, serializer in self.get_field_names(target):
+
+        extra_fields = [ [item, None] for item in self.extra_fields() ]
+
+        for key, serializer in itertools.chain(self.get_field_names(target), extra_fields):
             value          = getattr(target, key, None)
             override       = overrides.get(key, None)
             hide_field     = self.hide_field(key)
