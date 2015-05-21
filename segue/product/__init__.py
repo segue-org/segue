@@ -48,7 +48,7 @@ class ProductService(object):
         extra_fields = product.extra_purchase_fields_for(buyer_data)
         return self.purchases.create(buyer_data, product, account, **extra_fields)
 
-    def group_purchase(self, buyer_data, product_id, account=None):
+    def corporate_purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
         #product.check_eligibility(buyer_data)
         extra_fields = product.extra_purchase_fields_for(buyer_data)
@@ -85,9 +85,9 @@ class ProductController(object):
 
     @jwt_required()
     @jsoned
-    def group_purchase(self, product_id):
+    def corporate_purchase(self, product_id):
         data = request.get_json()
-        result = self.service.group_purchase(data, product_id, account=self.current_user) or flask.abort(400)
+        result = self.service.corporate_purchase(data, product_id, account=self.current_user) or flask.abort(400)
         return result, 200
 
     @jsoned
