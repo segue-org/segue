@@ -5,13 +5,13 @@ from segue.mailer import MailerService
 
 import schema
 
-from models import Corporate, CorporateEmployee
-from factories import CorporateFactory, CorporateEmployeeFactory, CorporatePurchaseFactory
-from ..account import AccountService, Account
+from models import Corporate, CorporateAccount
+from factories import CorporateFactory, CorporateAccountFactory, CorporatePurchaseFactory
+from ..account import schema as account_schema
 
 class CorporateService(object):
     def __init__(self, employees=None):
-        self.employees = employees or CorporateEmployeeService(corporates=self)
+        self.employees = employees or CorporateAccountService(corporates=self)
 
     def get_one(self, corporate_id, by=None):
         result = Corporate.query.get(corporate_id)
@@ -60,11 +60,11 @@ class CorporateService(object):
 
         return value
 
-class CorporateEmployeeService(object):
-    def __init__(self, corporates=None, accounts = None, hasher=None):
+class CorporateAccountService(object):
+    def __init__(self, corporates=None, hasher=None):
         self.corporates  = corporates  or CorporateService()
-        self.accounts  = accounts  or AccountService()
         self.hasher = hasher or Hasher(10)
+        self.account_schema = account_schema
 
     def list(self, corporate_id, by=None):
         return self.corporates.get_one(corporate_id, by).employees
@@ -81,17 +81,12 @@ class CorporateEmployeeService(object):
             'country': buyer_data['address_country'],
             'city': buyer_data['address_city'],
             'phone': by.phone,
-            'password': self.hasher.generate()
+            'password': self.hasher.generate(),
+            'corporate_id': corporate.id
         }
 
-        account = self.accounts.create(account_data)
+        account = CorporateAccountFactory.from_json(account_data, self.account_schema.signup)
 
-        employee = CorporateEmployeeFactory.from_json(data, schema.new_employee)
-        employee.corporate = corporate
-
-        db.session.add(employee)
-        db.session.commit()
         db.session.add(account)
         db.session.commit()
-
-        return employee
+        return account

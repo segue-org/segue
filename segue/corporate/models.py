@@ -4,6 +4,7 @@ from ..core import db
 from ..json import JsonSerializable
 from segue.product.models import Product
 from segue.purchase.models import Purchase
+from segue.account.models import Account
 from segue.errors import WrongBuyerForProduct
 
 from serializers import *
@@ -18,18 +19,12 @@ class Corporate(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    employees    = db.relationship("CorporateEmployee", backref="corporate")
+    employees    = db.relationship('CorporateAccount', primaryjoin='and_(Corporate.id==CorporateAccount.corporate_id)')
 
-class CorporateEmployee(JsonSerializable, db.Model):
-    _serializers = [ CorporateEmployeeJsonSerializer, ShortCorporateEmployeeJsonSerializer ]
-
-    id           = db.Column(db.Integer, primary_key=True)
-    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'))
-    email        = db.Column(db.Text)
-    name         = db.Column(db.Text)
-    document     = db.Column(db.Text)
-    created      = db.Column(db.DateTime, default=func.now())
-    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+class CorporateAccount(Account):
+    __mapper_args__ = { 'polymorphic_identity': 'employee' }
+    # TODO: find some way to reference the object directly: 'ca.corporate = c' and not 'ca.corporate_id = c.id', as it is now.
+    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id', use_alter=True, name='corporate'), name='cr_corporate_id')
 
 class CorporatePurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }

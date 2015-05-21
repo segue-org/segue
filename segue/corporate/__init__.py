@@ -8,12 +8,12 @@ from ..json import jsoned, accepts_html, JsonFor
 import schema
 
 from models import Corporate
-from services import CorporateService, CorporateEmployeeService
+from services import CorporateService, CorporateAccountService
 
 class CorporateController(object):
     def __init__(self, service=None, employee_service=None):
         self.service = service or CorporateService()
-        self.employee_service = employee_service or CorporateEmployeeService()
+        self.employee_service = employee_service or CorporateAccountService()
         self.current_user = current_user
 
     @jwt_required()
