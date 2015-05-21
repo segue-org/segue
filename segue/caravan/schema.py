@@ -3,7 +3,7 @@ new_caravan = {
     "type": "object",
     "properties": {
         "name":        { "type": "string", "minLength": 5, "maxLength": 80 },
-        "city":        { "type": "string", "minLength": 5, "maxLength": 80 },
+        "city":        { "type": "string", "minLength": 2, "maxLength": 80 },
         "description": { "type": "string", "minLength": 5, "maxLength": 400 }
     },
     "required": [ "name", "city" ]
