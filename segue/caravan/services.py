@@ -70,14 +70,9 @@ class CaravanInviteService(object):
         self.accounts  = accounts  or AccountService()
 
     def list(self, caravan_id, by=None):
-        #return self.caravans.get_one(caravan_id, by).invites
-        invites = self.caravans.get_one(caravan_id, by).invites
-        for invite in invites:
-            invite.paid = self.check_paid()
+        return self.caravans.get_one(caravan_id, by).invites
 
-        return invites
-
-    def create(self, caravan_id, data, by=None):
+    def create(self, caravan_id, data, by=None, send_email=True):
         caravan = self.caravans.get_one(caravan_id, by)
 
         invite = CaravanInviteFactory.from_json(data, schema.new_invite)
@@ -87,7 +82,8 @@ class CaravanInviteService(object):
         db.session.add(invite)
         db.session.commit()
 
-        self.mailer.caravan_invite(invite)
+        if send_email:
+            self.mailer.caravan_invite(invite)
 
         return invite
 
@@ -115,7 +111,3 @@ class CaravanInviteService(object):
             return NotAuthorized
 
         return self.accounts.create(account_data)
-
-    def check_paid(self):
-        # TODO: implement the verification to see if this invitee had already paid or not.
-        return True
