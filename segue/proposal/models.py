@@ -22,6 +22,9 @@ class Proposal(JsonSerializable, db.Model):
     invites      = db.relationship("ProposalInvite", backref="proposal", lazy='dynamic')
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
 
+    as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
+    as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
+
     @property
     def coauthors(self):
         return self.invites.filter(ProposalInvite.status == 'accepted')

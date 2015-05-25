@@ -22,6 +22,26 @@ class DeadlineReached(SegueError):
     def to_json(self):
         return { 'message': 'Proposals are no longer accepted after deadline has been reached' }
 
+class NoMatchAvailable(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'There is no match available for this hash' }
+
+class InvalidJudge(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This hash code is not valid' }
+
+class MatchAlreadyJudged(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This match has already been judged, and cannot be judged again' }
+
+class MatchAssignedToOtherJudge(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This match has been assigned to other judge' }
+
 class ExternalServiceError(SegueError):
     code = 500
 

@@ -11,6 +11,7 @@ from segue.models import Proposal, ProposalInvite, Track
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
+from segue.models import Judge, Match, Tournament
 from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
 
 import logging
@@ -47,6 +48,21 @@ class ValidAccountFactory(SegueFactory):
     phone        = "51 2345678"
     organization = "manos da quebrada"
     resume       = "um cara legal"
+
+class ValidTournamentFactory(SegueFactory):
+    class Meta:
+        model = Tournament
+    name      = "fisl16"
+    selection = "*"
+    status    = "open"
+
+class ValidJudgeFactory(SegueFactory):
+    class Meta:
+        model = Judge
+    hash       = _Sequence('C0FFEE{0:04x}')
+    email      = _Sequence('email_{0}@example.com')
+    votes      = 5
+    tournament = SubFactory(ValidTournamentFactory)
 
 class ValidAdminAccountFactory(ValidAccountFactory):
     role = "admin"
@@ -208,3 +224,14 @@ class ValidCaravanPurchaseFactory(ValidPurchaseFactory):
     class Meta:
         model = CaravanRiderPurchase
     caravan = SubFactory(ValidCaravanWithOwnerFactory)
+
+class ValidMatchFactory(SegueFactory):
+    class Meta:
+        model = Match
+    round      = 1
+    judge      = SubFactory(ValidJudgeFactory)
+    player1    = SubFactory(ValidProposalWithOwnerWithTrackFactory)
+    player2    = SubFactory(ValidProposalWithOwnerWithTrackFactory)
+    tournament = SubFactory(ValidTournamentFactory)
+
+
