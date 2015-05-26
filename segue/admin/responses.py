@@ -33,6 +33,7 @@ class AccountDetailResponse(BaseResponse):
         self.organization = account.organization
         self.created      = account.created
         self.last_updated = account.last_updated
+        self.resume       = account.resume
 
         self.has_valid_purchases = account.has_valid_purchases
 
