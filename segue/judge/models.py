@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy.sql import functions as func
 
 from ..core import db
+from segue.proposal.models import Proposal
 
 class Judge(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -35,15 +36,32 @@ class Match(db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
+    def points_for(self, proposal):
+        if not self.result: return 0
+        if proposal == self.player1:
+            if self.result == 'player1': return 3
+            if self.result == 'tie': return 1
+            return 0
+        elif proposal == self.player2:
+            if self.result == 'player2': return 3
+            if self.result == 'tie': return 1
+            return 0
+        return 0
+
 
 class Tournament(db.Model):
-    id        = db.Column(db.Integer, primary_key=True)
-    name      = db.Column(db.Text)
-    selection = db.Column(db.Text)
-    status    = db.Column(db.Enum("open", "closed", name="proposal_levels"))
+    id            = db.Column(db.Integer, primary_key=True)
+    current_round = db.Column(db.Integer, default = 0)
+    name          = db.Column(db.Text)
+    selection     = db.Column(db.Text)
+    status        = db.Column(db.Enum("open", "closed", name="proposal_levels"))
 
     judges  = db.relationship("Judge", backref="tournament", lazy='dynamic')
     matches = db.relationship("Match", backref="tournament", lazy="dynamic")
+
+    @property
+    def proposals(self):
+        return Proposal.query.all()
 
 
 

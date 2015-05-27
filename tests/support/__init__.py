@@ -6,6 +6,11 @@ import segue, segue.core
 import settings
 from hashie import hashie
 
+class Context(dict):
+    def __init__(self, a_dict):
+        super(Context, self).__init__(**a_dict)
+        self.__dict__.update(a_dict)
+
 class SegueApiTestCase(unittest.TestCase):
     def setUp(self):
         super(SegueApiTestCase, self).setUp()

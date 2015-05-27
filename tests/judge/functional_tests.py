@@ -5,13 +5,8 @@ import mockito
 
 from segue.errors import NotAuthorized
 
-from ..support import SegueApiTestCase
+from ..support import SegueApiTestCase, Context
 from ..support.factories import *
-
-class Context(dict):
-    def __init__(self, a_dict):
-        super(Context, self).__init__(**a_dict)
-        self.__dict__.update(a_dict)
 
 class JudgeControllerFunctionalTestCases(SegueApiTestCase):
     def setUp(self):
@@ -34,10 +29,8 @@ class JudgeControllerFunctionalTestCases(SegueApiTestCase):
         coauthor0 = self.create_from_factory(ValidInviteFactory, status="accepted", proposal=proposal1, recipient=acc1.email)
         coauthor1 = self.create_from_factory(ValidInviteFactory, status="accepted", proposal=proposal1, recipient=acc2.email)
 
-
         match0 = self.create_from_factory(ValidMatchFactory, tournament=tournament, player1 = proposal1, player2 = proposal2, judge=judge0)
         match1 = self.create_from_factory(ValidMatchFactory, tournament=tournament, player1 = proposal3, player2 = proposal4, judge=None)
-
 
         return Context(locals())
 
