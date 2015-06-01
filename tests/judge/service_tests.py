@@ -25,13 +25,25 @@ class JudgeTestCases(SegueApiTestCase):
         tag2 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p3)
         tag3 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p4)
 
+        j1 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="ABC", votes=5)
+        j2 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="DEF", votes=5)
+        j3 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="GHI", votes=5)
+        j4 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="JKL", votes=5)
+
         ctx.update(locals())
         return Context(ctx)
 
     def setUpExistingMatches(self, ctx=dict()):
-        m1 = self.create_from_factory(ValidMatchFactory, player1=ctx.p1, player2=ctx.p2, result="player1")
-        m2 = self.create_from_factory(ValidMatchFactory, player1=ctx.p3, player2=ctx.p4, result="tie")
-        m3 = self.create_from_factory(ValidMatchFactory, player1=ctx.p5, player2=ctx.p6, result="player2")
+        m1 = self.create_from_factory(ValidMatchFactory, player1=ctx.p1, player2=ctx.p2, tournament=ctx.t0, result="player1")
+        m2 = self.create_from_factory(ValidMatchFactory, player1=ctx.p3, player2=ctx.p4, tournament=ctx.t0, result="tie")
+        m3 = self.create_from_factory(ValidMatchFactory, player1=ctx.p5, player2=ctx.p6, tournament=ctx.t0, result="player2")
+        ctx.update(locals())
+        return Context(ctx)
+
+    def setUpExistingRoundWithPendingMatches(self, ctx=dict()):
+        m1 = self.create_from_factory(ValidMatchFactory, player1=ctx.p1, player2=ctx.p2, tournament=ctx.t0, result="player1")
+        m2 = self.create_from_factory(ValidMatchFactory, player1=ctx.p3, player2=ctx.p4, tournament=ctx.t0, result=None)
+        m3 = self.create_from_factory(ValidMatchFactory, player1=ctx.p5, player2=ctx.p6, tournament=ctx.t0, result=None)
         ctx.update(locals())
         return Context(ctx)
 
@@ -58,6 +70,27 @@ class JudgeServiceTestCases(JudgeTestCases):
 
         with self.assertRaises(JudgeAlreadyExists):
             self.service.create_token("fulano@example.com", 5, ctx.t0.id)
+
+    def test_multiple_judges(self):
+        ctx = self.setUpProposals()
+        ctx = self.setUpExistingRoundWithPendingMatches(ctx)
+
+        mj1 = self.service.get_next_match_for('ABC')
+        mj2 = self.service.get_next_match_for('DEF')
+
+        self.assertEquals(mj1, ctx.m2)
+        self.assertEquals(mj2, ctx.m3)
+
+        mj1_again = self.service.get_next_match_for('ABC')
+        self.assertEquals(mj1_again, ctx.m2)
+
+        self.service.judge_match(mj1.id, 'ABC', 'tie')
+
+        with self.assertRaises(RoundIsOver):
+            self.service.get_next_match_for('JKL')
+
+        with self.assertRaises(RoundIsOver):
+            self.service.get_next_match_for('ABC')
 
 class TournamentServiceTestCases(JudgeTestCases):
     def setUp(self):
@@ -89,7 +122,6 @@ class TournamentServiceTestCases(JudgeTestCases):
         self.assertEquals(ctx.t1.proposals[2], ctx.p3)
         self.assertEquals(ctx.t1.proposals[3], ctx.p4)
 
-
     def test_uses_trivial_round_generator_on_round_zero(self):
         ctx = self.setUpProposals()
 
@@ -107,6 +139,9 @@ class TournamentServiceTestCases(JudgeTestCases):
         self.assertIsNotNone(new_matches[0].id)
         self.assertIsNotNone(new_matches[1].id)
         self.assertIsNotNone(new_matches[2].id)
+        self.assertEquals(new_matches[0].tournament, ctx.t0)
+        self.assertEquals(new_matches[1].tournament, ctx.t0)
+        self.assertEquals(new_matches[2].tournament, ctx.t0)
 
     def test_uses_classical_round_generator_on_other_rounds(self):
         ctx = self.setUpProposals()
@@ -125,5 +160,8 @@ class TournamentServiceTestCases(JudgeTestCases):
         self.assertIsNotNone(new_matches[0].id)
         self.assertIsNotNone(new_matches[1].id)
         self.assertIsNotNone(new_matches[2].id)
+        self.assertEquals(new_matches[0].tournament, ctx.t1)
+        self.assertEquals(new_matches[1].tournament, ctx.t1)
+        self.assertEquals(new_matches[2].tournament, ctx.t1)
 
 

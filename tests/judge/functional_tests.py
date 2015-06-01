@@ -16,6 +16,9 @@ class JudgeControllerFunctionalTestCases(SegueApiTestCase):
         tournament = self.create_from_factory(ValidTournamentFactory)
 
         judge0 = self.create_from_factory(ValidJudgeFactory, id=111, hash="ABCD", votes=5, tournament=tournament)
+        judge1 = self.create_from_factory(ValidJudgeFactory, id=222, hash="EFGH", votes=5, tournament=tournament)
+        judge2 = self.create_from_factory(ValidJudgeFactory, id=333, hash="IJKL", votes=5, tournament=tournament)
+        judge3 = self.create_from_factory(ValidJudgeFactory, id=444, hash="MNOP", votes=5, tournament=tournament)
 
         acc0 = self.create_from_factory(ValidAccountFactory, name="Jaqen H'ghar", resume="a man has no past")
         acc1 = self.create_from_factory(ValidAccountFactory, name="Arya Stark",   resume="a girl has no past")
@@ -93,4 +96,3 @@ class JudgeControllerFunctionalTestCases(SegueApiTestCase):
         match = json.loads(response.data)['resource']
 
         self.assertNotEqual(match['id'], ctx.match0.id)
-

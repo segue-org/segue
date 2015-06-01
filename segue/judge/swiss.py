@@ -1,8 +1,13 @@
 from models import Match
+from errors import RoundHasPendingMatches
 
 class TrivialRoundGenerator(object):
     def generate(self, players, past_matches, round=1):
         matches = []
+
+        for match in past_matches:
+            if match.result == None:
+                raise RoundHasPendingMatches()
 
         for i in range(0, len(players), 2):
             match = Match(player1 = players[i].proposal, player2 = players[i+1].proposal, round=round)
@@ -19,8 +24,11 @@ class ClassicalRoundGenerator(object):
                 result[p1.id][p2.id] = False
 
         for match in past_matches:
+            if match.result == None:
+                raise RoundHasPendingMatches()
             result[match.player1.id][match.player2.id] = True
             result[match.player2.id][match.player1.id] = True
+
         return result
 
 

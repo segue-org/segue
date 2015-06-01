@@ -29,6 +29,7 @@ class TournamentService(object):
 
         new_matches = generator.generate(players, tournament.matches, tournament.current_round+1)
         for match in new_matches:
+            match.tournament = tournament
             db.session.add(match)
         db.session.commit()
 
@@ -66,12 +67,15 @@ class JudgeService(object):
 
     def get_next_match_for(self, hash_code):
         judge = self.get_by_hash(hash_code)
-        match = Match.query.filter(Match.judge == judge, Match.result == None).first()
-        if not match:
-            match = Match.query.filter(Match.result == None).first()
-            match.judge = judge
-            db.session.add(match)
-            db.session.commit()
+        match = judge.tournament.matches.filter(Match.judge == judge, Match.result == None).first()
+        if match: return match
+
+        match = judge.tournament.matches.filter(Match.judge == None, Match.result == None).first()
+        if not match: raise RoundIsOver()
+
+        match.judge = judge
+        db.session.add(match)
+        db.session.commit()
         return match
 
     def judge_match(self, match_id, hash_code, result):

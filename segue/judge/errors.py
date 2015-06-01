@@ -30,4 +30,12 @@ class MatchAssignedToOtherJudge(SegueError):
     def to_json(self):
         return { 'message': 'This match has been assigned to other judge' }
 
+class RoundHasPendingMatches(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This round still has pending matches' }
 
+class RoundIsOver(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This round is over. Please wait while new matches are generated' }

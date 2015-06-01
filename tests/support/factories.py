@@ -234,7 +234,6 @@ class ValidMatchFactory(SegueFactory):
     class Meta:
         model = Match
     round      = 1
-    judge      = SubFactory(ValidJudgeFactory)
     player1    = SubFactory(ValidProposalWithOwnerWithTrackFactory)
     player2    = SubFactory(ValidProposalWithOwnerWithTrackFactory)
     tournament = SubFactory(ValidTournamentFactory)

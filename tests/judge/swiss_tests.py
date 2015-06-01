@@ -1,5 +1,6 @@
 from .service_tests import JudgeTestCases
 
+from segue.judge.errors import *
 from segue.judge.swiss import TrivialRoundGenerator, ClassicalRoundGenerator, StandingsCalculator, Player
 
 class TrivialRoundGeneratorTestCases(JudgeTestCases):
@@ -28,6 +29,16 @@ class ClassicalRoundGeneratorTestCases(JudgeTestCases):
     def setUp(self):
         super(ClassicalRoundGeneratorTestCases, self).setUp()
         self.generator = ClassicalRoundGenerator()
+
+    def test_does_not_generate_a_new_round_if_there_is_one_ongoing(self):
+        ctx = self.setUpProposals()
+        ctx = self.setUpExistingRoundWithPendingMatches(ctx)
+
+        ordered_players  = [ Player(p,0) for p in [ctx.p1,ctx.p6,ctx.p3,ctx.p4,ctx.p2,ctx.p5]]
+        past_matches = [ctx.m1,ctx.m2,ctx.m3]
+
+        with self.assertRaises(RoundHasPendingMatches):
+            result = self.generator.generate(ordered_players, past_matches, 2)
 
     def test_does_not_repeat_already_existing_match(self):
         ctx = self.setUpProposals()
