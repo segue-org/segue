@@ -17,7 +17,7 @@ body: |
     link abaixo e seguir as instruções. Você tem direito a {token.votes}
     votos.
 
-    {backend_url}/api/judge/{token.hash}
+    {backend_url}/api/judges/{token.hash}
 
     Atenciosamente,
 

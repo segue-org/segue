@@ -82,6 +82,6 @@ class MailerServiceTestCases(SegueApiTestCase):
 
         self.assertIn(judge.email, outbox[0].recipients[0])
 
-        the_url = 'http://192.168.33.91:9001/api/judge/{}'.format(judge.hash)
+        the_url = 'http://192.168.33.91:9001/api/judges/{}'.format(judge.hash)
         self.assertIn(the_url, outbox[0].body)
 
