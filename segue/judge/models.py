@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.sql import functions as func
 
 from ..core import db
-from segue.proposal.models import Proposal
+from segue.proposal.models import Proposal, ProposalTag
 
 class Judge(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -25,7 +25,7 @@ class Judge(db.Model):
 
 class Match(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
-    result     = db.Column(db.Enum("player1", "player2", "tie", name="proposal_levels"))
+    result     = db.Column(db.Enum("player1", "player2", "tie", name="match_results"))
     round      = db.Column(db.Integer)
 
     judge_id      = db.Column(db.Integer, db.ForeignKey('judge.id'))
@@ -53,15 +53,18 @@ class Tournament(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
     current_round = db.Column(db.Integer, default = 0)
     name          = db.Column(db.Text)
-    selection     = db.Column(db.Text)
-    status        = db.Column(db.Enum("open", "closed", name="proposal_levels"))
+    selection     = db.Column(db.Text, default="*")
+    status        = db.Column(db.Enum("open", "closed", name="tournament_statuses"))
 
     judges  = db.relationship("Judge", backref="tournament", lazy='dynamic')
     matches = db.relationship("Match", backref="tournament", lazy="dynamic")
 
     @property
     def proposals(self):
-        return Proposal.query.all()
+        proposals = Proposal.query
+        if self.selection != "*":
+            proposals = proposals.filter(Proposal.tags.any(ProposalTag.name == self.selection))
+        return proposals.all()
 
 
 

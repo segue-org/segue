@@ -1,15 +1,17 @@
 from datetime import timedelta, datetime
 import mockito
 
-from segue.judge.services import TournamentService, StandingsCalculator, TrivialRoundGenerator, Player, ClassicalRoundGenerator
 from ..support import SegueApiTestCase, Context
 from ..support.factories import *
+
+from segue.judge.errors import *
+from segue.judge.services import JudgeService, TournamentService
 
 
 class JudgeTestCases(SegueApiTestCase):
     def setUpProposals(self, ctx=dict()):
-        tournament0 = self.create_from_factory(ValidTournamentFactory, current_round=0)
-        tournament1 = self.create_from_factory(ValidTournamentFactory, current_round=1)
+        t0 = self.create_from_factory(ValidTournamentFactory, current_round=0, selection="*")
+        t1 = self.create_from_factory(ValidTournamentFactory, current_round=1, selection="player")
 
         p1 = self.create_from_factory(ValidProposalFactory, id=1, title='valar morghulis')
         p2 = self.create_from_factory(ValidProposalFactory, id=2, title='valar dohaeris')
@@ -17,6 +19,12 @@ class JudgeTestCases(SegueApiTestCase):
         p4 = self.create_from_factory(ValidProposalFactory, id=4, title='a man must die')
         p5 = self.create_from_factory(ValidProposalFactory, id=5, title='for the night is dark')
         p6 = self.create_from_factory(ValidProposalFactory, id=6, title='and full of terrors')
+
+        tag0 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p1)
+        tag1 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p2)
+        tag2 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p3)
+        tag3 = self.create_from_factory(ValidProposalTagFactory, name="player", proposal=p4)
+
         ctx.update(locals())
         return Context(ctx)
 
@@ -26,6 +34,30 @@ class JudgeTestCases(SegueApiTestCase):
         m3 = self.create_from_factory(ValidMatchFactory, player1=ctx.p5, player2=ctx.p6, result="player2")
         ctx.update(locals())
         return Context(ctx)
+
+class JudgeServiceTestCases(JudgeTestCases):
+    def setUp(self):
+        super(JudgeServiceTestCases, self).setUp()
+        self.mock_hasher = mockito.Mock()
+        self.service = JudgeService(hasher=self.mock_hasher)
+
+    def test_create_tokens(self):
+        ctx = self.setUpProposals()
+        mockito.when(self.mock_hasher).generate().thenReturn("ABCDEF")
+
+        created = self.service.create_token("fulano@example.com", 5, ctx.t0.id)
+
+        self.assertEquals(created.votes, 5)
+        self.assertEquals(created.remaining, 5)
+        self.assertEquals(created.spent, 0)
+        self.assertEquals(created.email, "fulano@example.com")
+        self.assertEquals(created.hash, "ABCDEF")
+
+        retrieved = self.service.get_by_hash("ABCDEF")
+        self.assertEquals(created, retrieved)
+
+        with self.assertRaises(JudgeAlreadyExists):
+            self.service.create_token("fulano@example.com", 5, ctx.t0.id)
 
 class TournamentServiceTestCases(JudgeTestCases):
     def setUp(self):
@@ -38,6 +70,26 @@ class TournamentServiceTestCases(JudgeTestCases):
     def _build_matches(self, *pairs):
         return [ Match(player1=p[0], player2=p[1]) for p in pairs ]
 
+    def test_get_one(self):
+        ctx = self.setUpProposals()
+
+        result = self.service.get_one(ctx.t0.id)
+        self.assertEquals(result, ctx.t0)
+
+        with self.assertRaises(NoSuchTournament):
+            self.service.get_one(567)
+
+    def test_tournament_filters_proposals(self):
+        ctx = self.setUpProposals()
+
+        self.assertEquals(len(ctx.t0.proposals), 6)
+        self.assertEquals(len(ctx.t1.proposals), 4)
+        self.assertEquals(ctx.t1.proposals[0], ctx.p1)
+        self.assertEquals(ctx.t1.proposals[1], ctx.p2)
+        self.assertEquals(ctx.t1.proposals[2], ctx.p3)
+        self.assertEquals(ctx.t1.proposals[3], ctx.p4)
+
+
     def test_uses_trivial_round_generator_on_round_zero(self):
         ctx = self.setUpProposals()
 
@@ -49,7 +101,7 @@ class TournamentServiceTestCases(JudgeTestCases):
         mockito.when(self.mock_standings).calculate(mockito.any(), mockito.any()).thenReturn(ordered_players)
         mockito.when(self.mock_trivial).generate(ordered_players, mockito.any(), 1).thenReturn(fake_matches)
 
-        new_matches = self.service.generate_round(ctx.tournament0.id)
+        new_matches = self.service.generate_round(ctx.t0.id)
 
         self.assertEquals(new_matches, fake_matches)
         self.assertIsNotNone(new_matches[0].id)
@@ -67,88 +119,11 @@ class TournamentServiceTestCases(JudgeTestCases):
         mockito.when(self.mock_standings).calculate(mockito.any(), mockito.any()).thenReturn(ordered_players)
         mockito.when(self.mock_classical).generate(ordered_players, mockito.any(), 2).thenReturn(fake_matches)
 
-        new_matches = self.service.generate_round(ctx.tournament1.id)
+        new_matches = self.service.generate_round(ctx.t1.id)
 
         self.assertEquals(new_matches, fake_matches)
         self.assertIsNotNone(new_matches[0].id)
         self.assertIsNotNone(new_matches[1].id)
         self.assertIsNotNone(new_matches[2].id)
 
-class TrivialRoundGeneratorTestCases(JudgeTestCases):
-    def setUp(self):
-        super(TrivialRoundGeneratorTestCases, self).setUp()
-        self.generator = TrivialRoundGenerator()
 
-    def test_pairs_players_two_by_two(self):
-        ctx = self.setUpProposals()
-
-        ordered_players  = [ Player(p,0) for p in [ctx.p1,ctx.p2,ctx.p3,ctx.p4,ctx.p5,ctx.p6]]
-        past_matches = []
-
-        result = self.generator.generate(ordered_players, past_matches, round=1)
-
-        self.assertEquals(len(result), 3)
-        self.assertEquals([ x.round for x in result ], [1,1,1])
-        self.assertEquals(result[0].player1, ctx.p1)
-        self.assertEquals(result[0].player2, ctx.p2)
-        self.assertEquals(result[1].player1, ctx.p3)
-        self.assertEquals(result[1].player2, ctx.p4)
-        self.assertEquals(result[2].player1, ctx.p5)
-        self.assertEquals(result[2].player2, ctx.p6)
-
-class ClassicalRoundGeneratorTestCases(JudgeTestCases):
-    def setUp(self):
-        super(ClassicalRoundGeneratorTestCases, self).setUp()
-        self.generator = ClassicalRoundGenerator()
-
-    def test_does_not_repeat_already_existing_match(self):
-        ctx = self.setUpProposals()
-        ctx = self.setUpExistingMatches(ctx)
-
-        ordered_players  = [ Player(p,0) for p in [ctx.p1,ctx.p6,ctx.p3,ctx.p4,ctx.p2,ctx.p5]]
-        past_matches = [ctx.m1,ctx.m2,ctx.m3]
-
-        result = self.generator.generate(ordered_players, past_matches, 2)
-        self.assertEquals(result[0].player1, ctx.p1)
-        self.assertEquals(result[0].player2, ctx.p6)
-        self.assertEquals(result[1].player1, ctx.p3)
-        self.assertEquals(result[1].player2, ctx.p2)
-        self.assertEquals(result[2].player1, ctx.p4)
-        self.assertEquals(result[2].player2, ctx.p5)
-
-
-class StandingsCalculatorTestCases(JudgeTestCases):
-    def setUp(self):
-        super(StandingsCalculatorTestCases, self).setUp()
-        self.calculator = StandingsCalculator()
-
-    def test_defaults_to_proposal_id(self):
-        ctx = self.setUpProposals()
-
-        shuffled_proposals = [ctx.p5,ctx.p3,ctx.p1,ctx.p6,ctx.p2,ctx.p4]
-        past_matches = []
-
-        result = self.calculator.calculate(shuffled_proposals, past_matches)
-
-        self.assertEquals(result[0].proposal, ctx.p1)
-        self.assertEquals(result[1].proposal, ctx.p2)
-        self.assertEquals(result[2].proposal, ctx.p3)
-        self.assertEquals(result[3].proposal, ctx.p4)
-        self.assertEquals(result[4].proposal, ctx.p5)
-        self.assertEquals(result[5].proposal, ctx.p6)
-
-    def test_sorts_by_number_of_points(self):
-        ctx = self.setUpProposals()
-        ctx = self.setUpExistingMatches(ctx)
-
-        shuffled_proposals = [ctx.p5,ctx.p3,ctx.p1,ctx.p6,ctx.p2,ctx.p4]
-        past_matches = [ctx.m1,ctx.m2,ctx.m3]
-
-        result = self.calculator.calculate(shuffled_proposals, past_matches)
-
-        self.assertEquals(result[0].proposal, ctx.p1) # won 1, has lowest id
-        self.assertEquals(result[1].proposal, ctx.p6) # won 1, higher id
-        self.assertEquals(result[2].proposal, ctx.p3) # tied 1, lower id
-        self.assertEquals(result[3].proposal, ctx.p4) # tied 1, higher id
-        self.assertEquals(result[4].proposal, ctx.p2) # lost 1, lower id
-        self.assertEquals(result[5].proposal, ctx.p5) # lost 1, higher id
