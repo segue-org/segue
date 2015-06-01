@@ -9,6 +9,7 @@ import boletos
 import clean
 import report
 import import_caravan
+import judge
 
 def _make_context():
     import segue.models
@@ -30,3 +31,5 @@ manager.command(boletos.process_boletos)
 manager.command(report.buyers_report)
 manager.command(report.caravan_report)
 manager.command(import_caravan.import_caravan)
+manager.command(judge.invite_judges)
+manager.command(judge.create_tournament)

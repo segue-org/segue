@@ -1,0 +1,25 @@
+---
+
+template: invite_judge
+language: pt
+subject: "ajude-nos a escolher as palestras do FISL 16!"
+
+body: |
+
+    Olá!
+
+    Você está recebendo este e-mail por ser um participante
+    do FISL16 (ou de suas edições anteriores). Estamos
+    convidando você para fazer parte do nosso processo de
+    escolha de palestras dess edição.
+
+    Para participar, é muito simples: basta clicar no
+    link abaixo e seguir as instruções. Você tem direito a {token.votes}
+    votos.
+
+    {backend_url}/api/judges/{token.hash}
+
+    Atenciosamente,
+
+    --
+    Associação Software Livre.Org

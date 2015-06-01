@@ -36,7 +36,7 @@ class BoletoTransitionFactory(TransitionFactory):
         transition.paid_amount  = payload['amount']
         transition.batch_line   = payload['line']
 
-        if payment.due_date < transition.payment_date:
+        if payment.legal_due_date < transition.payment_date:
             transition.new_status = 'pending'
             transition.errors     = 'late-payment'
 

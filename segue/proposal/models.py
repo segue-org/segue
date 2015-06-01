@@ -1,12 +1,18 @@
 import datetime
 
 from sqlalchemy.sql import functions as func
+from sqlalchemy.dialects import postgresql
 
 from ..json import JsonSerializable
 from ..core import db
 from .serializers import *
 
 import schema
+
+class ProposalTag(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.Text)
+    proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
 
 class Proposal(JsonSerializable, db.Model):
     _serializers = [ ProposalJsonSerializer, ShortChildProposalJsonSerializer ]
@@ -19,8 +25,17 @@ class Proposal(JsonSerializable, db.Model):
     owner_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    invites      = db.relationship("ProposalInvite", backref="proposal")
+    invites      = db.relationship("ProposalInvite", backref="proposal", lazy='dynamic')
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
+
+    tags = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
+
+    as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
+    as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
+
+    @property
+    def coauthors(self):
+        return self.invites.filter(ProposalInvite.status == 'accepted')
 
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
@@ -33,6 +48,11 @@ class ProposalInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+
+    account = db.relation('Account', uselist=False,
+        backref=db.backref('proposal_invites', uselist=True),
+        primaryjoin='Account.email == ProposalInvite.recipient',
+        foreign_keys='Account.email')
 
 class Track(JsonSerializable, db.Model):
     _serializers = [ TrackSerializer, ShortTrackSerializer ]

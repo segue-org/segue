@@ -7,6 +7,8 @@ from purchase import PurchaseController, PaymentController
 from document import DocumentController
 from caravan import CaravanController, CaravanInviteController
 from corporate import CorporateController
+from admin import AdminController
+from judge import JudgeController, MatchController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -121,6 +123,33 @@ class CorporateBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:corporate_id>/people', methods=['POST'], view_func=self.controller.add_people)
         self.add_url_rule('/<string:name>.schema',      methods=['GET'],  view_func=self.controller.schema)
 
+class AdminBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
+        self.controller = AdminController()
+        self.add_url_rule('/accounts',  methods=['GET'], view_func=self.controller.list_accounts)
+        self.add_url_rule('/proposals', methods=['GET'], view_func=self.controller.list_proposals)
+        self.add_url_rule('/purchases', methods=['GET'], view_func=self.controller.list_purchases)
+        self.add_url_rule('/caravans',  methods=['GET'], view_func=self.controller.list_caravans)
+        self.add_url_rule('/payments',  methods=['GET'], view_func=self.controller.list_payments)
+
+        self.add_url_rule('/accounts/<int:account_id>',           methods=['GET'], view_func=self.controller.get_account)
+        self.add_url_rule('/proposals/<int:proposal_id>/invites', methods=['GET'], view_func=self.controller.list_proposal_invites)
+        self.add_url_rule('/proposals/<int:proposal_id>',         methods=['GET'], view_func=self.controller.get_proposal)
+
+class JudgeBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(JudgeBlueprint, self).__init__('judges', __name__, url_prefix='/judges')
+        self.controller = JudgeController()
+        self.add_url_rule('/<string:hash_code>',       methods=['GET'], view_func=self.controller.get_by_hash)
+        self.add_url_rule('/<string:hash_code>/match', methods=['GET'], view_func=self.controller.match_for_judge)
+
+class MatchBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(MatchBlueprint, self).__init__('matches', __name__, url_prefix='/matches')
+        self.controller = MatchController()
+        self.add_url_rule('/<int:match_id>/vote', methods=['POST'], view_func=self.controller.vote_on_match)
+
 blueprints = [
     ProposalBlueprint(),
     ProposalInviteBluePrint(),
@@ -133,4 +162,7 @@ blueprints = [
     CaravanBlueprint(),
     CaravanInviteBluePrint(),
     CorporateBlueprint()
+    AdminBlueprint(),
+    JudgeBlueprint(),
+    MatchBlueprint(),
 ]

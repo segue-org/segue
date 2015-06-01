@@ -25,7 +25,7 @@ def jsoned(f):
         if isinstance(result, tuple):
             result, status = result
         if isinstance(result, list):
-            return flask.jsonify(dict(items=result)), status
+            return flask.jsonify(dict(count=len(result),items=result)), status
         elif isinstance(result, dict):
             return flask.jsonify(dict(**result)), status
         elif hasattr(result, 'to_json'):
@@ -45,7 +45,13 @@ class JSONEncoder(flask.json.JSONEncoder):
             return obj.isoformat()
         if isinstance(obj, JsonSerializable):
             return obj.serialize()
+        if isinstance(obj, SimpleJson):
+            return obj.to_json()
         return super(JSONEncoder, self).default(obj)
+
+class SimpleJson(object):
+    def to_json(self, **kw):
+        return self.__dict__
 
 class JsonSerializable(object):
     _serializers = [ ]

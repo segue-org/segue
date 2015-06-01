@@ -1,6 +1,7 @@
 import yaml
 import os.path
 import glob
+import codecs
 
 from segue.core import mailer, config
 from flask_mail import Message
@@ -32,7 +33,7 @@ class MessageFactory(object):
         self._templates = {}
         for template_path in glob.glob(pattern):
             template_name = template_path.replace(base, '').replace('.yml','')[1:]
-            self._templates[template_name] = yaml.load(open(template_path))
+            self._templates[template_name] = yaml.load(codecs.open(template_path))
 
     def from_template(self, template_name):
         return TemplatedMessage(self._templates[template_name])
@@ -70,5 +71,12 @@ class MailerService(object):
         message = self.message_factory.from_template('account/reset_password')
         message.given(account=account,reset=reset)
         message.to(account.name, account.email)
+
+        return mailer.send(message.build())
+
+    def invite_judge(self, token):
+        message = self.message_factory.from_template('judge/invite')
+        message.given(token=token)
+        message.to('', token.email)
 
         return mailer.send(message.build())

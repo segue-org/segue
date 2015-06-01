@@ -1,37 +1,19 @@
 from datetime import datetime
 import random
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 from ..core import db, config
 from ..errors import NotAuthorized, DeadlineReached
 from ..mailer import MailerService
 from ..hasher import Hasher
+from ..filters import FilterStrategies
+
+from ..account import AccountService
 
 import schema
 from factories import ProposalFactory, InviteFactory
 from models    import Proposal, ProposalInvite, Track
-from ..account import AccountService, Account
-
-class ProposalFilterStrategies(object):
-    def given(self, as_user=None, **criteria):
-        result = []
-        for key, value in criteria.items():
-            method = getattr(self, "by_"+key)
-            result.append(method(value, as_user=as_user))
-        if not result:
-            result.append(self.enforce_user(as_user))
-        return result
-
-    def enforce_user(self, user):
-        return Proposal.owner == user
-
-    def by_owner_id(self, value, as_user=None):
-        value = as_user.id if as_user else value
-        return Proposal.owner_id == value
-
-    def by_coauthor_id(self, value, as_user=None):
-        value = as_user.id if as_user else value
-        return Proposal.invites.any(and_(ProposalInvite.recipient == Account.email, Account.id == value))
+from filters import ProposalFilterStrategies
 
 class CallForPapersDeadline(object):
     def __init__(self, override_config=None):
@@ -67,7 +49,11 @@ class ProposalService(object):
 
     def query(self, **kw):
         filter_list = self.filter_strategies.given(**kw)
+        return Proposal.query.filter(*filter_list).all()
 
+    def lookup(self, as_user=None, **kw):
+        needle = kw.pop('q',None)
+        filter_list = self.filter_strategies.needle(needle, as_user, **kw)
         return Proposal.query.filter(*filter_list).all()
 
     def modify(self, proposal_id, data, by=None):
@@ -103,7 +89,7 @@ class InviteService(object):
     def list(self, proposal_id, by=None):
         proposal = self.proposals.get_one(proposal_id)
         if not self.proposals.check_ownership(proposal, by): raise NotAuthorized
-        return proposal.invites
+        return proposal.invites[:]
 
     def get_one(self, invite_id):
         return ProposalInvite.query.get(invite_id)

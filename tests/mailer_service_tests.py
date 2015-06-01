@@ -71,3 +71,17 @@ class MailerServiceTestCases(SegueApiTestCase):
 
         the_url = 'http://192.168.33.91:9001/api/accounts/{}/reset/{}'.format(reset.account.id, reset.hash)
         self.assertIn(the_url, outbox[0].body)
+
+    @record_messages
+    def test_invite_judge(self, outbox):
+        judge = self.create_from_factory(ValidJudgeFactory)
+        self.service.invite_judge(judge)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+
+        self.assertIn(judge.email, outbox[0].recipients[0])
+
+        the_url = 'http://192.168.33.91:9001/api/judges/{}'.format(judge.hash)
+        self.assertIn(the_url, outbox[0].body)
+

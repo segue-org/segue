@@ -14,6 +14,7 @@ from pycorreios import Correios
 from segue.models import *
 from segue.core import db
 from segue.hasher import Hasher
+from support import *;
 
 c = Correios()
 ds = tablib.Dataset()
@@ -136,13 +137,13 @@ def guess_state(buyer):
             states_cache[buyer.address_zipcode] = result['uf']
             return result['uf']
         else:
-            found = City.query.filter_by(name = stripe_accents(buyer.address_city.upper())).all()
+            found = City.query.filter_by(name = strip_accents(buyer.address_city.upper())).all()
             if len(found):
                 return found[0].state
             else:
                 return ""
 
-def stripe_accents(item):
+def strip_accents(item):
     return unidecode(item)
 
 def get_category(name):

@@ -1,16 +1,19 @@
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 
 from ..core import db
 from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 from ..hasher import Hasher
 
 from segue.mailer import MailerService
+from ..filters import FilterStrategies
 
 from jwt import Signer
 
 from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
+from filters import AccountFilterStrategies
 import schema
 
 class AccountService(object):
@@ -19,6 +22,7 @@ class AccountService(object):
         self.mailer = mailer or MailerService()
         self.signer = signer or Signer()
         self.hasher = hasher or Hasher()
+        self.filters = AccountFilterStrategies()
 
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
@@ -40,6 +44,10 @@ class AccountService(object):
         db.session.add(account)
         db.session.commit()
         return account
+
+    def lookup(self, needle, by=None):
+        filters = self.filters.needle(needle, by)
+        return Account.query.filter(or_(*filters)).all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)
@@ -92,4 +100,3 @@ class AccountService(object):
         db.session.commit()
 
         return reset
-

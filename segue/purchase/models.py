@@ -35,8 +35,8 @@ class Buyer(JsonSerializable, db.Model):
         return u"{street} {number} {extra} - {city} {country}".format(**self.address_fields)
 
 class Purchase(JsonSerializable, db.Model):
-
     _serializers = [ PurchaseJsonSerializer, ShortPurchaseJsonSerializer ]
+
     id             = db.Column(db.Integer, primary_key=True)
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     customer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -112,7 +112,8 @@ class Payment(JsonSerializable, db.Model):
     def recalculate_status(self):
         self.status = self.most_recent_transition.new_status
 
-class Transition(db.Model):
+class Transition(JsonSerializable, db.Model):
+    _serializers   = [ TransitionJsonSerializer ]
     id             = db.Column(db.Integer, primary_key=True)
     type           = db.Column(db.String(20))
     payment_id     = db.Column(db.Integer, db.ForeignKey('payment.id'))

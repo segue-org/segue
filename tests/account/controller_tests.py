@@ -155,5 +155,3 @@ class AccountControllerTestCases(SegueApiTestCase):
         content = json.loads(response.data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(content['email'], reset.account.email)
-
-

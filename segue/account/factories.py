@@ -33,4 +33,3 @@ class ResetPasswordFactory(Factory):
         reset.account = account
         reset.hash    = hash_code
         return reset
-

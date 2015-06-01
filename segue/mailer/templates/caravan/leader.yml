@@ -1,0 +1,25 @@
+---
+
+template: leader_exempt
+language: pt
+subject: ""
+
+body: |
+
+    Olá {leader.name}!
+
+    Informamos que sua caravana {caravan.name} cumpriu os
+    requisitos básicos para que você receba uma inscrição
+    cortesia para o FISL16.
+
+    Para fazer uso dessa cortesia, no dia do evento, informe
+    os dados abaixo no balcão de inscritos:
+
+    * número de inscrição: {purchase.id}
+    * nome da caravana: {caravan.name}
+    * cidade: {caravan.city}
+
+    Atenciosamente,
+
+    --
+    Associação Software Livre.Org
