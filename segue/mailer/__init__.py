@@ -74,3 +74,9 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def invite_judge(self, token):
+        message = self.message_factory.from_template('judge/invite')
+        message.given(token=token)
+        message.to('', token.email)
+
+        return mailer.send(message.build())

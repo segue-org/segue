@@ -12,6 +12,12 @@ class TournamentService(object):
         self.classical = classical or ClassicalRoundGenerator()
         self.standings = standings or StandingsCalculator()
 
+    def create_tournament(self, selection="*"):
+        tournament = Tournament(selection=selection)
+        db.session.add(tournament)
+        db.session.commit()
+        return tournament
+
     def generate_round(self, tournament_id):
         tournament = Tournament.query.get(tournament_id)
         players = self.standings.calculate(tournament.proposals, tournament.matches)
