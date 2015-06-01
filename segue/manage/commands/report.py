@@ -114,7 +114,10 @@ def get_transition_date(payment):
     if payment.type == 'pagseguro':
         return get_date_pagseguro(transition)
     elif payment.type == 'boleto':
-        return transition.payment_date
+        if hasattr(transition, 'payment_date'):
+            return transition.payment_date
+        else:
+            return transition.created
     else:
         return transition.created
 
