@@ -29,6 +29,7 @@ class JudgeTestCases(SegueApiTestCase):
         j2 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="DEF", votes=5)
         j3 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="GHI", votes=5)
         j4 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="JKL", votes=5)
+        j5 = self.create_from_factory(ValidJudgeFactory, tournament=t0, hash="MNO", votes=2)
 
         ctx.update(locals())
         return Context(ctx)
@@ -91,6 +92,19 @@ class JudgeServiceTestCases(JudgeTestCases):
 
         with self.assertRaises(RoundIsOver):
             self.service.get_next_match_for('ABC')
+
+    def test_votes_are_spent(self):
+        ctx = self.setUpProposals()
+        ctx = self.setUpExistingRoundWithPendingMatches(ctx)
+
+        m1 = self.service.get_next_match_for('MNO')
+        self.service.judge_match(m1.id, 'MNO', 'tie')
+
+        m2 = self.service.get_next_match_for('MNO')
+        self.service.judge_match(m2.id, 'MNO', 'tie')
+
+        with self.assertRaises(JudgeHasNoVotesLeft):
+            self.service.get_next_match_for('MNO')
 
 class TournamentServiceTestCases(JudgeTestCases):
     def setUp(self):

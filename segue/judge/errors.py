@@ -39,3 +39,8 @@ class RoundIsOver(SegueError):
     code = 400
     def to_json(self):
         return { 'message': 'This round is over. Please wait while new matches are generated' }
+
+class JudgeHasNoVotesLeft(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'This token has spent all its votes and cannot vote anymore.' }

@@ -69,6 +69,8 @@ class JudgeService(object):
 
     def get_next_match_for(self, hash_code):
         judge = self.get_by_hash(hash_code)
+        if judge.remaining <= 0: raise JudgeHasNoVotesLeft()
+
         match = judge.tournament.matches.filter(Match.judge == judge, Match.result == None).first()
         if match: return match
 
@@ -80,13 +82,13 @@ class JudgeService(object):
         db.session.commit()
         return match
 
-    def judge_match(self, match_id, hash_code, result):
+    def judge_match(self, match_id, hash_code, vote):
         match = Match.query.get(match_id)
         if match.result != None:
             raise MatchAlreadyJudged()
         elif match.judge.hash != hash_code:
             raise MatchAssignedToOtherJudge()
-        match.result = result
+        match.result = vote
 
         db.session.add(match)
         db.session.commit()
