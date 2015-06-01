@@ -4,12 +4,10 @@ import itertools as it
 from segue.models import *
 from segue.core import db
 
-
-from colorama import init, Fore as F, Back as B
-init()
-LINE = "\n"
+from support import *;
 
 def clean_bad_buyers(start, end):
+    init_command()
     sys.stdout = codecs.open('/dev/stdout','w','utf-8')
     start = int(start)
     end   = int(end)

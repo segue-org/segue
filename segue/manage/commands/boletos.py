@@ -3,17 +3,15 @@
 import codecs
 import sys
 
-sys.stdout = codecs.open("/dev/stdout", "w", "utf-8")
 
 from segue.purchase import PaymentService
 from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.parsers  import BoletoFileParser
 
-from colorama import init, Fore as F, Back as B
-init()
-LINE = "\n"
+from support import *;
 
 def process_boletos(filename):
+    init_command()
     content = open(filename, 'r').read()
 
     boleto_service = BoletoPaymentService()

@@ -8,15 +8,16 @@ from unidecode import unidecode
 from pycorreios import Correios
 from segue.models import *
 from segue.core import db
-from colorama import init, Fore as F, Back as B
-#init()
-LINE = "\n"
+
+from support import *;
+
 c = Correios()
 
 def buyers_report(out_file = "buyers_report"):
+    init_command()
     sys.stdout = codecs.open('./' + out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%s")) + ".csv",'w','utf-8')
     print u'"CODIGO DA INSCRICAO";"EMAIL";"NOME";"TELEFONE";"DOCUMENTO";"ENDERECO";"NUMERO";"COMPLEMENTO";"CIDADE";"CEP";"ESTADO";"TIPO DE INSCRICAO";"FORMA DE PAGAMENTO";"VALOR";"DATA DA COMPRA"'
-    
+
     for account in Account.query.all():
         purchases = account.purchases
         buyers      = [ p.buyer for p in purchases ]
@@ -45,7 +46,7 @@ def guess_state(city_name, address_zipcode=None):
             return found[0].state
         else:
             return ""
-  
+
 def stripe_accents(item):
     return unidecode(item)
 
