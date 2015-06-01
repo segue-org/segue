@@ -18,6 +18,6 @@ __all__ = [
     'BoletoPayment',
     'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanLeaderPurchase', 'CaravanRiderPurchase',
     'Corporate', 'CorporateAccount', 'CorporateProduct', 'CorporatePurchase',
-    'City', 'Country'
+    'City', 'Country',
     'Judge', 'Match', 'Tournament'
 ]
