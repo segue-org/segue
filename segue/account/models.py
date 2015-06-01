@@ -51,7 +51,7 @@ class Account(JsonSerializable, db.Model):
 
     resets        = db.relationship("ResetPassword", backref="account")
 
-    __mapper_args__ = { 'polymorphic_on': role, 'polymorphic_identity': 'user' }
+    __mapper_args__ = { 'polymorphic_on': role }
 
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
@@ -84,6 +84,9 @@ class ResetPassword(JsonSerializable, db.Model):
     spent        = db.Column(db.Boolean, default=False)
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+class AdminAccount(Account):
+    __mapper_args__ = { 'polymorphic_identity': 'admin' }
 
 class Country(db.Model):
     id = db.Column(db.Integer, primary_key=True)
