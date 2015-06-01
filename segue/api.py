@@ -161,7 +161,7 @@ blueprints = [
     SessionBlueprint(),
     CaravanBlueprint(),
     CaravanInviteBluePrint(),
-    CorporateBlueprint()
+    CorporateBlueprint(),
     AdminBlueprint(),
     JudgeBlueprint(),
     MatchBlueprint(),
