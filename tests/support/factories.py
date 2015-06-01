@@ -7,7 +7,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
 from segue.models import Account, ResetPassword
-from segue.models import Proposal, ProposalInvite, Track
+from segue.models import ProposalTag, Proposal, ProposalInvite, Track
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
@@ -102,6 +102,11 @@ class InvalidProposalFactory(ValidProposalFactory):
     full        = "d"
     language    = "xunga"
     level       = "professional"
+
+class ValidProposalTagFactory(SegueFactory):
+    class Meta:
+        model = ProposalTag
+    name = _Sequence('proposal tag #{0}')
 
 class ValidInviteFactory(SegueFactory):
     class Meta:

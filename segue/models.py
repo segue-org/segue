@@ -1,5 +1,5 @@
 from account.models  import Account, ResetPassword
-from proposal.models import Proposal, ProposalInvite, Track
+from proposal.models import ProposalTag, Proposal, ProposalInvite, Track
 from product.models  import Product, StudentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
@@ -10,7 +10,7 @@ from judge.models import Judge, Match, Tournament
 
 __all__ = [
     'Account', 'ResetPassword',
-    'Proposal', 'ProposalInvite', 'Track',
+    'ProposalTag', 'Proposal', 'ProposalInvite', 'Track',
     'Product', 'StudentProduct',
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',

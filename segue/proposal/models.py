@@ -1,13 +1,18 @@
 import datetime
 
 from sqlalchemy.sql import functions as func
-from sqlalchemy_utils import ScalarListType
+from sqlalchemy.dialects import postgresql
 
 from ..json import JsonSerializable
 from ..core import db
 from .serializers import *
 
 import schema
+
+class ProposalTag(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.Text)
+    proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
 
 class Proposal(JsonSerializable, db.Model):
     _serializers = [ ProposalJsonSerializer, ShortChildProposalJsonSerializer ]
@@ -22,7 +27,8 @@ class Proposal(JsonSerializable, db.Model):
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     invites      = db.relationship("ProposalInvite", backref="proposal", lazy='dynamic')
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
-    tags         = db.Column(ScalarListType)
+
+    tags = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
 
     as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
     as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
