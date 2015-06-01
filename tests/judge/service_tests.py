@@ -143,6 +143,9 @@ class TournamentServiceTestCases(JudgeTestCases):
         self.assertEquals(new_matches[1].tournament, ctx.t0)
         self.assertEquals(new_matches[2].tournament, ctx.t0)
 
+        retrieved = self.service.get_one(ctx.t0.id)
+        self.assertEquals(retrieved.current_round, 1)
+
     def test_uses_classical_round_generator_on_other_rounds(self):
         ctx = self.setUpProposals()
 
@@ -163,5 +166,8 @@ class TournamentServiceTestCases(JudgeTestCases):
         self.assertEquals(new_matches[0].tournament, ctx.t1)
         self.assertEquals(new_matches[1].tournament, ctx.t1)
         self.assertEquals(new_matches[2].tournament, ctx.t1)
+
+        retrieved = self.service.get_one(ctx.t1.id)
+        self.assertEquals(retrieved.current_round, 2)
 
 

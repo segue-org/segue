@@ -1,5 +1,6 @@
 from .service_tests import JudgeTestCases
 
+from ..support.factories import *
 from segue.judge.errors import *
 from segue.judge.swiss import TrivialRoundGenerator, ClassicalRoundGenerator, StandingsCalculator, Player
 
@@ -24,6 +25,19 @@ class TrivialRoundGeneratorTestCases(JudgeTestCases):
         self.assertEquals(result[1].player2, ctx.p4)
         self.assertEquals(result[2].player1, ctx.p5)
         self.assertEquals(result[2].player2, ctx.p6)
+
+    def test_pairs_odd_player_as_a_bye(self):
+        ctx = self.setUpProposals()
+        p7 = self.create_from_factory(ValidProposalFactory, id=7, title='bye bye')
+        ordered_players  = [ Player(p,0) for p in [ctx.p1,ctx.p2,ctx.p3,ctx.p4,ctx.p5,ctx.p6,p7]]
+        past_matches = []
+
+        result = self.generator.generate(ordered_players, past_matches, round=1)
+
+        self.assertEquals(len(result), 4)
+        self.assertEquals(result[3].player1, p7)
+        self.assertEquals(result[3].player2, None)
+        self.assertEquals(result[3].result, 'player1')
 
 class ClassicalRoundGeneratorTestCases(JudgeTestCases):
     def setUp(self):
@@ -55,6 +69,18 @@ class ClassicalRoundGeneratorTestCases(JudgeTestCases):
         self.assertEquals(result[2].player1, ctx.p4)
         self.assertEquals(result[2].player2, ctx.p5)
 
+    def test_pairs_odd_player_as_a_bye(self):
+        ctx = self.setUpProposals()
+        p7 = self.create_from_factory(ValidProposalFactory, id=7, title='bye bye')
+        ordered_players  = [ Player(p,0) for p in [ctx.p1,ctx.p2,ctx.p3,ctx.p4,ctx.p5,ctx.p6,p7]]
+        past_matches = []
+
+        result = self.generator.generate(ordered_players, past_matches, round=1)
+
+        self.assertEquals(len(result), 4)
+        self.assertEquals(result[3].player1, p7)
+        self.assertEquals(result[3].player2, None)
+        self.assertEquals(result[3].result, 'player1')
 
 class StandingsCalculatorTestCases(JudgeTestCases):
     def setUp(self):

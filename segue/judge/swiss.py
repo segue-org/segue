@@ -10,24 +10,28 @@ class TrivialRoundGenerator(object):
                 raise RoundHasPendingMatches()
 
         for i in range(0, len(players), 2):
-            match = Match(player1 = players[i].proposal, player2 = players[i+1].proposal, round=round)
+            if i + 1 == len(players): # BYE case
+                match = Match(player1 = players[i].proposal, round=round, result='player1')
+            else:
+                match = Match(player1 = players[i].proposal, player2 = players[i+1].proposal, round=round)
             matches.append(match)
 
         return matches
 
 class ClassicalRoundGenerator(object):
     def _index_past(self, players, past_matches):
-        result = {}
+        result = { None: {} }
         for p1 in players:
             result[p1.id] = {}
+            result[p1.id][None] = False
             for p2 in players:
                 result[p1.id][p2.id] = False
 
         for match in past_matches:
             if match.result == None:
                 raise RoundHasPendingMatches()
-            result[match.player1.id][match.player2.id] = True
-            result[match.player2.id][match.player1.id] = True
+            result[match.player1_id][match.player2_id] = True
+            result[match.player2_id][match.player1_id] = True
 
         return result
 
@@ -47,6 +51,13 @@ class ClassicalRoundGenerator(object):
             other_idx = idx
             while True:
                 other_idx += 1
+                if other_idx == len(players): # BYE case
+                    print "-- has no one else to pair with, so it gets a freebie"
+                    match = Match(player1 = player.proposal, round=round, result='player1')
+                    matches.append(match)
+                    matched_players.add(player)
+                    break;
+
                 other_player = players[other_idx]
                 print "-- trying to pair {} with {}...".format(player.id, other_player.id)
                 if other_player in matched_players:
@@ -78,11 +89,21 @@ class Player(object):
 
 class StandingsCalculator(object):
    def calculate(self, unordered_proposals, past_matches):
-        players = []
+        print 'started pointing...'
+        players = {}
+
         for proposal in unordered_proposals:
-            points = sum([ match.points_for(proposal) for match in past_matches ])
-            players.append(Player(proposal, points))
+            players[proposal.id] = Player(proposal, 0)
+
+        for match in past_matches:
+            players[match.player1.id].points += match.points_for(match.player1)
+            if match.player2:
+                players[match.player2.id].points += match.points_for(match.player2)
+        players = players.values()
+
+        print 'started sorting'
         players.sort(reverse=True)
+        print 'done sorting'
         return players
 
 

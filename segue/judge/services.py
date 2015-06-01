@@ -31,6 +31,8 @@ class TournamentService(object):
         for match in new_matches:
             match.tournament = tournament
             db.session.add(match)
+        tournament.current_round += 1
+        db.session.add(tournament)
         db.session.commit()
 
         return new_matches
