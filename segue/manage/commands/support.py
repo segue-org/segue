@@ -7,5 +7,10 @@ B = colorama.Back
 LINE = "\n"
 
 def init_command():
-    sys.stdout = codecs.open("/dev/stdout", "w", "utf-8")
+    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+    sys.stderr = codecs.getwriter('utf8')(sys.stderr)
     colorama.init()
+    return sys.stdout
+
+def u(value):
+    return value.encode("utf-8")
