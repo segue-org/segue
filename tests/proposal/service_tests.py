@@ -140,6 +140,23 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.assertEquals(len(result), 1)
         self.assertEquals(result[0].id, proposal1.id)
 
+    def test_tag_proposal(self):
+        created = self.create_from_factory(ValidProposalFactory)
+        self.assertEquals(created.tagged_as('le-tag'), False)
+
+        self.service.tag_proposal(created.id, "le-tag")
+        retrieved = self.service.get_one(created.id)
+
+        self.assertEquals(retrieved.tag_names, ["le-tag"])
+        self.assertEquals(retrieved.tagged_as('le-tag'), True)
+
+        self.service.tag_proposal(created.id, "autre-tag")
+        self.assertEquals(retrieved.tag_names, ["le-tag", "autre-tag"])
+        self.assertEquals(retrieved.tagged_as('autre-tag'), True)
+
+        self.service.tag_proposal(created.id, "autre-tag")
+        self.assertEquals(retrieved.tag_names, ["le-tag", "autre-tag"])
+
 class InviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteServiceTestCases, self).setUp()

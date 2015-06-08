@@ -12,7 +12,7 @@ from ..account import AccountService
 
 import schema
 from factories import ProposalFactory, InviteFactory
-from models    import Proposal, ProposalInvite, Track
+from models    import ProposalTag, Proposal, ProposalInvite, Track
 from filters import ProposalFilterStrategies
 
 class CallForPapersDeadline(object):
@@ -65,6 +65,15 @@ class ProposalService(object):
         for name, value in ProposalFactory.clean_for_update(data).items():
             setattr(proposal, name, value)
         db.session.add(proposal)
+        db.session.commit()
+        return proposal
+
+    def tag_proposal(self, proposal_id, tag_name):
+        proposal = self.get_one(proposal_id)
+        if proposal.tagged_as(tag_name): return proposal
+
+        tag = ProposalTag(name=tag_name, proposal=proposal)
+        db.session.add(tag)
         db.session.commit()
         return proposal
 

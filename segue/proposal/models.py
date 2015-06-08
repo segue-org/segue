@@ -37,6 +37,13 @@ class Proposal(JsonSerializable, db.Model):
     def coauthors(self):
         return self.invites.filter(ProposalInvite.status == 'accepted')
 
+    @property
+    def tag_names(self):
+        return [ tag.name for tag in self.tags.all() ]
+
+    def tagged_as(self, tag_name):
+        return tag_name in self.tag_names
+
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
 
