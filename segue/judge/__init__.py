@@ -1,17 +1,27 @@
+import flask
 from flask import request
 
-from segue.json import jsoned
+from segue.core import config
+from segue.json import jsoned, accepts_html
+
 from services import JudgeService
 from responses import *
+
 
 class JudgeController(object):
     def __init__(self, service=None):
         self.service = service or JudgeService()
 
     @jsoned
-    def get_by_hash(self, hash_code):
-        result = self.service.get_by_hash(hash_code)
-        return JudgeResponse.create(result), 200
+    @accepts_html
+    def get_by_hash(self, hash_code, wants_html=False):
+        token = self.service.get_by_hash(hash_code) or flask.abort(404)
+
+        if wants_html:
+            path = '/#/judge/{}'.format(hash_code)
+            return flask.redirect(config.FRONTEND_URL + path)
+        else:
+            return JudgeResponse.create(token), 200
 
     @jsoned
     def match_for_judge(self, hash_code):
