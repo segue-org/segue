@@ -24,6 +24,14 @@ def invite_judges(filename, count=5, tid=0):
         except JudgeAlreadyExists, e:
             print F.RED + "already exists!" + F.RESET
 
+def generate_round(tid=0):
+    init_command()
+
+    service = TournamentService()
+    print "generating round for tournament {}{}{}...".format(F.GREEN, tid, F.RESET)
+    service.generate_round(tid)
+    print "OK"
+
 def create_tournament(selection="*"):
     init_command()
 
