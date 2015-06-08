@@ -9,6 +9,19 @@ class ProposalInviteResponse(BaseResponse):
         self.email      = invite.recipient
         self.status     = invite.status
 
+class TournamentShortResponse(BaseResponse):
+    def __init__(self, tournament, links=False):
+        super(TournamentShortResponse, self).__init__()
+        self.id        = tournament.id
+        self.selection = tournament.selection
+        self.status    = tournament.status
+        self.round     = tournament.current_round
+
+class TournamentDetailResponse(TournamentShortResponse):
+    def __init__(self, tournament, links=False):
+        super(TournamentDetailResponse, self).__init__(tournament)
+        self.rounds = [ tournament.status_of_round(i) for i in range(1, tournament.current_round+1) ]
+
 class AccountShortResponse(BaseResponse):
     def __init__(self, account, links=False):
         super(AccountShortResponse, self).__init__()

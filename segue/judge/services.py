@@ -42,6 +42,9 @@ class TournamentService(object):
         if not tournament: raise NoSuchTournament()
         return tournament
 
+    def all(self):
+        return Tournament.query.all()
+
 class JudgeService(object):
     def __init__(self, db_impl=None, hasher=None, tournaments=None):
         self.db          = db_impl or db

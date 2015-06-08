@@ -10,6 +10,7 @@ from ..json import jsoned, SimpleJson
 from segue.account import AccountService
 from segue.proposal import ProposalService
 from segue.purchase import PurchaseService, PaymentService
+from segue.judge.services import TournamentService
 
 from responses import *
 
@@ -24,11 +25,12 @@ def admin_only(fn):
 
 
 class AdminController(object):
-    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None):
+    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None, tournaments=None):
         self.accounts = accounts or AccountService()
         self.proposals = proposals or ProposalService()
         self.purchases = purchases or PurchaseService()
         self.payments = payments or PaymentService()
+        self.tournaments = tournaments or TournamentService()
         self.current_user = current_user
 
     @jwt_required()
@@ -89,3 +91,17 @@ class AdminController(object):
         parms = request.args.to_dict()
         result = self.payments.query(as_user=self.current_user, **parms)
         return PaymentDetailResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def list_tournaments(self):
+        result = self.tournaments.all()
+        return TournamentShortResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def get_tournament(self, tournament_id):
+        result = self.tournaments.get_one(tournament_id)
+        return TournamentDetailResponse.create(result), 200

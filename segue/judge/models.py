@@ -66,5 +66,11 @@ class Tournament(db.Model):
             proposals = proposals.filter(Proposal.tags.any(ProposalTag.name == self.selection))
         return proposals.all()
 
+    def status_of_round(self, round_number):
+        matches = self.matches.filter(Match.round == round_number)
 
-
+        return dict(
+            judged      = matches.filter(Match.result.isnot(None)).count(),
+            in_progress = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None)).count(),
+            pending     = matches.filter(Match.result.is_(None), Match.judge_id.is_(None)).count(),
+        )
