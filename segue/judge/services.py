@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from segue.core import db
 from segue.hasher import Hasher
 
@@ -74,16 +75,26 @@ class JudgeService(object):
         judge = self.get_by_hash(hash_code)
         if judge.remaining <= 0: raise JudgeHasNoVotesLeft()
 
-        match = judge.tournament.matches.filter(Match.judge == judge, Match.result == None).first()
-        if match: return match
+        matches = judge.tournament.matches
+        expired_max_time = datetime.now() - timedelta(minutes=15)
 
-        match = judge.tournament.matches.filter(Match.judge == None, Match.result == None).first()
-        if not match: raise RoundIsOver()
+        was_assigned_to_me       = matches.filter(Match.judge == judge, Match.result == None).first()
+        non_assigned_match       = matches.filter(Match.judge == None, Match.result == None).first()
+        stale_but_assigned_match = matches.filter(Match.judge != None, Match.last_updated < expired_max_time).first()
 
-        match.judge = judge
-        db.session.add(match)
+        if was_assigned_to_me:
+            selected_match = was_assigned_to_me
+        elif non_assigned_match:
+            selected_match = non_assigned_match
+        elif stale_but_assigned_match:
+            selected_match = stale_but_assigned_match
+        else:
+            raise RoundIsOver()
+
+        selected_match.judge = judge
+        db.session.add(selected_match)
         db.session.commit()
-        return match
+        return selected_match
 
     def judge_match(self, match_id, hash_code, vote):
         match = Match.query.get(match_id)

@@ -48,6 +48,12 @@ class JudgeTestCases(SegueApiTestCase):
         ctx.update(locals())
         return Context(ctx)
 
+    def _create_match(self, **kw):
+        return self.create_from_factory(ValidMatchFactory, **kw)
+
+    def _ago(self, **kw):
+        return datetime.now() - timedelta(**kw)
+
 class JudgeServiceTestCases(JudgeTestCases):
     def setUp(self):
         super(JudgeServiceTestCases, self).setUp()
@@ -71,6 +77,18 @@ class JudgeServiceTestCases(JudgeTestCases):
 
         with self.assertRaises(JudgeAlreadyExists):
             self.service.create_token("fulano@example.com", 5, ctx.t0.id)
+
+    def test_matches_expire_after_15_minutes(self):
+        ctx = self.setUpProposals()
+
+        match1 = self._create_match(judge=ctx.j1, tournament=ctx.t0, last_updated=self._ago(minutes=5))
+        match2 = self._create_match(judge=ctx.j2, tournament=ctx.t0, last_updated=self._ago(minutes=16))
+
+        retrieved = self.service.get_next_match_for(ctx.j3.hash)
+
+        self.assertEquals(retrieved, match2)
+        self.assertEquals(match2.judge, ctx.j3)
+
 
     def test_multiple_judges(self):
         ctx = self.setUpProposals()
