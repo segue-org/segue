@@ -74,5 +74,5 @@ class Tournament(db.Model):
             judged      = matches.filter(Match.result.isnot(None)).count(),
             in_progress = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None)).count(),
             pending     = matches.filter(Match.result.is_(None), Match.judge_id.is_(None)).count(),
-            stale       = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None), Match.last_updated <= max_expired_time).count()
+            stale       = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None), Match.last_updated <= expired_max_time).count()
         )
