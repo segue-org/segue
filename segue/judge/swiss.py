@@ -78,14 +78,31 @@ class ClassicalRoundGenerator(object):
         return matches
 
 class Player(object):
-    def __init__(self, proposal, points):
-        self.points = points
+    def __init__(self, proposal, points, victories=0, ties=0, defeats=0):
+        self.initial_points = points
         self.id = proposal.id
         self.proposal = proposal
+        self.victories = victories
+        self.ties = ties
+        self.defeats = defeats
+
+    def add_result(self, result_kind):
+        if result_kind == 'victory': self.victories += 1
+        if result_kind == 'tie':     self.ties      += 1
+        if result_kind == 'defeat':  self.defeats   += 1
+        pass
+
+    @property
+    def points(self):
+        return self.initial_points + self.victories * 3 + self.ties
+
     def __cmp__(self, other):
-        if self.points == other.points:
+        if self.points != other.points:
+            return self.points.__cmp__(other.points)
+        elif self.victories != other.victories:
+            return self.victories.__cmp__(other.victories)
+        else:
             return -self.id.__cmp__(other.id)
-        return self.points.__cmp__(other.points)
 
 class StandingsCalculator(object):
    def calculate(self, unordered_proposals, past_matches):
@@ -96,9 +113,9 @@ class StandingsCalculator(object):
             players[proposal.id] = Player(proposal, 0)
 
         for match in past_matches:
-            players[match.player1.id].points += match.points_for(match.player1)
+            players[match.player1.id].add_result(match.result_for(match.player1))
             if match.player2:
-                players[match.player2.id].points += match.points_for(match.player2)
+                players[match.player2.id].add_result(match.result_for(match.player2))
         players = players.values()
 
         print 'started sorting'

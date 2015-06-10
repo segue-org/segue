@@ -36,17 +36,17 @@ class Match(db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
-    def points_for(self, proposal):
-        if not self.result: return 0
+    def result_for(self, proposal):
+        if not self.result: return None
         if proposal == self.player1:
-            if self.result == 'player1': return 3
-            if self.result == 'tie': return 1
-            return 0
+            if self.result == 'player1': return 'victory'
+            if self.result == 'tie':     return 'tie'
+            return 'defeat'
         elif proposal == self.player2:
-            if self.result == 'player2': return 3
-            if self.result == 'tie': return 1
-            return 0
-        return 0
+            if self.result == 'player2': return 'victory'
+            if self.result == 'tie':     return 'tie'
+            return 'defeat'
+        return None
 
 
 class Tournament(db.Model):
