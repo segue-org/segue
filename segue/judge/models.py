@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.sql import functions as func
 
 from ..core import db
@@ -67,10 +67,12 @@ class Tournament(db.Model):
         return proposals.all()
 
     def status_of_round(self, round_number):
+        expired_max_time = datetime.now() - timedelta(minutes=15)
         matches = self.matches.filter(Match.round == round_number)
 
         return dict(
             judged      = matches.filter(Match.result.isnot(None)).count(),
             in_progress = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None)).count(),
             pending     = matches.filter(Match.result.is_(None), Match.judge_id.is_(None)).count(),
+            stale       = matches.filter(Match.result.is_(None), Match.judge_id.isnot(None), Match.last_updated <= max_expired_time).count()
         )
