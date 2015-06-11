@@ -109,6 +109,7 @@ class AdminController(object):
     @jwt_required()
     @admin_only
     @jsoned
+    @cache.cached(timeout=60 * 60)
     def get_standings(self, tournament_id):
         result = self.tournaments.get_standings(tournament_id)
         return StandingsResponse.create(result), 200
