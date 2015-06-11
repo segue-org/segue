@@ -4,7 +4,7 @@ from flask import request, url_for, abort
 from flask.ext.jwt import current_user
 
 from ..errors import NotAuthorized
-from ..core import jwt_required, config, logger
+from ..core import jwt_required, config, logger, cache
 from ..json import jsoned, SimpleJson
 
 from segue.account import AccountService
@@ -105,3 +105,10 @@ class AdminController(object):
     def get_tournament(self, tournament_id):
         result = self.tournaments.get_one(tournament_id)
         return TournamentDetailResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def get_standings(self, tournament_id):
+        result = self.tournaments.get_standings(tournament_id)
+        return StandingsResponse.create(result), 200

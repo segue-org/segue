@@ -19,6 +19,10 @@ class TournamentService(object):
         db.session.commit()
         return tournament
 
+    def get_standings(self, tournament_id):
+        tournament = Tournament.query.get(tournament_id)
+        return self.standings.calculate(tournament.proposals, tournament.matches)
+
     def generate_round(self, tournament_id):
         tournament = Tournament.query.get(tournament_id)
         players = self.standings.calculate(tournament.proposals, tournament.matches)

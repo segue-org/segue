@@ -22,6 +22,20 @@ class TournamentDetailResponse(TournamentShortResponse):
         super(TournamentDetailResponse, self).__init__(tournament)
         self.rounds = [ tournament.status_of_round(i) for i in range(1, tournament.current_round+1) ]
 
+class StandingsResponse(BaseResponse):
+    def __init__(self, player, links=False):
+        super(StandingsResponse, self).__init__()
+        self.id        = player.proposal.id
+        self.title     = player.proposal.title
+        self.points    = player.points
+        self.victories = player.victories
+        self.ties      = player.ties
+        self.defeats   = player.defeats
+        self.author    = player.proposal.owner.name
+        if player.proposal.track:
+            self.zone      = player.proposal.track.name_pt.split(" - ")[0]
+            self.area      = player.proposal.track.name_pt.split(" - ")[1]
+
 class AccountShortResponse(BaseResponse):
     def __init__(self, account, links=False):
         super(AccountShortResponse, self).__init__()
