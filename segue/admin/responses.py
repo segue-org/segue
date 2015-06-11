@@ -32,6 +32,7 @@ class StandingsResponse(BaseResponse):
         self.ties      = player.ties
         self.defeats   = player.defeats
         self.author    = player.proposal.owner.name
+        self.position  = player.position
         if player.proposal.track:
             self.zone      = player.proposal.track.name_pt.split(" - ")[0]
             self.area      = player.proposal.track.name_pt.split(" - ")[1]

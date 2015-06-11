@@ -106,6 +106,7 @@ class StandingsCalculatorTestCases(JudgeTestCases):
 
         result = self.calculator.calculate(proposals, past_matches)
 
+        self.assertEquals([ p.position for p in result ], [ 1, 2, 3, 4, 5, 6 ])
         self.assertEquals(result[0].proposal, ctx.p1) # won 1, has lowest id
         self.assertEquals(result[1].proposal, ctx.p6) # won 1, higher id
         self.assertEquals(result[2].proposal, ctx.p3) # tied 1, lower id

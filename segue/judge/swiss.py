@@ -85,6 +85,7 @@ class Player(object):
         self.victories = victories
         self.ties = ties
         self.defeats = defeats
+        self.position = None
 
     def add_result(self, result_kind):
         if result_kind == 'victory': self.victories += 1
@@ -121,6 +122,10 @@ class StandingsCalculator(object):
         print 'started sorting'
         players.sort(reverse=True)
         print 'done sorting'
+
+        for idx, player in enumerate(players):
+            player.position = idx+1
+
         return players
 
 
