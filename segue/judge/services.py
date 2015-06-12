@@ -79,12 +79,12 @@ class JudgeService(object):
         judge = self.get_by_hash(hash_code)
         if judge.remaining <= 0: raise JudgeHasNoVotesLeft()
 
-        matches = judge.tournament.matches
+        pending_matches = judge.tournament.matches.filter(Match.result == None)
         expired_max_time = datetime.now() - timedelta(minutes=15)
 
-        was_assigned_to_me       = matches.filter(Match.judge == judge, Match.result == None).first()
-        non_assigned_match       = matches.filter(Match.judge == None, Match.result == None).first()
-        stale_but_assigned_match = matches.filter(Match.judge != None, Match.last_updated < expired_max_time).first()
+        was_assigned_to_me       = pending_matches.filter(Match.judge == judge).first()
+        non_assigned_match       = pending_matches.filter(Match.judge == None).first()
+        stale_but_assigned_match = pending_matches.filter(Match.judge != None, Match.last_updated < expired_max_time).first()
 
         if was_assigned_to_me:
             selected_match = was_assigned_to_me
