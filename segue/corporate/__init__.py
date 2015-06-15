@@ -51,6 +51,13 @@ class CorporateController(object):
         data = request.get_json()
         return self.employee_service.create(corporate_id, data, self.current_user), 201
 
+    @jwt_required()
+    @jsoned
+    def verify_person(self):
+        data = request.get_json()
+        result = self.service.verify_person(data['email']) or flask.abort(404)
+        return result, 200
+
     @jsoned
     def schema(self, name):
         return schema.whitelist[name], 200
