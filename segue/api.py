@@ -42,6 +42,7 @@ class AccountBlueprint(flask.Blueprint):
         self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:account_id>',     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:account_id>',     methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/is_registered',        methods=['GET'],  view_func=self.controller.is_registered)
 
         self.add_url_rule('/<int:account_id>/proposals', methods=['GET'], view_func=self.controller.list_proposals)
         self.add_url_rule('/<int:account_id>/purchases', methods=['GET'], view_func=self.controller.list_purchases)
@@ -120,7 +121,6 @@ class CorporateBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:corporate_id>',        methods=['PUT'],  view_func=self.controller.modify)
         self.add_url_rule('/<int:corporate_id>',        methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:corporate_id>/people', methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:corporate_id>/people', methods=['POST'], view_func=self.controller.add_people)
         self.add_url_rule('/<string:name>.schema',      methods=['GET'],  view_func=self.controller.schema)
 
 class AdminBlueprint(flask.Blueprint):
