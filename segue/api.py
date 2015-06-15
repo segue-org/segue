@@ -13,13 +13,14 @@ class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
         super(ProposalBlueprint, self).__init__('proposals', __name__, url_prefix='/proposals')
         self.controller = ProposalController()
-        self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
-        self.add_url_rule('',                      methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:proposal_id>',    methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:proposal_id>',    methods=['PUT'],  view_func=self.controller.modify)
-        self.add_url_rule('/<string:name>.schema', methods=['GET'],  view_func=self.controller.schema)
-        self.add_url_rule('/tracks',               methods=['GET'],  view_func=self.controller.list_tracks)
-        self.add_url_rule('/cfp-state',            methods=['GET'],  view_func=self.controller.cfp_state)
+        self.add_url_rule('',                       methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('',                       methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:proposal_id>',     methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:proposal_id>',     methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/<string:name>.schema',  methods=['GET'],  view_func=self.controller.schema)
+        self.add_url_rule('/tracks',                methods=['GET'],  view_func=self.controller.list_tracks)
+        self.add_url_rule('/tracks/<int:track_id>', methods=['GET'],  view_func=self.controller.get_track)
+        self.add_url_rule('/cfp-state',             methods=['GET'],  view_func=self.controller.cfp_state)
 
 class ProposalInviteBluePrint(flask.Blueprint):
     def __init__(self):
@@ -124,8 +125,7 @@ class AdminBlueprint(flask.Blueprint):
         self.add_url_rule('/tournaments/<int:tournament_id>',           methods=['GET'], view_func=self.controller.get_tournament)
         self.add_url_rule('/tournaments/<int:tournament_id>/standings', methods=['GET'], view_func=self.controller.get_standings)
 
-        self.add_url_rule('/tournaments/<int:tournament_id>/ranking',                methods=['GET'], view_func=self.controller.get_ranking)
-        self.add_url_rule('/tournaments/<int:tournament_id>/ranking/<int:track_id>', methods=['GET'], view_func=self.controller.get_ranking_by_track)
+        self.add_url_rule('/call/<int:tournament_id>/<int:track_id>', methods=['GET'], view_func=self.controller.get_ranking_by_track)
 
 class JudgeBlueprint(flask.Blueprint):
     def __init__(self):

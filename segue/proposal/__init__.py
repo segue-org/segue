@@ -52,6 +52,10 @@ class ProposalController(object):
     def cfp_state(self):
         return { 'state': self.service.cfp_state() }, 200
 
+    @jsoned
+    def get_track(self, track_id):
+        return self.service.get_track(track_id), 200
+
 
 class ProposalInviteController(object):
     def __init__(self, service=None):

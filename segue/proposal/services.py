@@ -84,6 +84,9 @@ class ProposalService(object):
     def list_tracks(self):
         return Track.query.all()
 
+    def get_track(self, track_id):
+        return Track.query.filter(Track.id == track_id).first()
+
     def by_coauthor(self, coauthor_id):
         return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
 

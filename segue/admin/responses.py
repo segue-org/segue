@@ -44,7 +44,7 @@ class RankingResponse(BaseResponse):
         self.title     = ranked.proposal.title
         self.author    = ranked.proposal.owner.name
         self.tags      = ranked.tag_names
-        self.position  = ranked.rank
+        self.ranking   = ranked.rank
         if ranked.proposal.track:
             self.zone      = ranked.proposal.track.name_pt.split(" - ")[0]
 

@@ -118,13 +118,6 @@ class AdminController(object):
     @jwt_required()
     @admin_only
     @jsoned
-    def get_ranking(self, tournament_id):
-        result = self.rankings.classificate(tournament_id)
-        return RankingResponse.create(result), 200
-
-    @jwt_required()
-    @admin_only
-    @jsoned
     def get_ranking_by_track(self, tournament_id, track_id):
         result = self.rankings.classificate(tournament_id, track_id=track_id)
         return RankingResponse.create(result), 200
