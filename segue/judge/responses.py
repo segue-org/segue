@@ -10,6 +10,8 @@ class JudgeResponse(BaseResponse):
         self.spent     = judge.spent
         self.remaining = judge.remaining
 
+        self.tournament_state = judge.tournament.status
+
 class AuthorResponse(BaseResponse):
     def __init__(self, account, links=False):
         super(AuthorResponse, self).__init__()
