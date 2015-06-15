@@ -42,7 +42,7 @@ class CorporateServiceTestCases(SegueApiTestCase):
         with self.assertRaises(NotAuthorized):
             self.service.get_by_owner(existing.owner.id, self.mock_owner)
 
-    def test_retrieves_coroporate_checking_ownership(self):
+    def test_retrieves_corporate_checking_ownership(self):
         existing = self.create_from_factory(ValidCorporateWithOwnerFactory)
 
         retrieved = self.service.get_one(existing.id, existing.owner)
