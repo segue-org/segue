@@ -2,6 +2,7 @@ from segue.core import db
 from segue.errors import AccountAlreadyHasCorporate, NotAuthorized
 from segue.hasher import Hasher
 from segue.mailer import MailerService
+from segue.models import Account
 
 import schema
 
@@ -50,8 +51,11 @@ class CorporateService(object):
         db.session.commit()
         return corporate
 
-    def add_people(self, corporate_id, people, buyer_data, by=None):
-        return self.employees.create(corporate_id, people, buyer_data, by=by)
+    def verify_person(self, email):
+        return Account.query.filter(Account.email == email).first()
+
+    def add_person(self, corporate_id, person_data, buyer_data, by=None):
+        return self.employees.add_person(corporate_id, person_data, buyer_data, by=by)
 
     def sum_employee_tickets(self, corporate_id, product_value, by):
         value = 0
@@ -69,15 +73,18 @@ class CorporateAccountService(object):
     def list(self, corporate_id, by=None):
         return self.corporates.get_one(corporate_id, by).employees
 
-    def create(self, corporate_id, data, buyer_data, by=None):
+    def get_one(self, account_id, by=None):
+        return CorporateAccount.query.get(account_id)
+
+    def add_person(self, corporate_id, person_data, buyer_data, by=None):
         corporate = self.corporates.get_one(corporate_id, by)
 
-        data['document'] = str(data['document']).translate(None, './-')
+        person_data['document'] = str(person_data['document']).translate(None, './-')
 
         account_data = {
-            'email': data['email'],
-            'name': data['name'],
-            'cpf': data['document'],
+            'email': person_data['email'],
+            'name': person_data['name'],
+            'document': person_data['document'],
             'country': buyer_data['address_country'],
             'city': buyer_data['address_city'],
             'phone': by.phone,
