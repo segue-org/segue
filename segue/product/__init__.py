@@ -11,7 +11,7 @@ from segue.errors import ProductExpired, InvalidCaravan
 from segue.purchase.services import PurchaseService
 from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct
-from segue.corporate.services import CorporateService
+from segue.corporate.services import CorporateService, CorporateAccountService
 from segue.corporate.models import CorporateProduct
 from segue.corporate.factories import EmployeePurchaseFactory
 
@@ -55,14 +55,17 @@ class ProductService(object):
 
         purchase = self.purchases.create(buyer_data, product, account, **extra_fields)
 
-        for people in buyer_data[u'employees']:
-            self.corporates.add_people(int(buyer_data[u'corporate_id']), people, buyer_data, account)
-            p = EmployeePurchaseFactory.create(self.corporates.get_one(purchase.corporate_id, account))
-            p.product = purchase.product
-            p.buyer = purchase.buyer
-            p.corporate_id = purchase.corporate_id
-            self.db.session.add(p)
-            self.db.session.commit()
+        for person in buyer_data[u'employees']:
+            account_person = self.corporates.add_person(int(buyer_data[u'corporate_id']), person, buyer_data, account)
+
+            if not account_person.has_valid_purchases:
+                p = EmployeePurchaseFactory.create(self.corporates.get_one(purchase.corporate_id, account), account_person)
+                p.product = purchase.product
+                p.buyer = purchase.buyer
+                p.corporate_id = purchase.corporate_id
+                self.db.session.add(corporate_person)
+                self.db.session.add(p)
+                self.db.session.commit()
 
         return purchase
 
