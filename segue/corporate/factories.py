@@ -29,9 +29,9 @@ class EmployeePurchaseFactory(Factory):
     model = EmployeePurchase
 
     @classmethod
-    def create(cls, corporate):
+    def create(cls, corporate, account):
         result = cls.model()
         result.corporate  = corporate
         result.status   = 'pending'
-        result.customer = corporate.owner
+        result.customer = account
         return result
