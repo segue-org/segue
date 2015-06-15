@@ -5,6 +5,7 @@ from segue.hasher import Hasher
 from models import Judge, Match, Tournament
 from errors import *
 from swiss import TrivialRoundGenerator, ClassicalRoundGenerator, StandingsCalculator
+from ..proposal import ProposalService
 
 class TournamentService(object):
     def __init__(self, db_impl=None, trivial=None, classical=None, standings=None):
@@ -49,6 +50,33 @@ class TournamentService(object):
 
     def all(self):
         return Tournament.query.all()
+
+class Ranked(object):
+    def __init__(self, proposal, idx_standings):
+        self.proposal = proposal
+        self.tag_names = proposal.tag_names
+        if proposal.id in idx_standings:
+            self.rank = idx_standings[proposal.id].position
+        elif "approved" in proposal.tag_names:
+            self.rank = 0
+        else:
+            self.rank = 1000
+    def __cmp__(self, other):
+        return self.rank.__cmp__(other.rank)
+
+class RankingService(object):
+    def __init__(self, tournaments=None, proposals=None):
+        self.tournaments = tournaments or TournamentService()
+        self.proposals   = proposals   or ProposalService()
+
+    def classificate(self, tournament_id, **filters):
+        standings = self.tournaments.get_standings(tournament_id)
+        proposals = self.proposals.query(**filters)
+
+        idx_standings = { player.id: player for player in standings }
+
+        unsorted = [ Ranked(proposal, idx_standings) for proposal in proposals ]
+        return sorted(unsorted)
 
 class JudgeService(object):
     def __init__(self, db_impl=None, hasher=None, tournaments=None):

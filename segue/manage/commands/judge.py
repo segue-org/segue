@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from segue.mailer import MailerService
-from segue.judge.services import JudgeService, TournamentService
+from segue.judge.services import JudgeService, TournamentService, RankingService
 from segue.judge.errors import JudgeAlreadyExists
 from segue.proposal.services import ProposalService
 from support import *;
@@ -31,6 +31,13 @@ def generate_round(tid=0):
     print "generating round for tournament {}{}{}...".format(F.GREEN, tid, F.RESET)
     service.generate_round(tid)
     print "OK"
+
+def freeze_judging(tid=0, aid=0):
+    init_command()
+    service = RankingService()
+    r = service.classificate(tid, track_id=aid)
+    for e in r:
+        print e.rank, e.proposal.id, e.tag_names
 
 def create_tournament(selection="*"):
     init_command()

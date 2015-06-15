@@ -10,7 +10,7 @@ from ..json import jsoned, SimpleJson
 from segue.account import AccountService
 from segue.proposal import ProposalService
 from segue.purchase import PurchaseService, PaymentService
-from segue.judge.services import TournamentService
+from segue.judge.services import TournamentService, RankingService
 
 from responses import *
 
@@ -25,12 +25,13 @@ def admin_only(fn):
 
 
 class AdminController(object):
-    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None, tournaments=None):
+    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None, tournaments=None, rankings=None):
         self.accounts = accounts or AccountService()
         self.proposals = proposals or ProposalService()
         self.purchases = purchases or PurchaseService()
         self.payments = payments or PaymentService()
         self.tournaments = tournaments or TournamentService()
+        self.rankings = rankings or RankingService()
         self.current_user = current_user
 
     @jwt_required()
@@ -113,3 +114,17 @@ class AdminController(object):
     def get_standings(self, tournament_id):
         result = self.tournaments.get_standings(tournament_id)
         return StandingsResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def get_ranking(self, tournament_id):
+        result = self.rankings.classificate(tournament_id)
+        return RankingResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def get_ranking_by_track(self, tournament_id, track_id):
+        result = self.rankings.classificate(tournament_id, track_id=track_id)
+        return RankingResponse.create(result), 200

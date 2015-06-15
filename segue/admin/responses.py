@@ -37,6 +37,17 @@ class StandingsResponse(BaseResponse):
             self.zone      = player.proposal.track.name_pt.split(" - ")[0]
             self.area      = player.proposal.track.name_pt.split(" - ")[1]
 
+class RankingResponse(BaseResponse):
+    def __init__(self, ranked, links=False):
+        super(RankingResponse, self).__init__()
+        self.id        = ranked.proposal.id
+        self.title     = ranked.proposal.title
+        self.author    = ranked.proposal.owner.name
+        self.tags      = ranked.tag_names
+        self.position  = ranked.rank
+        if ranked.proposal.track:
+            self.zone      = ranked.proposal.track.name_pt.split(" - ")[0]
+
 class AccountShortResponse(BaseResponse):
     def __init__(self, account, links=False):
         super(AccountShortResponse, self).__init__()

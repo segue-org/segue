@@ -1,7 +1,8 @@
 from sqlalchemy import or_, and_
 from segue.filters import FilterStrategies
 
-from segue.models import Account, Proposal, ProposalInvite
+from models import Proposal, ProposalInvite
+from ..account.models import Account
 
 class ProposalFilterStrategies(FilterStrategies):
     def enforce_user(self, user):

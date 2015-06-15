@@ -124,6 +124,9 @@ class AdminBlueprint(flask.Blueprint):
         self.add_url_rule('/tournaments/<int:tournament_id>',           methods=['GET'], view_func=self.controller.get_tournament)
         self.add_url_rule('/tournaments/<int:tournament_id>/standings', methods=['GET'], view_func=self.controller.get_standings)
 
+        self.add_url_rule('/tournaments/<int:tournament_id>/ranking',                methods=['GET'], view_func=self.controller.get_ranking)
+        self.add_url_rule('/tournaments/<int:tournament_id>/ranking/<int:track_id>', methods=['GET'], view_func=self.controller.get_ranking_by_track)
+
 class JudgeBlueprint(flask.Blueprint):
     def __init__(self):
         super(JudgeBlueprint, self).__init__('judges', __name__, url_prefix='/judges')
