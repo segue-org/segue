@@ -48,6 +48,14 @@ class AccountController(object):
         data = request.get_json()
         return self.service.login(**data), 200
 
+    @jwt_required()
+    @jsoned
+    def is_registered(self):
+        email = request.args.get('email')
+        result = self.service.is_email_registered(email)
+        if result:
+            raise EmailAlreadyInUse(email)
+
     def list_proposals(self, account_id):
         query_string = "?owner_id={}".format(account_id)
         return redirect(url_for('proposals.list') + query_string)
