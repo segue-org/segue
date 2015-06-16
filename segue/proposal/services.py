@@ -90,6 +90,13 @@ class ProposalService(object):
     def by_coauthor(self, coauthor_id):
         return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
 
+    def change_track(self, proposal_id, new_track_id):
+        proposal = self.get_one(proposal_id)
+        proposal.track_id = new_track_id
+        db.session.add(proposal)
+        db.session.commit()
+        return proposal
+
 class InviteService(object):
     def __init__(self, proposals=None, hasher=None, accounts = None, mailer=None, deadline=None):
         self.proposals = proposals or ProposalService()
@@ -151,5 +158,4 @@ class InviteService(object):
             raise NotAuthorized
 
         return self.accounts.create(account_data)
-
 

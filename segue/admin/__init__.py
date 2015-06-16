@@ -121,3 +121,17 @@ class AdminController(object):
     def get_ranking_by_track(self, tournament_id, track_id):
         result = self.rankings.classificate(tournament_id, track_id=track_id)
         return RankingResponse.create(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def change_track_of_proposal(self, proposal_id):
+        data = request.get_json()
+        old_track_id = self.proposals.get_one(proposal_id).track_id
+        new_track_id = data.get('track_id', None) or flask.abort(400)
+        result = self.proposals.change_track(proposal_id, new_track_id)
+
+        logger.info("user %s changed track of proposal %d. track was %d, now is %d", self.current_user.email, proposal_id, old_track_id, new_track_id)
+
+        return ProposalDetailResponse(result), 200
+

@@ -83,6 +83,18 @@ class ProposalServiceTestCases(SegueApiTestCase):
         # id should never change
         self.assertEquals(retrieved.id,    existing.id)
 
+    def test_change_track_of_proposal(self):
+        old_track = self.create_from_factory(ValidTrackFactory)
+        new_track = self.create_from_factory(ValidTrackFactory)
+        proposal = self.create_from_factory(ValidProposalFactory, track=old_track)
+
+        result    = self.service.change_track(proposal.id, new_track.id)
+        retrieved = self.service.get_one(proposal.id)
+
+        self.assertEquals(result, retrieved)
+        self.assertEquals(retrieved.track, new_track)
+
+
     def test_modify_proposal_wrong_owner(self):
         other_owner = ValidAccountFactory.create()
         existing = self.create_from_factory(ValidProposalFactory, owner=self.mock_owner)
