@@ -9,3 +9,4 @@ segue/settings.py
 ansible/secret/*.yml
 *backup.sql
 *.bbt
+migrations/manual/fisl16/s*.sql
