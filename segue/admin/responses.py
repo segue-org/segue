@@ -100,10 +100,12 @@ class ProposalDetailResponse(BaseResponse):
         self.language     = proposal.language
         self.created      = proposal.created
         self.last_updated = proposal.last_updated
+        self.tags         = proposal.tag_names
         self.track     = TrackDetailResponse.create(proposal.track, links=False)
 
         self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
         self.owner     = AccountShortResponse.create(proposal.owner, links=False)
+
 
         if links:
             self.add_link('invites', proposal.invites.all(), 'admin.list_proposal_invites', proposal_id=proposal.id)

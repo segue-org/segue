@@ -77,6 +77,15 @@ class ProposalService(object):
         db.session.commit()
         return proposal
 
+    def untag_proposal(self, proposal_id, tag_name):
+        proposal = self.get_one(proposal_id)
+        if not proposal.tagged_as(tag_name): return proposal
+
+        tag = ProposalTag.query.filter(ProposalTag.name == tag_name, Proposal.id == proposal.id).first()
+        db.session.delete(tag)
+        db.session.commit()
+        return proposal
+
     def check_ownership(self, proposal, alleged):
         if isinstance(proposal, int): proposal = self.get_one(proposal)
         return proposal and alleged and proposal.owner_id == alleged.id

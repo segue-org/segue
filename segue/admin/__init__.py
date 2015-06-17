@@ -135,3 +135,19 @@ class AdminController(object):
 
         return ProposalDetailResponse(result), 200
 
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def add_tag_to_proposal(self, proposal_id, tag_name):
+        result = self.proposals.tag_proposal(proposal_id, tag_name)
+        logger.info("user %s added tag %s to proposal %d", self.current_user.email, tag_name, proposal_id)
+        return ProposalDetailResponse(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def remove_tag_from_proposal(self, proposal_id, tag_name):
+        result = self.proposals.untag_proposal(proposal_id, tag_name)
+        logger.info("user %s removed tag %s from proposal %d", self.current_user.email, tag_name, proposal_id)
+        return ProposalDetailResponse(result), 200
+

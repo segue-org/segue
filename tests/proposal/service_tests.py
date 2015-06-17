@@ -169,6 +169,16 @@ class ProposalServiceTestCases(SegueApiTestCase):
         self.service.tag_proposal(created.id, "autre-tag")
         self.assertEquals(retrieved.tag_names, ["le-tag", "autre-tag"])
 
+    def test_untag_proposal(self):
+        created = self.create_from_factory(ValidProposalFactory)
+        self.service.tag_proposal(created.id, "le-tag")
+        self.service.tag_proposal(created.id, "autre-tag")
+
+        self.service.untag_proposal(created.id, "le-tag")
+        retrieved = self.service.get_one(created.id)
+        self.assertEquals(retrieved.tag_names, ['autre-tag'])
+
+
 class InviteServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(InviteServiceTestCases, self).setUp()
