@@ -26,3 +26,25 @@ class Slot(db.Model):
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+
+class Notification(db.Model):
+    id         = db.Column(db.Integer, primary_key=True)
+    kind       = db.Column(db.Text)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    content    = db.Column(db.Text)
+    sent       = db.Column(db.DateTime)
+    response   = db.Column(db.Enum('confirmed', 'pending', 'declined'))
+
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+
+    __tablename__ = 'purchase'
+    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'notification' }
+
+class CallNotification(Notification):
+    proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), name='cn_proposal_id')
+    __mapper_args__ = { 'polymorphic_identity': 'call' }
+
+class SlotNotification(Notification):
+    slot_id  = db.Column(db.Integer, db.ForeignKey('slot.id'),        name='sn_slot_id')
+    __mapper_args__ = { 'polymorphic_identity': 'slot' }
