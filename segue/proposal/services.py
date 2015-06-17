@@ -81,7 +81,7 @@ class ProposalService(object):
         proposal = self.get_one(proposal_id)
         if not proposal.tagged_as(tag_name): return proposal
 
-        tag = ProposalTag.query.filter(ProposalTag.name == tag_name, Proposal.id == proposal.id).first()
+        tag = ProposalTag.query.filter(ProposalTag.name == tag_name, m.ProposalTag.proposal_id == proposal.id).first()
         db.session.delete(tag)
         db.session.commit()
         return proposal
