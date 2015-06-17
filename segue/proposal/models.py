@@ -51,11 +51,6 @@ class Proposal(JsonSerializable, db.Model):
 class Talk(Proposal):
     __mapper_args__ = { 'polymorphic_identity': 'talk' }
 
-
-
-
-
-
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
 

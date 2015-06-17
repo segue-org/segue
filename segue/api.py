@@ -8,6 +8,7 @@ from document import DocumentController
 from caravan import CaravanController, CaravanInviteController
 from admin import AdminController
 from judge import JudgeController, MatchController
+from schedule import RoomController, SlotController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -143,6 +144,19 @@ class MatchBlueprint(flask.Blueprint):
         self.controller = MatchController()
         self.add_url_rule('/<int:match_id>/vote', methods=['POST'], view_func=self.controller.vote_on_match)
 
+class RoomBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(RoomBlueprint, self).__init__('rooms', __name__, url_prefix='/rooms')
+        self.controller = RoomController()
+        self.add_url_rule('',                     methods=['GET'], view_func=self.controller.list_all)
+        self.add_url_rule('/<int:room_id>',       methods=['GET'], view_func=self.controller.get_one)
+
+class SlotBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(SlotBlueprint, self).__init__('slots', __name__, url_prefix='/rooms/<int:room_id>/slots')
+        self.controller = SlotController()
+        self.add_url_rule('/',              methods=['GET'], view_func=self.controller.of_room)
+        self.add_url_rule('/<int:slot_id>', methods=['GET'], view_func=self.controller.get_one)
 
 blueprints = [
     ProposalBlueprint(),
@@ -158,4 +172,6 @@ blueprints = [
     AdminBlueprint(),
     JudgeBlueprint(),
     MatchBlueprint(),
+    RoomBlueprint(),
+    SlotBlueprint()
 ]

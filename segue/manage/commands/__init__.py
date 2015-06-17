@@ -25,6 +25,7 @@ manager.add_command('shell', Shell(make_context=_make_context))
 
 manager.command(populate.populate)
 manager.command(populate.populate_reference_data)
+manager.command(populate.populate_slots)
 manager.command(clean.clean_bad_buyers)
 manager.command(boletos.process_boletos)
 manager.command(report.buyers_report)

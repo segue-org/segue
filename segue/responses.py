@@ -15,6 +15,7 @@ class BaseResponse(SimpleJson):
     def add_link(self, name, collection_or_entity, route='', **route_parms):
         if not hasattr(self, 'links'):
             self.links = {}
+        if collection_or_entity is None: return
         self.links[name] = { "href": url_for(route, **route_parms) }
         if isinstance(collection_or_entity, list):
             self.links[name]['count'] = len(collection_or_entity)

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
 from decimal import Decimal
 from segue.core import db
 from tests.support.factories import *
-from segue.models import Account, Proposal, ProposalInvite, Track
+from segue.models import Account, Proposal, ProposalInvite, Track, Room, Slot
+from support import *
 
 def populate(clean=False):
     if clean:
@@ -44,6 +46,23 @@ def populate(clean=False):
     db.session.add_all(proposal_invites)
     db.session.add_all(purchases)
     db.session.add_all(payments)
+    db.session.commit()
+
+def populate_slots():
+    init_command()
+    dates = [ datetime(2015,7,8), datetime(2015,7,9), datetime(2015,7,10), datetime(2015,7,11) ]
+    hours = [ 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
+
+    rooms = Room.query.all()
+    for room in rooms:
+        print "{}creating slots for room {}{}{}...".format(F.RESET, F.RED, room.name, F.RESET)
+        for date in dates:
+            for hour in hours:
+                slot = Slot()
+                slot.room = room
+                slot.begins = date + timedelta(hours=hour)
+                slot.duration = 60
+                db.session.add(slot)
     db.session.commit()
 
 def populate_reference_data(clean=False):

@@ -7,6 +7,7 @@ from purchase.boleto.models    import BoletoPayment,    BoletoTransition
 from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct
 from judge.models import Judge, Match, Tournament
+from schedule.models import Room, Slot
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -17,5 +18,6 @@ __all__ = [
     'BoletoPayment',
     'Caravan', 'CaravanInvite', 'CaravanProduct',
     'City', 'Country',
-    'Judge', 'Match', 'Tournament'
+    'Judge', 'Match', 'Tournament',
+    'Room', 'Slot'
 ]
