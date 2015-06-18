@@ -22,7 +22,7 @@ body: |
     de palestra serão convocadas. Para confirmar sua participação
     no evento por favor utilize o link abaixo.
 
-      {backend_url}/api/notification/{notification.hash}
+      {backend_url}/api/notifications/{notification.hash}
 
       ATENÇÃO: favor confirmar a sua presença até
                às {deadline_hours} do dia {deadline_day}

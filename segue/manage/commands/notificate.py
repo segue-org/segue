@@ -13,8 +13,8 @@ def notify_proposals(deadline=None, start=0, end=sys.maxint):
     notification = NotificationService()
 
     for proposal in proposals:
-        if proposal.id < start: continue;
-        if proposal.id > end: continue;
+        if proposal.id < int(start): continue;
+        if proposal.id > int(end): continue;
 
         print "{} issuing notification call_proposal for proposal {}{}{} - {}{}{} ({}{}{})...".format(F.RESET,
                 F.GREEN, proposal.id, F.RESET,

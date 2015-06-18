@@ -101,5 +101,5 @@ class MailerServiceTestCases(SegueApiTestCase):
         self.assertIn('18/06/2015', outbox[0].body)
         self.assertIn(notification.proposal.title, outbox[0].body)
 
-        the_url   = 'http://192.168.33.91:9001/api/notification/{}'.format(notification.hash)
+        the_url   = 'http://192.168.33.91:9001/api/notifications/{}'.format(notification.hash)
         self.assertIn(the_url,      outbox[0].body)
