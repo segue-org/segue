@@ -74,7 +74,7 @@ class CaravanInviteService(object):
     def list(self, caravan_id, by=None):
         return self.caravans.get_one(caravan_id, by).invites
 
-    def create(self, caravan_id, data, by=None):
+    def create(self, caravan_id, data, by=None, send_email=True):
         caravan = self.caravans.get_one(caravan_id, by)
 
         invite = CaravanInviteFactory.from_json(data, schema.new_invite)
@@ -84,7 +84,8 @@ class CaravanInviteService(object):
         db.session.add(invite)
         db.session.commit()
 
-        self.mailer.caravan_invite(invite)
+        if send_email:
+            self.mailer.caravan_invite(invite)
 
         return invite
 
