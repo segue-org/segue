@@ -34,9 +34,6 @@ class Proposal(JsonSerializable, db.Model):
     as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
     as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
 
-    __tablename__ = 'proposal'
-    __mapper_args__ = { 'polymorphic_on': status, 'polymorphic_identity': 'proposal' }
-
     @property
     def coauthors(self):
         return self.invites.filter(ProposalInvite.status == 'accepted')
@@ -47,9 +44,6 @@ class Proposal(JsonSerializable, db.Model):
 
     def tagged_as(self, tag_name):
         return tag_name in self.tag_names
-
-class Talk(Proposal):
-    __mapper_args__ = { 'polymorphic_identity': 'talk' }
 
 class ProposalInvite(JsonSerializable, db.Model):
     _serializers = [ InviteJsonSerializer, ShortInviteJsonSerializer, SafeInviteJsonSerializer ]
