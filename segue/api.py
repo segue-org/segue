@@ -8,7 +8,7 @@ from document import DocumentController
 from caravan import CaravanController, CaravanInviteController
 from admin import AdminController
 from judge import JudgeController, MatchController
-from schedule import RoomController, SlotController
+from schedule import RoomController, SlotController, NotificationController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -161,6 +161,14 @@ class SlotBlueprint(flask.Blueprint):
         self.add_url_rule('/',              methods=['GET'], view_func=self.controller.of_room)
         self.add_url_rule('/<int:slot_id>', methods=['GET'], view_func=self.controller.get_one)
 
+class NotificationBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(NotificationBlueprint, self).__init__('notifications', __name__, url_prefix='/notifications')
+        self.controller = NotificationController()
+        self.add_url_rule('/<string:hash_code>',         methods=['GET'],  view_func=self.controller.get_by_hash)
+        self.add_url_rule('/<string:hash_code>/accept',  methods=['POST'], view_func=self.controller.accept)
+        self.add_url_rule('/<string:hash_code>/decline', methods=['POST'], view_func=self.controller.decline)
+
 blueprints = [
     ProposalBlueprint(),
     ProposalInviteBluePrint(),
@@ -176,5 +184,6 @@ blueprints = [
     JudgeBlueprint(),
     MatchBlueprint(),
     RoomBlueprint(),
-    SlotBlueprint()
+    SlotBlueprint(),
+    NotificationBlueprint()
 ]

@@ -1,3 +1,4 @@
+from datetime import datetime
 import mockito
 
 from functools import wraps
@@ -85,3 +86,20 @@ class MailerServiceTestCases(SegueApiTestCase):
         the_url = 'http://192.168.33.91:9001/api/judges/{}'.format(judge.hash)
         self.assertIn(the_url, outbox[0].body)
 
+    @record_messages
+    def test_call_proposal(self, outbox):
+        deadline = datetime(2015,6,18,23,59,59)
+        notification = self.create_from_factory(ValidCallNotificationFactory, deadline=deadline)
+        self.service.call_proposal(notification)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+
+        self.assertIn(notification.account.email, outbox[0].recipients[0])
+
+        self.assertIn('23:59',      outbox[0].body)
+        self.assertIn('18/06/2015', outbox[0].body)
+        self.assertIn(notification.proposal.title, outbox[0].body)
+
+        the_url   = 'http://192.168.33.91:9001/api/notification/{}'.format(notification.hash)
+        self.assertIn(the_url,      outbox[0].body)

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from sqlalchemy.sql import functions as func
-from segue.core import db
+from ..core import db
 
 SLOT_STATUSES = ('confirmed','pending','rejected','dirty','empty');
 
@@ -22,29 +22,43 @@ class Slot(db.Model):
     duration    = db.Column(db.Integer)
     status      = db.Column(db.Enum(*SLOT_STATUSES, name="slot_statuses"), default='empty')
 
-    talk        = db.relationship("Talk", backref="slot")
+    talk        = db.relationship("Proposal", backref="slot")
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
 class Notification(db.Model):
-    id         = db.Column(db.Integer, primary_key=True)
-    kind       = db.Column(db.Text)
-    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-    content    = db.Column(db.Text)
-    sent       = db.Column(db.DateTime)
-    response   = db.Column(db.Enum('confirmed', 'pending', 'declined'))
+     id         = db.Column(db.Integer, primary_key=True)
+     kind       = db.Column(db.Text)
+     hash       = db.Column(db.String(64))
+     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+     content    = db.Column(db.Text)
+     sent       = db.Column(db.DateTime)
+     deadline   = db.Column(db.DateTime)
+     status     = db.Column(db.Enum('confirmed', 'pending', 'declined'))
 
-    created      = db.Column(db.DateTime, default=func.now())
-    last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+     created      = db.Column(db.DateTime, default=func.now())
+     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
-    __tablename__ = 'purchase'
-    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'notification' }
+     account = db.relationship('Account')
+
+     __tablename__ = 'notification'
+     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'notification' }
 
 class CallNotification(Notification):
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), name='cn_proposal_id')
+    proposal    = db.relationship("Proposal")
     __mapper_args__ = { 'polymorphic_identity': 'call' }
 
+    def update_target_status(self):
+        self.proposal.status = self.status
+        return self.proposal
+
+    @property
+    def target(self):
+        return self.proposal
+
 class SlotNotification(Notification):
-    slot_id  = db.Column(db.Integer, db.ForeignKey('slot.id'),        name='sn_slot_id')
+    slot_id = db.Column(db.Integer, db.ForeignKey('slot.id'), name='sn_slot_id')
+    slot    = db.relationship("Slot")
     __mapper_args__ = { 'polymorphic_identity': 'slot' }

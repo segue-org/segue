@@ -1,0 +1,33 @@
+---
+
+template: call_proposal
+language: pt
+subject: "FISL16 - proposta de palestra aceita"
+
+body: |
+
+    Saudações Livres {account.name}
+
+      Temos o prazer de informar que sua proposta de palestra
+    para o FISL16 foi aceita! Sabemos que falta pouco tempo
+    para o evento, mas de qualquer forma torcemos para ainda
+    haja tempo para você agendar sua visita a Porto Alegre
+    para brindar-nos com a apresentação de:
+
+        título: {proposal.title}
+        trilha: {proposal.track.name_pt}
+
+      É imprescindível que você confirme sua vinda para o
+    evento. Em caso de estar impossibilitado(a), outras propostas
+    de palestra serão convocadas. Para confirmar sua participação
+    no evento por favor utilize o link abaixo.
+
+      {backend_url}/api/notification/{notification.hash}
+
+      ATENÇÃO: favor confirmar a sua presença até
+               às {deadline_hours} do dia {deadline_day}
+
+    Cordialmente
+
+    --
+    Coordenação do Temario FISL16

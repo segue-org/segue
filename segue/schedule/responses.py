@@ -22,3 +22,13 @@ class SlotResponse(BaseResponse):
         if links:
             self.add_link('room', slot.room, 'rooms.get_one', room_id=slot.room_id)
             self.add_link('talk', slot.talk, 'talks.get_one', talk_id=slot.talk_id)
+
+class NotificationResponse(BaseResponse):
+    def __init__(self, notification):
+        self.id       = notification.id
+        self.kind     = notification.kind
+        self.hash     = notification.hash
+        self.deadline = notification.deadline
+        self.status   = notification.status
+        self.target   = notification.target
+

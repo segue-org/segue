@@ -80,3 +80,15 @@ class MailerService(object):
         message.to('', token.email)
 
         return mailer.send(message.build())
+
+    def call_proposal(self, notification):
+        message = self.message_factory.from_template('schedule/call_proposal')
+        message.given(
+            notification   = notification,
+            account        = notification.account,
+            proposal       = notification.proposal,
+            deadline_hours = notification.deadline.strftime("%H:%M"),
+            deadline_day   = notification.deadline.strftime("%d/%m/%Y")
+        )
+        message.to(notification.account.name, notification.account.email)
+        return mailer.send(message.build())

@@ -12,6 +12,7 @@ from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
 from segue.models import Judge, Match, Tournament
+from segue.models import Room, Slot, CallNotification, SlotNotification
 from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
 
 import logging
@@ -238,4 +239,10 @@ class ValidMatchFactory(SegueFactory):
     player2    = SubFactory(ValidProposalWithOwnerWithTrackFactory)
     tournament = SubFactory(ValidTournamentFactory)
 
-
+class ValidCallNotificationFactory(SegueFactory):
+    class Meta:
+        model = CallNotification
+    proposal = SubFactory(ValidProposalWithOwnerWithTrackFactory)
+    account  = SubFactory(ValidAccountFactory)
+    status   = 'pending'
+    hash     = _Sequence('C0FFE#{:04d}')

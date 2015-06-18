@@ -1,9 +1,9 @@
 import flask
 
-from segue.json import jsoned
+from segue.json import jsoned, accepts_html
 
-from responses import RoomResponse, SlotResponse
-from services import RoomService, SlotService
+from responses import RoomResponse, SlotResponse, NotificationResponse
+from services import RoomService, SlotService, NotificationService
 
 class RoomController(object):
     def __init__(self, service=None):
@@ -32,4 +32,30 @@ class SlotController(object):
     def get_one(self, room_id, slot_id):
         result = self.service.get_one(slot_id) or flask.abort(404)
         return SlotResponse.create(result), 200
+
+class NotificationController(object):
+    def __init__(self, service=None):
+        self.service = service or NotificationService()
+
+    @jsoned
+    @accepts_html
+    def get_by_hash(self, hash_code, wants_html=False):
+        print hash_code
+        notification = self.service.get_by_hash(hash_code) or flask.abort(404)
+        if wants_html:
+            path = '/#/notification/{}/{}/answer'.format(hash_code, notification.kind)
+            return flask.redirect(config.FRONTEND_URL + path)
+        else:
+            return NotificationResponse.create(notification), 200
+
+    @jsoned
+    def accept(self, hash_code):
+        notification = self.service.accept_notification(hash_code)
+        return NotificationResponse.create(notification), 200
+
+    @jsoned
+    def decline(self, hash_code):
+        notification = self.service.decline_notification(hash_code)
+        return NotificationResponse.create(notification), 200
+
 

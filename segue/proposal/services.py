@@ -35,6 +35,9 @@ class ProposalService(object):
     def cfp_state(self):
         return 'closed' if self.deadline.is_past() else 'open'
 
+    def all_with_tags(self, *tags):
+        return Proposal.query.join(ProposalTag).filter(ProposalTag.name.in_(tags)).all()
+
     def create(self, data, owner):
         self.deadline.enforce()
 
