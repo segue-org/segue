@@ -1,5 +1,6 @@
 import flask
 
+from segue.core import config
 from segue.json import jsoned, accepts_html
 
 from responses import RoomResponse, SlotResponse, NotificationResponse
@@ -40,7 +41,6 @@ class NotificationController(object):
     @jsoned
     @accepts_html
     def get_by_hash(self, hash_code, wants_html=False):
-        print hash_code
         notification = self.service.get_by_hash(hash_code) or flask.abort(404)
         if wants_html:
             path = '/#/notification/{}/{}/answer'.format(hash_code, notification.kind)

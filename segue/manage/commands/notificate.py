@@ -13,4 +13,3 @@ def notify_proposals(deadline=None):
 
     for proposal in proposals:
         notification.call_proposal(proposal.id, deadline)
-        break
