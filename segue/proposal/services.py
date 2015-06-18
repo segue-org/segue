@@ -36,7 +36,7 @@ class ProposalService(object):
         return 'closed' if self.deadline.is_past() else 'open'
 
     def all_with_tags(self, *tags):
-        return Proposal.query.join(ProposalTag).filter(ProposalTag.name.in_(tags)).all()
+        return Proposal.query.join(ProposalTag).filter(ProposalTag.name.in_(tags)).order_by(Proposal.id).all()
 
     def create(self, data, owner):
         self.deadline.enforce()
