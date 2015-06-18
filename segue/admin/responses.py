@@ -45,8 +45,9 @@ class RankingResponse(BaseResponse):
         self.author    = ranked.proposal.owner.name
         self.tags      = ranked.tag_names
         self.ranking   = ranked.rank
+        self.status    = ranked.proposal.status
         if ranked.proposal.track:
-            self.zone      = ranked.proposal.track.name_pt.split(" - ")[0]
+            self.zone = ranked.proposal.track.name_pt.split(" - ")[0]
 
 class AccountShortResponse(BaseResponse):
     def __init__(self, account, links=False):
@@ -101,6 +102,7 @@ class ProposalDetailResponse(BaseResponse):
         self.created      = proposal.created
         self.last_updated = proposal.last_updated
         self.tags         = proposal.tag_names
+        self.status       = proposal.status
         self.track     = TrackDetailResponse.create(proposal.track, links=False)
 
         self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
