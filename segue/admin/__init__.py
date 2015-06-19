@@ -11,6 +11,7 @@ from segue.account import AccountService
 from segue.proposal import ProposalService
 from segue.purchase import PurchaseService, PaymentService
 from segue.judge.services import TournamentService, RankingService
+from segue.schedule.services import NotificationService
 
 from responses import *
 
@@ -25,13 +26,14 @@ def admin_only(fn):
 
 
 class AdminController(object):
-    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None, tournaments=None, rankings=None):
+    def __init__(self, accounts=None, proposals=None, purchases=None, payments=None, tournaments=None, rankings=None, notifications=None):
         self.accounts = accounts or AccountService()
         self.proposals = proposals or ProposalService()
         self.purchases = purchases or PurchaseService()
         self.payments = payments or PaymentService()
         self.tournaments = tournaments or TournamentService()
         self.rankings = rankings or RankingService()
+        self.notifications = notifications or NotificationService()
         self.current_user = current_user
 
     @jwt_required()
@@ -134,6 +136,13 @@ class AdminController(object):
         logger.info("user %s changed track of proposal %d. track was %d, now is %d", self.current_user.email, proposal_id, old_track_id, new_track_id)
 
         return ProposalDetailResponse(result), 200
+
+    @jwt_required()
+    @admin_only
+    @jsoned
+    def list_call_notification_by_status(self, status):
+        result = self.notifications.list_by_status('call', status)
+        return CallNotificationResponse.create(result), 200
 
     @jwt_required()
     @admin_only

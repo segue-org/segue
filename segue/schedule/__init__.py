@@ -57,5 +57,3 @@ class NotificationController(object):
     def decline(self, hash_code):
         notification = self.service.decline_notification(hash_code)
         return NotificationResponse.create(notification), 200
-
-

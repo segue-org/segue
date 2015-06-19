@@ -37,6 +37,20 @@ class StandingsResponse(BaseResponse):
             self.zone      = player.proposal.track.name_pt.split(" - ")[0]
             self.area      = player.proposal.track.name_pt.split(" - ")[1]
 
+class CallNotificationResponse(BaseResponse):
+    def __init__(self, notification):
+        self.id           = notification.id
+        self.kind         = notification.kind
+        self.hash         = notification.hash
+        self.deadline     = notification.deadline
+        self.status       = notification.status
+        self.proposal     = notification.proposal.title
+        self.recipient    = notification.account.email
+        self.last_updated = notification.last_updated
+        self.zone         = notification.proposal.track.name_pt.split(" - ")[0]
+        self.area         = notification.proposal.track.name_pt.split(" - ")[1]
+
+
 class RankingResponse(BaseResponse):
     def __init__(self, ranked, links=False):
         super(RankingResponse, self).__init__()

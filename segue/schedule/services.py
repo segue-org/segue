@@ -29,6 +29,9 @@ class NotificationService(object):
         self.hasher = hasher or Hasher()
         self.proposals = proposals or ProposalService()
 
+    def list_by_status(self, kind, status):
+        return Notification.query.filter(Notification.kind == kind, Notification.status == status).all()
+
     def call_proposal(self, proposal_id, deadline):
         proposal = self.proposals.get_one(proposal_id)
         if not proposal: raise NoSuchProposal()
