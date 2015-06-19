@@ -1,7 +1,8 @@
 import mockito
 from datetime import datetime, timedelta
 
-from segue.errors import *
+from segue.errors import NoSuchProposal
+from segue.schedule.errors import *
 
 from ..support import SegueApiTestCase
 from ..support.factories import *
@@ -31,6 +32,14 @@ class NotificationServiceTestCase(SegueApiTestCase):
         self.assertEquals(notification.hash, 'ABCD')
 
         mockito.verify(self.mock_mailer).call_proposal(notification)
+
+    def test_call_proposal_does_not_resend_if_a_similar_one_has_been_answered_already(self):
+        deadline = datetime.now() + timedelta(days=2)
+        proposal = self.create_from_factory(ValidProposalWithOwnerFactory)
+        notification = self.create_from_factory(ValidCallNotificationFactory, proposal=proposal, status='confirmed')
+
+        with self.assertRaises(NotificationAlreadyAnswered):
+            self.service.call_proposal(proposal.id, deadline)
 
     def test_retrieve_notification(self):
         existing = self.create_from_factory(ValidCallNotificationFactory, hash='DCBA')

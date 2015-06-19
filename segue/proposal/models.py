@@ -29,7 +29,8 @@ class Proposal(JsonSerializable, db.Model):
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
     status       = db.Column(db.Text, server_default='proposal')
 
-    tags = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
+    tags          = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
+    notifications = db.relationship("CallNotification", backref="proposal", lazy="dynamic")
 
     as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
     as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")

@@ -4,8 +4,9 @@ from segue.core import db
 from segue.mailer import MailerService
 from segue.hasher import Hasher
 from segue.proposal.services import ProposalService
-from segue.errors import NoSuchProposal, NoSuchNotification, NotificationExpired
+from segue.errors import NoSuchProposal
 
+from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered
 from models import Room, Slot, Notification, CallNotification
 
 class RoomService(object):
@@ -31,6 +32,9 @@ class NotificationService(object):
     def call_proposal(self, proposal_id, deadline):
         proposal = self.proposals.get_one(proposal_id)
         if not proposal: raise NoSuchProposal()
+
+        already_answered = proposal.notifications.filter(Notification.status != 'pending').count() > 0
+        if already_answered: raise NotificationAlreadyAnswered()
 
         notification = CallNotification(proposal=proposal)
         notification.account  = proposal.owner

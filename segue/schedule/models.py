@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from sqlalchemy.orm import backref
 from sqlalchemy.sql import functions as func
 from ..core import db
 
@@ -47,7 +48,6 @@ class Notification(db.Model):
 
 class CallNotification(Notification):
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), name='cn_proposal_id')
-    proposal    = db.relationship("Proposal")
     __mapper_args__ = { 'polymorphic_identity': 'call' }
 
     def update_target_status(self):

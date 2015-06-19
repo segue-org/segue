@@ -17,11 +17,6 @@ class SegueError(JsonSerializable, Exception):
 class BadConfiguration(SegueError):
     pass
 
-class NotificationExpired(SegueError):
-    code = 400
-    def to_json(self):
-        return { 'message': 'This notification has already expired and is no longer valid' }
-
 class DeadlineReached(SegueError):
     code = 400
     def to_json(self):
@@ -47,11 +42,6 @@ class AccountAlreadyHasCaravan(SegueError):
     code = 400
     def to_json(self):
         return { 'message': 'this account already has a caravan' }
-
-class NoSuchNotification(SegueError):
-    code = 404
-    def to_json(self):
-        return { 'message': 'no such notification' }
 
 class NoSuchAccount(SegueError):
     code = 404
