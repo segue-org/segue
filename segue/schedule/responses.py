@@ -25,10 +25,13 @@ class SlotResponse(BaseResponse):
 
 class NotificationResponse(BaseResponse):
     def __init__(self, notification):
-        self.id       = notification.id
-        self.kind     = notification.kind
-        self.hash     = notification.hash
-        self.deadline = notification.deadline
-        self.status   = notification.status
-        self.target   = notification.target
+        self.id           = notification.id
+        self.kind         = notification.kind
+        self.hash         = notification.hash
+        self.deadline     = notification.deadline
+        self.status       = notification.status
+        self.target       = notification.target
+        self.deadline     = notification.deadline
+        self.sent         = notification.sent
+        self.is_expired   = notification.is_expired
 
