@@ -39,9 +39,9 @@ class JSONEncoder(flask.json.JSONEncoder):
         if isinstance(obj, decimal.Decimal):
             return "{0:0.2f}".format(obj)
         if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
+            return obj.replace(microsecond=0).isoformat()
         if isinstance(obj, datetime.date):
-            return obj.isoformat()
+            return obj.replace(microsecond=0).isoformat()
         if isinstance(obj, JsonSerializable):
             return obj.serialize()
         if isinstance(obj, SimpleJson):

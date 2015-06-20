@@ -41,14 +41,14 @@ class CallNotificationResponse(BaseResponse):
     def __init__(self, notification):
         self.id           = notification.id
         self.kind         = notification.kind
-        self.hash         = notification.hash
         self.deadline     = notification.deadline
-        self.status       = notification.status
-        self.proposal     = notification.proposal.title
-        self.recipient    = notification.account.email
+        self.sent         = notification.sent
+        self.is_expired   = notification.is_expired
         self.last_updated = notification.last_updated
-        self.zone         = notification.proposal.track.name_pt.split(" - ")[0]
-        self.area         = notification.proposal.track.name_pt.split(" - ")[1]
+        self.status       = notification.status
+        self.proposal_id  = notification.proposal.id
+        self.proposal     = notification.proposal.title
+        self.author       = notification.proposal.owner.name
 
 
 class RankingResponse(BaseResponse):
