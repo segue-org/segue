@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
 from ..core import db
-from ..errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 from ..hasher import Hasher
 
 from segue.mailer import MailerService
@@ -14,6 +13,7 @@ from jwt import Signer
 from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
+from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 import schema
 
 class AccountService(object):

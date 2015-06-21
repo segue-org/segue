@@ -1,7 +1,7 @@
 import json
 import mockito
 
-from segue.account import Signer
+from segue.account.jwt import Signer
 from segue.account.models import TokenJsonSerializer
 
 from ..support import SegueApiTestCase

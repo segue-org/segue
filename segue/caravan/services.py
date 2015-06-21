@@ -8,7 +8,8 @@ import schema
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
 from errors import AccountAlreadyHasCaravan
-from ..account import AccountService, Account
+
+from segue.account.services import AccountService
 
 class CaravanService(object):
     def __init__(self, invites=None):

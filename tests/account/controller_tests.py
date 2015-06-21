@@ -3,8 +3,10 @@ import mockito
 
 from werkzeug.exceptions import NotFound
 
-from segue.account import AccountController, AccountService, Account, Signer
-from segue.errors import SegueValidationError, InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
+from segue.errors import SegueValidationError
+
+from segue.account.controllers import AccountController
+from segue.account.errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie

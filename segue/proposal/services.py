@@ -4,11 +4,11 @@ from sqlalchemy import and_, or_
 
 from ..core import db, config
 from ..errors import NotAuthorized
-from ..mailer import MailerService
 from ..hasher import Hasher
 from ..filters import FilterStrategies
 
-from ..account import AccountService
+from segue.mailer import MailerService
+from segue.account.services import AccountService
 
 import schema
 from errors import DeadlineReached
