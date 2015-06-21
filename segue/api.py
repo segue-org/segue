@@ -2,7 +2,7 @@ import flask
 
 from document import DocumentController
 from admin import AdminController
-from judge import JudgeController, MatchController
+from judge import JudgeBlueprint, MatchBlueprint
 
 from purchase import PurchaseBlueprint, PaymentBlueprint
 from account import AccountBlueprint, SessionBlueprint
@@ -42,19 +42,6 @@ class AdminBlueprint(flask.Blueprint):
         self.add_url_rule('/tournaments/<int:tournament_id>/standings', methods=['GET'], view_func=self.controller.get_standings)
 
         self.add_url_rule('/call/<int:tournament_id>/<int:track_id>', methods=['GET'], view_func=self.controller.get_ranking_by_track)
-
-class JudgeBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(JudgeBlueprint, self).__init__('judges', __name__, url_prefix='/judges')
-        self.controller = JudgeController()
-        self.add_url_rule('/<string:hash_code>',       methods=['GET'], view_func=self.controller.get_by_hash)
-        self.add_url_rule('/<string:hash_code>/match', methods=['GET'], view_func=self.controller.match_for_judge)
-
-class MatchBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(MatchBlueprint, self).__init__('matches', __name__, url_prefix='/matches')
-        self.controller = MatchController()
-        self.add_url_rule('/<int:match_id>/vote', methods=['POST'], view_func=self.controller.vote_on_match)
 
 blueprints = [
     ProposalBlueprint(),
