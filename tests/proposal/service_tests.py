@@ -6,8 +6,9 @@ import mockito
 from datetime import timedelta
 from freezegun import freeze_time
 
-from segue.proposal import ProposalService, InviteService
-from segue.errors import SegueValidationError, NotAuthorized, DeadlineReached
+from segue.proposal.services import ProposalService, InviteService
+from segue.proposal.errors import DeadlineReached
+from segue.errors import SegueValidationError, NotAuthorized
 
 from ..support import SegueApiTestCase
 from ..support.factories import *

@@ -1,38 +1,15 @@
 import flask
 
-from proposal import ProposalController, ProposalInviteController
 from account import AccountController
 from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
 from admin import AdminController
 from judge import JudgeController, MatchController
+
+from proposal import ProposalBlueprint, ProposalInviteBluePrint
 from caravan import CaravanBlueprint, CaravanInviteBluePrint
 from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
-
-class ProposalBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(ProposalBlueprint, self).__init__('proposals', __name__, url_prefix='/proposals')
-        self.controller = ProposalController()
-        self.add_url_rule('',                       methods=['POST'], view_func=self.controller.create)
-        self.add_url_rule('',                       methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:proposal_id>',     methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:proposal_id>',     methods=['PUT'],  view_func=self.controller.modify)
-        self.add_url_rule('/<string:name>.schema',  methods=['GET'],  view_func=self.controller.schema)
-        self.add_url_rule('/tracks',                methods=['GET'],  view_func=self.controller.list_tracks)
-        self.add_url_rule('/tracks/<int:track_id>', methods=['GET'],  view_func=self.controller.get_track)
-        self.add_url_rule('/cfp-state',             methods=['GET'],  view_func=self.controller.cfp_state)
-
-class ProposalInviteBluePrint(flask.Blueprint):
-    def __init__(self):
-        super(ProposalInviteBluePrint, self).__init__('proposal_invites', __name__, url_prefix='/proposals/<int:proposal_id>/invites')
-        self.controller = ProposalInviteController()
-        self.add_url_rule('',                             methods=['GET'],   view_func=self.controller.list)
-        self.add_url_rule('',                             methods=['POST'],  view_func=self.controller.create)
-        self.add_url_rule('/<string:hash_code>',          methods=['GET'],   view_func=self.controller.get_by_hash)
-        self.add_url_rule('/<string:hash_code>/accept',   methods=['POST'],  view_func=self.controller.accept)
-        self.add_url_rule('/<string:hash_code>/decline',  methods=['POST'],  view_func=self.controller.decline)
-        self.add_url_rule('/<string:hash_code>/register', methods=['POST'],  view_func=self.controller.register)
 
 class AccountBlueprint(flask.Blueprint):
     def __init__(self):

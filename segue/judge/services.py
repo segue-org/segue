@@ -5,7 +5,7 @@ from segue.hasher import Hasher
 from models import Judge, Match, Tournament
 from errors import *
 from swiss import TrivialRoundGenerator, ClassicalRoundGenerator, StandingsCalculator
-from ..proposal import ProposalService
+from segue.proposal.services import ProposalService
 
 class TournamentService(object):
     def __init__(self, db_impl=None, trivial=None, classical=None, standings=None):

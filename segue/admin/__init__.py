@@ -8,7 +8,7 @@ from ..core import jwt_required, config, logger, cache
 from ..json import jsoned, SimpleJson
 
 from segue.account import AccountService
-from segue.proposal import ProposalService
+from segue.proposal.services import ProposalService
 from segue.purchase import PurchaseService, PaymentService
 from segue.judge.services import TournamentService, RankingService
 from segue.schedule.services import NotificationService

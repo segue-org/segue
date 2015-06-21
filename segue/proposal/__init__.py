@@ -1,108 +1,28 @@
 import flask
+from controllers import ProposalController, ProposalInviteController
 
-from flask import request
-from flask.ext.jwt import current_user, verify_jwt, JWTError
+class ProposalBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(ProposalBlueprint, self).__init__('proposals', __name__, url_prefix='/proposals')
+        self.controller = ProposalController()
+        self.add_url_rule('',                       methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('',                       methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<int:proposal_id>',     methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:proposal_id>',     methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/<string:name>.schema',  methods=['GET'],  view_func=self.controller.schema)
+        self.add_url_rule('/tracks',                methods=['GET'],  view_func=self.controller.list_tracks)
+        self.add_url_rule('/tracks/<int:track_id>', methods=['GET'],  view_func=self.controller.get_track)
+        self.add_url_rule('/cfp-state',             methods=['GET'],  view_func=self.controller.cfp_state)
 
-from ..core import jwt_required, config
-from ..json import jsoned, accepts_html, JsonFor
+class ProposalInviteBluePrint(flask.Blueprint):
+    def __init__(self):
+        super(ProposalInviteBluePrint, self).__init__('proposal_invites', __name__, url_prefix='/proposals/<int:proposal_id>/invites')
+        self.controller = ProposalInviteController()
+        self.add_url_rule('',                             methods=['GET'],   view_func=self.controller.list)
+        self.add_url_rule('',                             methods=['POST'],  view_func=self.controller.create)
+        self.add_url_rule('/<string:hash_code>',          methods=['GET'],   view_func=self.controller.get_by_hash)
+        self.add_url_rule('/<string:hash_code>/accept',   methods=['POST'],  view_func=self.controller.accept)
+        self.add_url_rule('/<string:hash_code>/decline',  methods=['POST'],  view_func=self.controller.decline)
+        self.add_url_rule('/<string:hash_code>/register', methods=['POST'],  view_func=self.controller.register)
 
-import schema
-from factories import ProposalFactory
-from services  import ProposalService, InviteService
-
-class ProposalController(object):
-    def __init__(self, service=None):
-        self.service = service or ProposalService()
-        self.current_user = current_user
-
-    @jwt_required()
-    @jsoned
-    def create(self):
-        data = request.get_json()
-        return self.service.create(data, self.current_user), 201
-
-    @jwt_required()
-    @jsoned
-    def modify(self, proposal_id):
-        data = request.get_json()
-        result = self.service.modify(proposal_id, data, by=self.current_user) or flask.abort(404)
-        return result, 200
-
-    @jsoned
-    def get_one(self, proposal_id):
-        result = self.service.get_one(proposal_id) or flask.abort(404)
-        return result, 200
-
-    @jsoned
-    @jwt_required()
-    def list(self):
-        parms = { c: request.args.get(c) for c in ProposalFactory.QUERY_WHITELIST if c in request.args }
-        result = self.service.query(as_user=self.current_user, **parms)
-        return JsonFor(result).using('ShortChildProposalJsonSerializer'), 200
-
-    @jsoned
-    def schema(self, name):
-        return schema.whitelist[name], 200
-
-    @jsoned
-    def list_tracks(self):
-        return self.service.list_tracks(), 200
-
-    @jsoned
-    def cfp_state(self):
-        return { 'state': self.service.cfp_state() }, 200
-
-    @jsoned
-    def get_track(self, track_id):
-        return self.service.get_track(track_id), 200
-
-
-class ProposalInviteController(object):
-    def __init__(self, service=None):
-        self.service      = service   or InviteService()
-        self.current_user = current_user
-
-    @jwt_required()
-    @jsoned
-    def list(self, proposal_id):
-        result = self.service.list(proposal_id, by=self.current_user)
-        return JsonFor(result).using('ShortInviteJsonSerializer'), 200
-
-    @jsoned
-    @accepts_html
-    def get_by_hash(self, proposal_id, hash_code, wants_html=False):
-        invite = self.service.get_by_hash(hash_code) or flask.abort(404)
-        if wants_html:
-            path = '/#/proposal/{}/invite/{}/answer'.format(proposal_id, hash_code)
-            return flask.redirect(config.FRONTEND_URL + path)
-        else:
-            return invite, 200
-
-    @jwt_required()
-    @jsoned
-    def create(self, proposal_id):
-        data = request.get_json()
-        result = self.service.create(proposal_id, data, by=self.current_user)
-        return result, 200
-
-    @jsoned
-    def accept(self, proposal_id, hash_code):
-        try:
-            verify_jwt()
-        except JWTError:
-            pass
-
-        result = self.service.answer(hash_code, accepted=True, by=self.current_user) or flask.abort(404)
-        return result, 200
-
-    @jsoned
-    def decline(self, proposal_id, hash_code):
-        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
-        return result, 200
-
-    @jsoned
-    def register(self, proposal_id, hash_code):
-        data = request.get_json()
-        result = self.service.register(hash_code, data) or flask.abort(404)
-        return result, 200
 

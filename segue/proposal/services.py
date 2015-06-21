@@ -3,7 +3,7 @@ import random
 from sqlalchemy import and_, or_
 
 from ..core import db, config
-from ..errors import NotAuthorized, DeadlineReached
+from ..errors import NotAuthorized
 from ..mailer import MailerService
 from ..hasher import Hasher
 from ..filters import FilterStrategies
@@ -11,6 +11,7 @@ from ..filters import FilterStrategies
 from ..account import AccountService
 
 import schema
+from errors import DeadlineReached
 from factories import ProposalFactory, InviteFactory
 from models    import ProposalTag, Proposal, ProposalInvite, Track
 from filters import ProposalFilterStrategies
