@@ -4,7 +4,8 @@ import mockito
 from segue.product import ProductService
 from segue.product.models import Product
 from segue.caravan.models import CaravanProduct
-from segue.errors import ProductExpired, InvalidCaravan, WrongBuyerForProduct
+from segue.caravan.errors import InvalidCaravan
+from segue.errors import ProductExpired, WrongBuyerForProduct
 
 from ..support import SegueApiTestCase
 from ..support.factories import *

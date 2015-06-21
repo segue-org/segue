@@ -2,14 +2,13 @@ from segue.core import db, logger
 from segue.errors import NotAuthorized, NoSuchPayment, NoSuchProduct, PurchaseAlreadySatisfied, ProductExpired
 
 from factories import BuyerFactory, PurchaseFactory
-from models import Purchase, Payment
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
 
 from segue.mailer import MailerService
-from segue.caravan.services import CaravanService
 
 from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
+from models    import Purchase, Payment
 
 import schema
 
@@ -70,6 +69,7 @@ class PaymentService(object):
     )
 
     def __init__(self, mailer=None, caravans=None, filters=None, **processors_overrides):
+        from segue.caravan.services import CaravanService # THIS IS UGLY
         self.processors_overrides = processors_overrides
         self.mailer               = mailer or MailerService()
         self.caravans             = caravans or CaravanService()

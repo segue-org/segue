@@ -2,6 +2,7 @@ import datetime
 from sqlalchemy.sql import functions as func
 from ..core import db
 from ..json import JsonSerializable
+
 from segue.product.models import Product
 from segue.purchase.models import Purchase
 from segue.errors import WrongBuyerForProduct

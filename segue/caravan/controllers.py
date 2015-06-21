@@ -7,7 +7,6 @@ from ..json import jsoned, accepts_html, JsonFor
 
 import schema
 
-from models import Caravan, CaravanInvite
 from services import CaravanService, CaravanInviteService
 
 class CaravanController(object):

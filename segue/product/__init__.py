@@ -7,7 +7,8 @@ from ..core import db, jwt_required
 from ..json import jsoned, JsonFor
 
 from models import Product
-from segue.errors import ProductExpired, InvalidCaravan
+from segue.errors import ProductExpired
+from segue.caravan.errors import InvalidCaravan
 from segue.purchase.services import PurchaseService
 from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct

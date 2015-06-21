@@ -1,12 +1,13 @@
 from segue.core import db
-from segue.errors import AccountAlreadyHasCaravan, NotAuthorized
 from segue.hasher import Hasher
 from segue.mailer import MailerService
+from segue.errors import NotAuthorized
 
 import schema
 
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
+from errors import AccountAlreadyHasCaravan
 from ..account import AccountService, Account
 
 class CaravanService(object):

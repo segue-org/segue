@@ -33,16 +33,6 @@ class InvalidResetPassword(SegueError):
     def to_json(self):
         return { 'message': 'invalid reset password code' }
 
-class InvalidCaravan(SegueError):
-    code = 400
-    def to_json(self):
-        return { 'message': 'caravan code is not valid' }
-
-class AccountAlreadyHasCaravan(SegueError):
-    code = 400
-    def to_json(self):
-        return { 'message': 'this account already has a caravan' }
-
 class NoSuchAccount(SegueError):
     code = 404
     def to_json(self):

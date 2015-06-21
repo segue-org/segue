@@ -3,7 +3,8 @@ import sys;
 import json
 import mockito
 
-from segue.errors import AccountAlreadyHasCaravan, NotAuthorized, SegueValidationError
+from segue.errors import NotAuthorized, SegueValidationError
+from segue.caravan.errors import AccountAlreadyHasCaravan
 from segue.caravan.services import CaravanService, CaravanInviteService
 from segue.caravan.models import CaravanLeaderPurchase
 
