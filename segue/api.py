@@ -1,21 +1,15 @@
 import flask
 
-from document import DocumentController
 from admin import AdminController
-from judge import JudgeBlueprint, MatchBlueprint
 
+from document import DocumentBlueprint
+from judge import JudgeBlueprint, MatchBlueprint
 from purchase import PurchaseBlueprint, PaymentBlueprint
 from account import AccountBlueprint, SessionBlueprint
 from proposal import ProposalBlueprint, ProposalInviteBluePrint
 from product import ProductBlueprint
 from caravan import CaravanBlueprint, CaravanInviteBluePrint
 from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
-
-class DocumentBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(DocumentBlueprint, self).__init__('documents', __name__, url_prefix='/documents')
-        self.controller = DocumentController()
-        self.add_url_rule('/<string:kind>-<string:document_hash>', methods=['GET'], view_func=self.controller.get_by_hash)
 
 class AdminBlueprint(flask.Blueprint):
     def __init__(self):

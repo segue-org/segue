@@ -28,10 +28,6 @@ class NoSuchProposal(SegueError):
     def to_json(self):
         return { 'message': 'no such proposal' }
 
-class DocumentNotFound(SegueError):
-    code = 404
-    def to_json(self):
-        return { 'message': 'could not find document {}'.format(self.args) }
 
 class SegueValidationError(SegueError):
     recognizers = []

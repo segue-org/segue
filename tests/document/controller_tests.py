@@ -1,6 +1,6 @@
 import mockito
 
-from segue.errors import DocumentNotFound
+from segue.document.errors import DocumentNotFound
 from ..support import SegueApiTestCase
 
 class DocumentControllerTestCases(SegueApiTestCase):

@@ -3,8 +3,8 @@ import mockito
 
 from testfixtures import TempDirectory
 
-from segue.document import DocumentService
-from segue.errors import DocumentNotFound
+from segue.document.services import DocumentService
+from segue.document.errors import DocumentNotFound
 
 from ..support import SegueApiTestCase
 
