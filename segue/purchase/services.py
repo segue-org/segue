@@ -1,6 +1,7 @@
 from segue.core import db, logger
 
-from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied
+from segue.errors import NotAuthorized
+from segue.purchase.errors import NoSuchPayment, PurchaseAlreadySatisfied
 from segue.product.errors import NoSuchProduct, ProductExpired
 
 from factories import BuyerFactory, PurchaseFactory

@@ -1,5 +1,6 @@
 from requests.exceptions import RequestException
-from segue.errors import ExternalServiceError, InvalidPaymentNotification, NoSuchPayment
+from segue.errors import ExternalServiceError
+from segue.purchase.errors import InvalidPaymentNotification, NoSuchPayment
 from segue.core import db, logger
 
 from .factories import PagSeguroPaymentFactory, PagSeguroSessionFactory, PagSeguroTransitionFactory

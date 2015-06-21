@@ -9,7 +9,7 @@ from ..json import jsoned, SimpleJson
 
 from segue.account.services import AccountService
 from segue.proposal.services import ProposalService
-from segue.purchase import PurchaseService, PaymentService
+from segue.purchase.services import PurchaseService, PaymentService
 from segue.judge.services import TournamentService, RankingService
 from segue.schedule.services import NotificationService
 

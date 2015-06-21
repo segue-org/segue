@@ -1,8 +1,8 @@
 import json
 import mockito
 
-from segue.errors import NotAuthorized, PaymentVerificationFailed,\
-                         InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
+from segue.errors import NotAuthorized
+from segue.purchase.errors import PaymentVerificationFailed, InvalidPaymentNotification, NoSuchPayment, PurchaseAlreadySatisfied
 
 from ..support import SegueApiTestCase
 from ..support.factories import *

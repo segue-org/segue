@@ -1,62 +1,20 @@
 import flask
-from flask.ext.jwt import current_user
-from flask import request
 
-from ..json import jsoned, JsonFor
-from ..core import jwt_required, config
+from controllers import PurchaseController, PaymentController
 
-from services import PurchaseService, PaymentService
-from factories import PurchaseFactory
+class PurchaseBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(PurchaseBlueprint, self).__init__('purchases', __name__, url_prefix='/purchases')
+        self.controller = PurchaseController()
+        self.add_url_rule('',                                       methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
+        self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
+        self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
 
-import schema
-
-class PurchaseController(object):
-    def __init__(self, service=None):
-        self.service = service or PurchaseService()
-        self.current_user = current_user
-
-    @jsoned
-    @jwt_required()
-    def list(self):
-        parms = { c: request.args.get(c) for c in PurchaseFactory.QUERY_WHITELIST if c in request.args }
-        result = self.service.query(by=self.current_user, **parms)
-        return JsonFor(result).using('PurchaseJsonSerializer'), 200
-
-    @jwt_required()
-    @jsoned
-    def get_one(self, purchase_id=None):
-        result = self.service.get_one(purchase_id, by=self.current_user) or flask.abort(404)
-        return result, 200
-
-    @jwt_required()
-    @jsoned
-    def pay(self, purchase_id=None, method=None):
-        payload = request.get_json()
-        result = self.service.create_payment(purchase_id, method, payload, by=self.current_user)
-        return result, 200
-
-    @jsoned
-    def schema(self, name):
-        return schema.whitelist[name], 200
-
-    @jwt_required()
-    @jsoned
-    def clone(self, purchase_id=None):
-        result = self.service.clone_purchase(purchase_id, by=self.current_user) or flask.abort(404)
-        return result, 200
-
-class PaymentController(object):
-    def __init__(self, service=None):
-        self.service = service or PaymentService()
-
-    @jsoned
-    def notify(self, purchase_id=None, payment_id=None):
-        payload = request.form.to_dict(True)
-        result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
-        return result[0], 200
-
-    def conclude(self, purchase_id, payment_id):
-        payload = request.args.to_dict(True)
-        self.service.conclude(purchase_id, payment_id, payload) or flask.abort(404)
-        path = '/#/purchase/{}/payment/{}/conclude'.format(purchase_id, payment_id)
-        return flask.redirect(config.FRONTEND_URL + path)
+class PaymentBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(PaymentBlueprint, self).__init__('purchase_payments', __name__, url_prefix='/purchases/<int:purchase_id>/payments')
+        self.controller = PaymentController()
+        self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
+        self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)

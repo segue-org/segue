@@ -7,7 +7,8 @@ from pagseguro.sandbox import ConfigSandbox
 from segue.core import config, logger
 from segue.factory import Factory
 from segue.purchase.factories import PaymentFactory, TransitionFactory
-from segue.errors import BadConfiguration, InvalidPaymentNotification
+from segue.errors import BadConfiguration
+from segue.purchase.errors import InvalidPaymentNotification
 
 from models import PagSeguroPayment, PagSeguroTransition
 

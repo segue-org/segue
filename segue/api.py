@@ -1,38 +1,22 @@
 import flask
 
-from purchase import PurchaseController, PaymentController
 from document import DocumentController
 from admin import AdminController
 from judge import JudgeController, MatchController
 
+from purchase import PurchaseBlueprint, PaymentBlueprint
 from account import AccountBlueprint, SessionBlueprint
 from proposal import ProposalBlueprint, ProposalInviteBluePrint
 from product import ProductBlueprint
 from caravan import CaravanBlueprint, CaravanInviteBluePrint
 from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
 
-class PurchaseBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(PurchaseBlueprint, self).__init__('purchases', __name__, url_prefix='/purchases')
-        self.controller = PurchaseController()
-        self.add_url_rule('',                                       methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
-        self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
-        self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
-
-class PaymentBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(PaymentBlueprint, self).__init__('purchase_payments', __name__, url_prefix='/purchases/<int:purchase_id>/payments')
-        self.controller = PaymentController()
-        self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
-        self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)
-
 class DocumentBlueprint(flask.Blueprint):
     def __init__(self):
         super(DocumentBlueprint, self).__init__('documents', __name__, url_prefix='/documents')
         self.controller = DocumentController()
         self.add_url_rule('/<string:kind>-<string:document_hash>', methods=['GET'], view_func=self.controller.get_by_hash)
+
 class AdminBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
