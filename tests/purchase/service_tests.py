@@ -5,9 +5,9 @@ from segue.purchase.factories import PaymentFactory
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.models import Payment
 from segue.purchase.pagseguro.models import PagSeguroPayment
-from segue.errors import NotAuthorized, PaymentVerificationFailed, ProductExpired, \
-                         InvalidPaymentNotification, NoSuchPayment, NoSuchProduct, \
-                         PurchaseAlreadySatisfied
+
+from segue.errors import NotAuthorized, NoSuchPayment, PurchaseAlreadySatisfied, InvalidPaymentNotification, PaymentVerificationFailed
+from segue.product.errors import NoSuchProduct, ProductExpired
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *

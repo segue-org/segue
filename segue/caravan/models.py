@@ -5,7 +5,7 @@ from ..json import JsonSerializable
 
 from segue.product.models import Product
 from segue.purchase.models import Purchase
-from segue.errors import WrongBuyerForProduct
+from segue.product.errors import WrongBuyerForProduct
 
 from serializers import *
 

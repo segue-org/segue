@@ -1,7 +1,7 @@
 import json
 import mockito
 
-from segue.product import ProductController
+from segue.product.controllers import ProductController
 
 from ..support import SegueApiTestCase
 from ..support.factories import *

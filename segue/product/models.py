@@ -1,7 +1,8 @@
 from datetime import datetime
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
-from segue.errors import ProductExpired
+
+from errors import ProductExpired
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

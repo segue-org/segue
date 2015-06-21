@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 import mockito
 
-from segue.product import ProductService
+from segue.product.services import ProductService
 from segue.product.models import Product
 from segue.caravan.models import CaravanProduct
 from segue.caravan.errors import InvalidCaravan
-from segue.errors import ProductExpired, WrongBuyerForProduct
+from segue.product.errors import ProductExpired, WrongBuyerForProduct
 
 from ..support import SegueApiTestCase
 from ..support.factories import *

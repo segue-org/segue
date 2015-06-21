@@ -33,16 +33,6 @@ class DocumentNotFound(SegueError):
     def to_json(self):
         return { 'message': 'could not find document {}'.format(self.args) }
 
-class WrongBuyerForProduct(SegueError):
-    code = 403
-    def to_json(self):
-        return { 'message': 'product cannot be bought by this buyer' }
-
-class ProductExpired(SegueError):
-    code = 403
-    def to_json(self):
-        return { 'message': 'product is no longer being sold' }
-
 class SegueValidationError(SegueError):
     recognizers = []
 
@@ -79,11 +69,6 @@ class NoSuchPayment(SegueError):
     code = 404
     def to_json(self):
         return { 'message': 'notification was sent to an invalid payment' }
-
-class NoSuchProduct(SegueError):
-    code = 404
-    def to_json(self):
-        return { 'message': 'cannot find a product like that' }
 
 class InvalidPaymentNotification(SegueError):
     code = 400

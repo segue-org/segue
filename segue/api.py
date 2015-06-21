@@ -1,6 +1,5 @@
 import flask
 
-from product import ProductController
 from purchase import PurchaseController, PaymentController
 from document import DocumentController
 from admin import AdminController
@@ -8,16 +7,9 @@ from judge import JudgeController, MatchController
 
 from account import AccountBlueprint, SessionBlueprint
 from proposal import ProposalBlueprint, ProposalInviteBluePrint
+from product import ProductBlueprint
 from caravan import CaravanBlueprint, CaravanInviteBluePrint
 from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
-
-class ProductBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(ProductBlueprint, self).__init__('products', __name__, url_prefix='/products')
-        self.controller = ProductController()
-        self.add_url_rule('',                            methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('/<int:product_id>/purchase',  methods=['POST'], view_func=self.controller.purchase)
-        self.add_url_rule('/caravan/<string:hash_code>', methods=['GET'],  view_func=self.controller.caravan_products)
 
 class PurchaseBlueprint(flask.Blueprint):
     def __init__(self):
