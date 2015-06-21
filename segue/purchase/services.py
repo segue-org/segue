@@ -5,10 +5,11 @@ from factories import BuyerFactory, PurchaseFactory
 from models import Purchase, Payment
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
 
-from .pagseguro import PagSeguroPaymentService
-from .boleto    import BoletoPaymentService
-from ..mailer import MailerService
-from ..caravan import CaravanService
+from segue.mailer import MailerService
+from segue.caravan.services import CaravanService
+
+from pagseguro import PagSeguroPaymentService
+from boleto    import BoletoPaymentService
 
 import schema
 
