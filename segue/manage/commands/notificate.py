@@ -3,14 +3,19 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 
+from segue.errors import SegueError
 from segue.proposal.services import ProposalService
 from segue.schedule.services import NotificationService
 from support import *;
 
-def notify_proposals(deadline=None, start=0, end=sys.maxint):
+def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
     init_command()
+    if not tags:
+        print "must specify tag names"
+        sys.exit(1)
+    tags = tags.split(",")
     deadline = datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
-    proposals = ProposalService().all_with_tags('marked','accepted')
+    proposals = ProposalService().all_with_tags(*tags)
     notification = NotificationService()
 
     operations = defaultdict(lambda: 0)
@@ -29,11 +34,12 @@ def notify_proposals(deadline=None, start=0, end=sys.maxint):
             print F.GREEN + "OK" + F.RESET
             operations["OK"] += 1
         except SegueError, e:
+            print "{}{}{} got raised!".format(F.RED, e.__class__.__name__, F.RESET)
             name = e.__class__.__name__
             operations[name] += 1
 
     print "==[ RESULTS ]========================="
-    print "{}{}{} notifications got sent".format(F.GREEN, operations.pop('OK'), F.RESET)
+    print "{}{}{} notifications got sent".format(F.GREEN, operations.pop('OK', 0), F.RESET)
     for key, value in operations.items():
         print "{}{}{} notifications resulted in {}{}{}".format(F.GREEN, value, F.RESET, F.GREEN, key, F.RESET)
 
