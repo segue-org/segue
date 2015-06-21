@@ -8,7 +8,8 @@ from document import DocumentController
 from caravan import CaravanController, CaravanInviteController
 from admin import AdminController
 from judge import JudgeController, MatchController
-from schedule import RoomController, SlotController, NotificationController
+# from schedule import RoomController, SlotController, NotificationController
+from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -147,28 +148,6 @@ class MatchBlueprint(flask.Blueprint):
         super(MatchBlueprint, self).__init__('matches', __name__, url_prefix='/matches')
         self.controller = MatchController()
         self.add_url_rule('/<int:match_id>/vote', methods=['POST'], view_func=self.controller.vote_on_match)
-
-class RoomBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(RoomBlueprint, self).__init__('rooms', __name__, url_prefix='/rooms')
-        self.controller = RoomController()
-        self.add_url_rule('',                     methods=['GET'], view_func=self.controller.list_all)
-        self.add_url_rule('/<int:room_id>',       methods=['GET'], view_func=self.controller.get_one)
-
-class SlotBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(SlotBlueprint, self).__init__('slots', __name__, url_prefix='/rooms/<int:room_id>/slots')
-        self.controller = SlotController()
-        self.add_url_rule('/',              methods=['GET'], view_func=self.controller.of_room)
-        self.add_url_rule('/<int:slot_id>', methods=['GET'], view_func=self.controller.get_one)
-
-class NotificationBlueprint(flask.Blueprint):
-    def __init__(self):
-        super(NotificationBlueprint, self).__init__('notifications', __name__, url_prefix='/notifications')
-        self.controller = NotificationController()
-        self.add_url_rule('/<string:hash_code>',         methods=['GET'],  view_func=self.controller.get_by_hash)
-        self.add_url_rule('/<string:hash_code>/accept',  methods=['POST'], view_func=self.controller.accept)
-        self.add_url_rule('/<string:hash_code>/decline', methods=['POST'], view_func=self.controller.decline)
 
 blueprints = [
     ProposalBlueprint(),
