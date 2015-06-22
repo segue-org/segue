@@ -34,6 +34,22 @@ class ValidTrackFactory(SegueFactory):
     name_pt = _Sequence('zone - track {0}')
     public  = True
 
+class ValidRoomFactory(SegueFactory):
+    class Meta:
+        model = Room
+    name        = _Sequence('sala {0}')
+    capacity    = 200
+    translation = False
+
+class ValidSlotFactory(SegueFactory):
+    class Meta:
+        model = Slot
+    room      = SubFactory(ValidRoomFactory)
+    blocked   = False
+    begins    = datetime(2015,7,8,9,0,0)
+    duration  = 60
+    status    = 'empty'
+
 class ValidAccountFactory(SegueFactory):
     class Meta:
         model = Account

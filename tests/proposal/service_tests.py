@@ -7,7 +7,7 @@ from datetime import timedelta
 from freezegun import freeze_time
 
 from segue.proposal.services import ProposalService, InviteService
-from segue.proposal.errors import DeadlineReached
+from segue.proposal.errors import DeadlineReached, NoSuchProposal
 from segue.errors import SegueValidationError, NotAuthorized
 
 from ..support import SegueApiTestCase
@@ -35,6 +35,13 @@ class ProposalServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(SegueValidationError):
             self.service.create(proposal, self.mock_owner)
+
+    def test_get_one_strictness(self):
+        result = self.service.get_one(1234)
+        self.assertEquals(result, None)
+
+        with self.assertRaises(NoSuchProposal):
+            self.service.get_one(1234, strict=True)
 
     def test_create_and_retrieve_of_valid_proposal(self):
         proposal = ValidProposalFactory().to_json()

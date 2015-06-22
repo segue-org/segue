@@ -3,25 +3,51 @@ from datetime import datetime
 from segue.core import db
 from segue.mailer import MailerService
 from segue.hasher import Hasher
-from segue.proposal.services import ProposalService
-from segue.errors import NoSuchProposal
 
-from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered
+from segue.proposal.services import ProposalService
+from segue.proposal.errors import NoSuchProposal
+
+from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered, NoSuchSlot
 from models import Room, Slot, Notification, CallNotification
+from filters import SlotFilterStrategies
 
 class RoomService(object):
     def get_one(self, room_id):
         return Room.query.get(room_id)
+
     def query(self, **kw):
         filters = kw
         return Room.query.filter(**filters).order_by(Room.position).all()
 
 class SlotService(object):
+    def __init__(self, proposals=None):
+        self.proposals = proposals or ProposalService()
+        self.filters = SlotFilterStrategies()
+
     def of_room(self, room_id):
         return Slot.query.filter(Slot.room_id == room_id).all()
 
-    def get_one(self, slot_id):
-        return Slot.query.get(slot_id)
+    def get_one(self, slot_id, strict=False):
+        slot = Slot.query.get(slot_id)
+        if slot: return slot
+        elif strict: raise NoSuchSlot()
+        return None
+
+    def set_talk(self, slot_id, proposal_id):
+        slot = self.get_one(slot_id, strict=True)
+        proposal = self.proposals.get_one(proposal_id, strict=True)
+
+        slot.proposal = proposal
+        db.session.add(slot)
+        db.session.commit()
+        return slot
+
+    def empty_slot(self, slot_id):
+        slot = self.get_one(slot_id, strict=True)
+        slot.proposal = None
+        db.session.add(slot)
+        db.session.commit()
+        return slot
 
 class NotificationService(object):
     def __init__(self, mailer=None, hasher=None, proposals=None):

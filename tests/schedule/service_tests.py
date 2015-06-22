@@ -1,13 +1,41 @@
 import mockito
 from datetime import datetime, timedelta
 
-from segue.errors import NoSuchProposal
 from segue.schedule.errors import *
 
-from ..support import SegueApiTestCase
+from ..support import SegueApiTestCase, Context
 from ..support.factories import *
 
-from segue.schedule.services import NotificationService
+from segue.schedule.services import NotificationService, SlotService
+from segue.schedule.errors import NoSuchSlot
+
+class SlotServiceTestCases(SegueApiTestCase):
+    def setUp(self):
+        super(SlotServiceTestCases, self).setUp()
+        self.service = SlotService()
+
+    def test_get_one_strictness(self):
+        result = self.service.get_one(123)
+        self.assertEquals(result, None)
+
+        with self.assertRaises(NoSuchSlot):
+            self.service.get_one(123, strict=True)
+
+    def test_set_talk(self):
+        proposal = self.create_from_factory(ValidProposalWithOwnerFactory)
+        slot     = self.create_from_factory(ValidSlotFactory)
+
+        result = self.service.set_talk(slot.id, proposal.id)
+        retrieved = self.service.get_one(slot.id)
+
+        self.assertEquals(result, retrieved)
+        self.assertEquals(result.proposal, proposal)
+
+    def test_empty_slot(self):
+        slot = self.create_from_factory(ValidSlotFactory)
+        result = self.service.empty_slot(slot.id)
+        retrieved = self.service.get_one(slot.id)
+        self.assertEquals(result.proposal, None)
 
 class NotificationServiceTestCase(SegueApiTestCase):
     def setUp(self):
@@ -81,5 +109,3 @@ class NotificationServiceTestCase(SegueApiTestCase):
         retrieved = self.service.get_by_hash('DEF')
         self.assertEquals(retrieved.status, 'pending')
         self.assertEquals(retrieved.proposal.status, 'proposal')
-
-

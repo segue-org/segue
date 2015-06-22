@@ -15,5 +15,11 @@ class NoSuchNotification(SegueError):
     def to_json(self):
         return { 'message': 'no such notification' }
 
+class NoSuchSlot(SegueError):
+    code = 404
+    def to_json(self):
+        return { 'message': 'no such slot' }
+
+
 
 

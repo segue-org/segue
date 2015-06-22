@@ -11,7 +11,7 @@ from segue.mailer import MailerService
 from segue.account.services import AccountService
 
 import schema
-from errors import DeadlineReached
+from errors import DeadlineReached, NoSuchProposal
 from factories import ProposalFactory, InviteFactory
 from models    import ProposalTag, Proposal, ProposalInvite, Track
 from filters import ProposalFilterStrategies
@@ -48,8 +48,11 @@ class ProposalService(object):
         db.session.commit()
         return proposal
 
-    def get_one(self, proposal_id):
-        return Proposal.query.get(proposal_id)
+    def get_one(self, proposal_id, strict=False):
+        proposal = Proposal.query.get(proposal_id)
+        if proposal: return proposal
+        elif strict: raise NoSuchProposal()
+        return None
 
     def query(self, **kw):
         filter_list = self.filter_strategies.given(**kw)
