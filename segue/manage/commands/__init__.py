@@ -10,6 +10,7 @@ import clean
 import report
 import judge
 import notificate
+import import_avulsos
 
 def _make_context():
     import segue.models
@@ -37,3 +38,4 @@ manager.command(judge.put_tag_if_absent_of)
 manager.command(judge.generate_round)
 manager.command(judge.freeze_judging)
 manager.command(notificate.notify_proposals)
+manager.command(import_avulsos.import_avulsos)
