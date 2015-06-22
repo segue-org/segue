@@ -4,7 +4,7 @@ import codecs
 import sys
 
 
-from segue.purchase import PaymentService
+from segue.purchase.services import PaymentService
 from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.parsers  import BoletoFileParser
 
