@@ -5,13 +5,8 @@ import mockito
 
 from segue.errors import NotAuthorized
 
-from ..support import SegueApiTestCase
+from ..support import SegueApiTestCase, Context
 from ..support.factories import *
-
-class Context(dict):
-    def __init__(self, a_dict):
-        super(Context, self).__init__(**a_dict)
-        self.__dict__.update(a_dict)
 
 class AdminControllerFunctionalTestCases(SegueApiTestCase):
     def setUp(self):

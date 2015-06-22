@@ -3,8 +3,9 @@ import flask
 from flask import request
 from flask.ext.jwt import current_user, verify_jwt, JWTError
 
-from ..core import jwt_required, config
-from ..json import jsoned, accepts_html, JsonFor
+from segue.core import config
+from segue.json import JsonFor
+from segue.decorators import jsoned, jwt_only, accepts_html
 
 import schema
 from factories import ProposalFactory
@@ -15,13 +16,13 @@ class ProposalController(object):
         self.service = service or ProposalService()
         self.current_user = current_user
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def create(self):
         data = request.get_json()
         return self.service.create(data, self.current_user), 201
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def modify(self, proposal_id):
         data = request.get_json()
@@ -34,7 +35,7 @@ class ProposalController(object):
         return result, 200
 
     @jsoned
-    @jwt_required()
+    @jwt_only
     def list(self):
         parms = { c: request.args.get(c) for c in ProposalFactory.QUERY_WHITELIST if c in request.args }
         result = self.service.query(as_user=self.current_user, **parms)
@@ -62,7 +63,7 @@ class ProposalInviteController(object):
         self.service      = service   or InviteService()
         self.current_user = current_user
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def list(self, proposal_id):
         result = self.service.list(proposal_id, by=self.current_user)
@@ -78,7 +79,7 @@ class ProposalInviteController(object):
         else:
             return invite, 200
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def create(self, proposal_id):
         data = request.get_json()

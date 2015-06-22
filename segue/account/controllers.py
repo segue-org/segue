@@ -1,15 +1,12 @@
 import flask
 from flask import request, url_for, redirect
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import IntegrityError
 from flask.ext.jwt import current_user
 
-from ..core import db, jwt_required, config
-from ..factory import Factory
-from ..json import jsoned
+from segue.core import db, config
+from segue.factory import Factory
+from segue.decorators import jsoned, jwt_only
 
 from jwt import Signer
-
 from models import Account, ResetPassword
 from services import AccountService
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
@@ -21,13 +18,13 @@ class AccountController(object):
         self.service = service or AccountService()
         self.current_user = current_user
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def get_one(self, account_id):
         result = self.service.get_one(account_id, by=self.current_user) or flask.abort(404)
         return result, 200
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def modify(self, account_id):
         data = request.get_json()

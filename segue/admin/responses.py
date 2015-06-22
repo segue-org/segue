@@ -125,7 +125,7 @@ class ProposalDetailResponse(BaseResponse):
 
         if links:
             self.add_link('invites', proposal.invites.all(), 'admin.list_proposal_invites', proposal_id=proposal.id)
-            self.add_link('owner',   proposal.owner,         'admin.get_account',           account_id =proposal.owner.id)
+            self.add_link('owner',   proposal.owner,         'admin.account.get_one',       account_id =proposal.owner.id)
 
 class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):
@@ -142,8 +142,8 @@ class PurchaseDetailResponse(BaseResponse):
         self.product = ProductDetailResponse.create(purchase.product)
 
         if links:
-            self.add_link('payments', purchase.payments.all(), 'admin.list_payments', purchase_id = purchase.id)
-            self.add_link('customer', purchase.customer,       'admin.get_account',   account_id  = purchase.customer.id)
+            self.add_link('payments', purchase.payments.all(), 'admin.list_payments',   purchase_id = purchase.id)
+            self.add_link('customer', purchase.customer,       'admin.account.get_one', account_id  = purchase.customer.id)
 
 class ProductDetailResponse(BaseResponse):
     def __init__(self, product, links=True):

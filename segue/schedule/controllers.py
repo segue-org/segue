@@ -1,7 +1,7 @@
 import flask
 
 from segue.core import config
-from segue.json import jsoned, accepts_html
+from segue.decorators import jsoned, accepts_html
 
 from responses import RoomResponse, SlotResponse, NotificationResponse
 from services import RoomService, SlotService, NotificationService

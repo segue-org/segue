@@ -2,8 +2,9 @@ import flask
 from flask import request
 from flask.ext.jwt import current_user, verify_jwt, JWTError
 
-from ..core import jwt_required, config
-from ..json import jsoned, accepts_html, JsonFor
+from segue.core import config
+from segue.json import JsonFor
+from segue.decorators import jsoned, jwt_only, accepts_html
 
 import schema
 
@@ -14,20 +15,20 @@ class CaravanController(object):
         self.service = service or CaravanService()
         self.current_user = current_user
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def create(self):
         data = request.get_json()
         return self.service.create(data, self.current_user), 201
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def modify(self, caravan_id):
         data = request.get_json()
         result = self.service.modify(caravan_id, data, by=self.current_user) or flask.abort(404)
         return result, 200
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def get_one(self, caravan_id=None):
         if caravan_id:
@@ -46,7 +47,7 @@ class CaravanInviteController(object):
         self.service = service or CaravanInviteService()
         self.current_user = current_user
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def list(self, caravan_id):
         result = self.service.list(caravan_id, by=self.current_user)
@@ -62,7 +63,7 @@ class CaravanInviteController(object):
         else:
             return invite, 200
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def create(self, caravan_id):
         data = request.get_json()

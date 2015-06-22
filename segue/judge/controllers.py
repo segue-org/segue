@@ -2,7 +2,7 @@ import flask
 from flask import request
 
 from segue.core import config
-from segue.json import jsoned, accepts_html
+from segue.decorators import jsoned, accepts_html
 
 from services import JudgeService
 from responses import *

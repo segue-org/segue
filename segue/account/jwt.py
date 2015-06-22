@@ -7,7 +7,7 @@ local_jwt = LocalProxy(lambda: current_app.extensions['jwt'])
 
 @jwt.user_handler
 def load_user(payload):
-    from ..account import AccountService
+    from services import AccountService
     if payload["id"]:
         return AccountService().get_one(payload["id"], check_owner=False)
 

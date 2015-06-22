@@ -2,9 +2,8 @@ import flask
 from flask import request
 from flask.ext.jwt import current_user
 
-from segue.core import  jwt_required
-from segue.json import jsoned, JsonFor
-
+from segue.json import JsonFor
+from segue.decorators import jsoned, jwt_only
 
 from services import ProductService
 
@@ -18,7 +17,7 @@ class ProductController(object):
         result = self.service.list()
         return JsonFor(result).using('ProductJsonSerializer'), 200
 
-    @jwt_required()
+    @jwt_only
     @jsoned
     def purchase(self, product_id):
         data = request.get_json()
