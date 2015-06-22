@@ -16,6 +16,8 @@ class SlotFilterStrategies(FilterStrategies):
     def by_day(self, value, as_user=None):
         if isinstance(value, date):
             value = datetime(value.year, value.month, value.day)
+        if isinstance(value, basestring):
+            value = datetime.strptime(value,"%Y-%m-%d")
         if not isinstance(value, datetime):
             return None
         day_start = value.replace(hour=0,  minute=0,  second=0)

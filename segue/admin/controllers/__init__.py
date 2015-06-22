@@ -23,6 +23,7 @@ from ..responses import *
 from .account import AdminAccountController
 from .proposal import AdminProposalController
 from .judge import AdminJudgeController
+from .schedule import AdminScheduleController
 
 class AdminController(object):
     def __init__(self, purchases=None, payments=None, tournaments=None, rankings=None, notifications=None):

@@ -35,6 +35,18 @@ class AdminCallBlueprint(flask.Blueprint):
         self.controller = AdminJudgeController()
         self.add_url_rule('/<int:tournament_id>/<int:track_id>',   methods=['GET'], view_func=self.controller.get_ranking_by_track)
 
+class AdminRoomBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminRoomBlueprint, self).__init__('admin.room', __name__, url_prefix="/admin/rooms")
+        self.controller = AdminScheduleController()
+        self.add_url_rule('', methods=['GET'], view_func=self.controller.list_rooms)
+
+class AdminSlotBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminSlotBlueprint, self).__init__('admin.slot', __name__, url_prefix="/admin/slots")
+        self.controller = AdminScheduleController()
+        self.add_url_rule('', methods=['GET'], view_func=self.controller.query_slots)
+
 class AdminBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
@@ -51,5 +63,7 @@ blueprints = [
     AdminProposalBlueprint(),
     AdminTournamentsBlueprint(),
     AdminCallBlueprint(),
+    AdminRoomBlueprint(),
+    AdminSlotBlueprint(),
     AdminBlueprint()
 ]
