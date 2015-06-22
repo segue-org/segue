@@ -1,14 +1,15 @@
 from flask import request, abort
+from flask.ext.jwt import current_user
 
 from segue.decorators import jwt_only, admin_only, jsoned
-from segue.admin.controllers import BaseAdminController
-from segue.admin.responses import AccountDetailResponse
+from segue.account.services import AccountService
 
-from services import AccountService
+from ..responses import AccountDetailResponse
+from base import BaseAdminController
 
 class AdminAccountController(BaseAdminController):
     def __init__(self, service=None):
-        super(AdminAccountController, self).__init__()
+        self.current_user = current_user
         self.service = service or AccountService()
 
     @jsoned

@@ -92,7 +92,7 @@ class AccountDetailResponse(BaseResponse):
         self.has_valid_purchases = account.has_valid_purchases
 
         if links:
-            self.add_link('proposals', account.proposals,     'admin.list_proposals', owner_id   =account.id)
+            self.add_link('proposals', account.proposals,     'admin.proposal.list',  owner_id   =account.id)
             self.add_link('purchases', account.purchases,     'admin.list_purchases', customer_id=account.id)
             self.add_link('payments',  account.payments,      'admin.list_payments',  customer_id=account.id)
             self.add_link('caravans',  account.caravan_owned, 'admin.list_caravans',  owner_id   =account.id)
@@ -124,7 +124,7 @@ class ProposalDetailResponse(BaseResponse):
 
 
         if links:
-            self.add_link('invites', proposal.invites.all(), 'admin.list_proposal_invites', proposal_id=proposal.id)
+            self.add_link('invites', proposal.invites.all(), 'admin.proposal.list_invites', proposal_id=proposal.id)
             self.add_link('owner',   proposal.owner,         'admin.account.get_one',       account_id =proposal.owner.id)
 
 class PurchaseDetailResponse(BaseResponse):
