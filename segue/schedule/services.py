@@ -27,6 +27,16 @@ class SlotService(object):
     def of_room(self, room_id):
         return Slot.query.filter(Slot.room_id == room_id).all()
 
+    def query(self, **kw):
+        base    = self.filters.joins_for(Slot.query, **kw)
+        filters = self.filters.given(**kw)
+        return base.filter(*filters).order_by(Slot.begins).all()
+
+    def lookup(self, needle):
+        base    = self.filters.all_joins(Slot.query)
+        filters = self.filters.needle(needle)
+        return base.filter(*filters).order_by(Slot.begins).all()
+
     def get_one(self, slot_id, strict=False):
         slot = Slot.query.get(slot_id)
         if slot: return slot

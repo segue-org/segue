@@ -41,6 +41,8 @@ class SegueApiTestCase(unittest.TestCase):
         segue.core.jwt.decode_handler(lambda token: None)
         segue.core.jwt.user_handler(lambda payload: None)
 
+    def create(self, *args, **kw):
+        return self.create_from_factory(*args, **kw)
 
     def create_from_factory(self, factory, *args, **kw):
         entity = factory.create(*args, **kw)

@@ -37,6 +37,65 @@ class SlotServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(slot.id)
         self.assertEquals(result.proposal, None)
 
+    def setUpComplexScenario(self):
+        day1 = datetime(2015,7,8)
+        day2 = datetime(2015,7,9)
+        owner1 = self.create(ValidAccountFactory, name='Arya Stark')
+        owner2 = self.create(ValidAccountFactory, name='Sansa Stark')
+        owner3 = self.create(ValidAccountFactory, name='Rob Baratheon')
+        proposal1 = self.create(ValidProposalFactory, owner=owner1, title='Valar Morghulis')
+        proposal2 = self.create(ValidProposalFactory, owner=owner2, title='Valar Dohaeris')
+        proposal3 = self.create(ValidProposalFactory, owner=owner3, title='Winter is Coming')
+        proposal4 = self.create(ValidProposalFactory, owner=owner3, title='You know nothing')
+        room1 = self.create(ValidRoomFactory)
+        room2 = self.create(ValidRoomFactory)
+        slot1 = self.create(ValidSlotFactory, room=room1, talk=proposal1, begins=day1 + timedelta(hours= 9))
+        slot2 = self.create(ValidSlotFactory, room=room1, talk=proposal2, begins=day1 + timedelta(hours=10))
+        slot3 = self.create(ValidSlotFactory, room=room2, talk=proposal3, begins=day1 + timedelta(hours=11))
+        slot3 = self.create(ValidSlotFactory, room=room1, talk=proposal4, begins=day2 + timedelta(hours= 9))
+
+        return Context(locals())
+
+    def test_queries_slot_by_room_and_day(self):
+        ctx = self.setUpComplexScenario()
+
+        result_with_datetime = self.service.query(room=ctx.room1.id, day=ctx.day1)
+
+        self.assertEquals(len(result_with_datetime), 2)
+        self.assertEquals(result_with_datetime[0], ctx.slot1)
+        self.assertEquals(result_with_datetime[1], ctx.slot2)
+
+        result_with_date = self.service.query(room=ctx.room1.id, day=ctx.day1.date())
+        self.assertEquals(result_with_datetime, result_with_date)
+
+    def test_query_slot_by_talk_title(self):
+        ctx = self.setUpComplexScenario()
+        result = self.service.query(title='Valar')
+
+        self.assertEquals(len(result), 2)
+        self.assertIn(ctx.slot1, result)
+        self.assertIn(ctx.slot2, result)
+
+    def test_needle_slot_by_talk_title(self):
+        ctx = self.setUpComplexScenario()
+        result = self.service.lookup('Dohaeris')
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0], ctx.slot2)
+
+    def test_query_slot_by_speaker(self):
+        ctx = self.setUpComplexScenario()
+        result = self.service.query(speaker='Arya')
+        self.assertEquals(len(result), 1)
+        self.assertIn(ctx.slot1, result)
+
+    def test_lookup_slot_by_speaker(self):
+        ctx = self.setUpComplexScenario()
+        result = self.service.lookup('Stark')
+        self.assertEquals(len(result), 2)
+        self.assertIn(ctx.slot1, result)
+        self.assertIn(ctx.slot2, result)
+
+
 class NotificationServiceTestCase(SegueApiTestCase):
     def setUp(self):
         super(NotificationServiceTestCase, self).setUp()

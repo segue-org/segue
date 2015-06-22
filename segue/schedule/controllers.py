@@ -27,7 +27,7 @@ class SlotController(object):
     @jsoned
     def of_room(self, room_id):
         result = self.service.of_room(room_id) or flask.abort(404)
-        return SlotResponse.create(result), 200
+        return SlotResponse.create(result, links=False), 200
 
     @jsoned
     def get_one(self, room_id, slot_id):
