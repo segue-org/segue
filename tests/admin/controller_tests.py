@@ -32,10 +32,10 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
 
         track1 = self.create_from_factory(ValidTrackFactory)
         track2 = self.create_from_factory(ValidTrackFactory)
-        proposal1 = self.create_from_factory(ValidProposalFactory, owner=account0, title='valar morghulis',  track=track1)
-        proposal2 = self.create_from_factory(ValidProposalFactory, owner=account0, title='valar dohaeris',   track=track2)
-        proposal3 = self.create_from_factory(ValidProposalFactory, owner=account3, title='valar lavarlouca', track=track2)
-        proposal4 = self.create_from_factory(ValidProposalFactory, owner=account3, title='a man must die',   track=track2)
+        proposal1 = self.create_from_factory(ValidProposalFactory, id=555, owner=account0, title='valar morghulis',  track=track1)
+        proposal2 = self.create_from_factory(ValidProposalFactory, id=666, owner=account0, title='valar dohaeris',   track=track2)
+        proposal3 = self.create_from_factory(ValidProposalFactory, id=777, owner=account3, title='valar lavarlouca', track=track2)
+        proposal4 = self.create_from_factory(ValidProposalFactory, id=888, owner=account3, title='a man must die',   track=track2)
         proposal_invite1 = self.create_from_factory(ValidInviteFactory, proposal=proposal1, status='accepted', recipient=account2.email)
         proposal_invite2 = self.create_from_factory(ValidInviteFactory, proposal=proposal1, status='pending',  recipient=account3.email)
 
@@ -171,5 +171,12 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
             self.assertEquals(links['payments']['count'],  4)
             self.assertEquals(links['purchases']['count'], 3)
 
+    def test_change_track_of_proposal(self):
+        ctx = self.setUpData()
+        with self.admin_user():
+            raw_data = json.dumps({'track_id': ctx.track2.id })
+            response = self.jpost('/admin/proposals/555/set-track', data=raw_data)
+            item = json.loads(response.data)['resource']
 
-
+            self.assertEquals(response.status_code, 200)
+            self.assertEquals(item['track']['id'], ctx.track2.id)

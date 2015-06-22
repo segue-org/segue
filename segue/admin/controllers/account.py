@@ -5,9 +5,8 @@ from segue.decorators import jwt_only, admin_only, jsoned
 from segue.account.services import AccountService
 
 from ..responses import AccountDetailResponse
-from base import BaseAdminController
 
-class AdminAccountController(BaseAdminController):
+class AdminAccountController(object):
     def __init__(self, service=None):
         self.current_user = current_user
         self.service = service or AccountService()

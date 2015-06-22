@@ -7,10 +7,9 @@ from segue.core import logger
 
 from segue.proposal.services import ProposalService
 
-from base import BaseAdminController
 from ..responses import ProposalDetailResponse, ProposalInviteResponse
 
-class AdminProposalController(BaseAdminController):
+class AdminProposalController(object):
     def __init__(self, service=None):
         self.service = service or ProposalService()
         self.current_user = current_user
