@@ -13,7 +13,7 @@ class JSONEncoder(flask.json.JSONEncoder):
         if isinstance(obj, datetime.datetime):
             return obj.replace(microsecond=0).isoformat()
         if isinstance(obj, datetime.date):
-            return obj.replace(microsecond=0).isoformat()
+            return obj.replace().isoformat()
         if isinstance(obj, JsonSerializable):
             return obj.serialize()
         if isinstance(obj, SimpleJson):
