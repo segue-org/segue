@@ -19,8 +19,10 @@ from segue.decorators import admin_only, jwt_only
 from flask.ext.jwt import current_user
 
 from ..responses import *
+
 from .account import AdminAccountController
 from .proposal import AdminProposalController
+from .judge import AdminJudgeController
 
 class AdminController(object):
     def __init__(self, purchases=None, payments=None, tournaments=None, rankings=None, notifications=None):
@@ -52,35 +54,6 @@ class AdminController(object):
         parms = request.args.to_dict()
         result = self.payments.query(as_user=self.current_user, **parms)
         return PaymentDetailResponse.create(result), 200
-
-    @jwt_only
-    @admin_only
-    @jsoned
-    def list_tournaments(self):
-        result = self.tournaments.all()
-        return TournamentShortResponse.create(result), 200
-
-    @jwt_only
-    @admin_only
-    @jsoned
-    def get_tournament(self, tournament_id):
-        result = self.tournaments.get_one(tournament_id)
-        return TournamentDetailResponse.create(result), 200
-
-    @jwt_only
-    @admin_only
-    @jsoned
-    @cache.cached(timeout=60 * 60)
-    def get_standings(self, tournament_id):
-        result = self.tournaments.get_standings(tournament_id)
-        return StandingsResponse.create(result), 200
-
-    @jwt_only
-    @admin_only
-    @jsoned
-    def get_ranking_by_track(self, tournament_id, track_id):
-        result = self.rankings.classificate(tournament_id, track_id=track_id)
-        return RankingResponse.create(result), 200
 
     @jwt_only
     @admin_only

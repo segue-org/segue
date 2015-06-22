@@ -1,7 +1,9 @@
+import flask
 from flask import request
 from flask.ext.jwt import current_user
 
 from segue.decorators import jsoned, jwt_only, admin_only
+from segue.core import logger
 
 from segue.proposal.services import ProposalService
 

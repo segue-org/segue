@@ -1,5 +1,5 @@
 import flask
-from controllers import AdminAccountController, AdminProposalController, AdminController
+from controllers import *
 
 from responses import *
 
@@ -21,6 +21,20 @@ class AdminProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>/tags/<string:tag_name>', methods=['POST'],   view_func=self.controller.add_tag)
         self.add_url_rule('/<int:proposal_id>/tags/<string:tag_name>', methods=['DELETE'], view_func=self.controller.remove_tag)
 
+class AdminTournamentsBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminTournamentsBlueprint, self).__init__('admin.tournaments', __name__, url_prefix="/admin/tournaments")
+        self.controller = AdminJudgeController()
+        self.add_url_rule('',                               methods=['GET'], view_func=self.controller.list_tournaments)
+        self.add_url_rule('/<int:tournament_id>',           methods=['GET'], view_func=self.controller.get_tournament)
+        self.add_url_rule('/<int:tournament_id>/standings', methods=['GET'], view_func=self.controller.get_standings)
+
+class AdminCallBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminCallBlueprint, self).__init__('admin.call', __name__, url_prefix="/admin/call")
+        self.controller = AdminJudgeController()
+        self.add_url_rule('/<int:tournament_id>/<int:track_id>',   methods=['GET'], view_func=self.controller.get_ranking_by_track)
+
 class AdminBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminBlueprint, self).__init__('admin', __name__, url_prefix='/admin')
@@ -28,18 +42,14 @@ class AdminBlueprint(flask.Blueprint):
         self.add_url_rule('/purchases',   methods=['GET'], view_func=self.controller.list_purchases)
         self.add_url_rule('/caravans',    methods=['GET'], view_func=self.controller.list_caravans)
         self.add_url_rule('/payments',    methods=['GET'], view_func=self.controller.list_payments)
-        self.add_url_rule('/tournaments', methods=['GET'], view_func=self.controller.list_tournaments)
-
 
         self.add_url_rule('/notifications/call/<string:status>', methods=['GET'], view_func=self.controller.list_call_notification_by_status)
 
-        self.add_url_rule('/tournaments/<int:tournament_id>',           methods=['GET'], view_func=self.controller.get_tournament)
-        self.add_url_rule('/tournaments/<int:tournament_id>/standings', methods=['GET'], view_func=self.controller.get_standings)
-
-        self.add_url_rule('/call/<int:tournament_id>/<int:track_id>', methods=['GET'], view_func=self.controller.get_ranking_by_track)
 
 blueprints = [
     AdminAccountBlueprint(),
     AdminProposalBlueprint(),
+    AdminTournamentsBlueprint(),
+    AdminCallBlueprint(),
     AdminBlueprint()
 ]
