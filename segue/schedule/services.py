@@ -59,6 +59,13 @@ class SlotService(object):
         db.session.commit()
         return slot
 
+    def set_blocked(self, slot_id, new_value):
+        slot = self.get_one(slot_id, strict=True)
+        slot.blocked = new_value
+        db.session.add(slot)
+        db.session.commit()
+        return slot
+
 class NotificationService(object):
     def __init__(self, mailer=None, hasher=None, proposals=None):
         self.mailer = mailer or MailerService()

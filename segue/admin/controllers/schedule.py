@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, abort
 from flask.ext.jwt import current_user
 
 from segue.core import cache
@@ -27,4 +27,25 @@ class AdminScheduleController(object):
     def query_slots(self):
         criteria = request.args.to_dict()
         result = self.slots.query(**criteria)
+        return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def get_slot(self, slot_id):
+        result = self.slots.get_one(slot_id) or abort(404)
+        return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def block_slot(self, slot_id):
+        result = self.slots.set_blocked(slot_id,True) or abort(404)
+        return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def unblock_slot(self, slot_id):
+        result = self.slots.set_blocked(slot_id,False) or abort(404)
         return SlotResponse.create(result, links=False), 200
