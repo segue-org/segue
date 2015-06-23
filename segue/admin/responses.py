@@ -158,6 +158,15 @@ class ProposalDetailResponse(BaseResponse):
             self.add_link('invites', proposal.invites.all(), 'admin.proposal.list_invites', proposal_id=proposal.id)
             self.add_link('owner',   proposal.owner,         'admin.account.get_one',       account_id =proposal.owner.id)
 
+class ProposalShortResponse(BaseResponse):
+    def __init__(self, proposal, links=False):
+        self.id     = proposal.id
+        self.title  = proposal.title
+        self.tags   = proposal.tag_names
+        self.status = proposal.status
+        self.owner  = AccountShortResponse.create(proposal.owner, links=False)
+        self.track  = TrackDetailResponse.create(proposal.track, links=False)
+
 class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):
         self.id             = purchase.id

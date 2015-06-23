@@ -26,3 +26,6 @@ class ProposalFilterStrategies(FilterStrategies):
 
     def by_title(self, value, as_user=None):
         return Proposal.title.ilike('%'+value+'%')
+
+    def by_status(self, value, as_user=None):
+        return Proposal.status == value

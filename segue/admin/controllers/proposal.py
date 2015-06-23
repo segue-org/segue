@@ -7,7 +7,7 @@ from segue.core import logger
 
 from segue.proposal.services import ProposalService
 
-from ..responses import ProposalDetailResponse, ProposalInviteResponse
+from ..responses import ProposalDetailResponse, ProposalShortResponse, ProposalInviteResponse
 
 class AdminProposalController(object):
     def __init__(self, service=None):
@@ -20,7 +20,7 @@ class AdminProposalController(object):
     def list(self):
         parms = request.args.to_dict()
         result = self.service.lookup(as_user=self.current_user, **parms)
-        return ProposalDetailResponse.create(result), 200
+        return ProposalShortResponse.create(result), 200
 
     @jwt_only
     @admin_only
