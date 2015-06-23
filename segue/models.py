@@ -5,7 +5,7 @@ from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
 from account.models import City, Country
-from caravan.models import Caravan, CaravanInvite, CaravanProduct
+from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderPurchase, CaravanLeaderPurchase
 from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification
 
@@ -16,7 +16,7 @@ __all__ = [
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
     'BoletoPayment',
-    'Caravan', 'CaravanInvite', 'CaravanProduct',
+    'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanRiderPurchase', 'CaravanLeaderPurchase',
     'City', 'Country',
     'Judge', 'Match', 'Tournament',
     'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification'
