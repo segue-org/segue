@@ -45,16 +45,17 @@ class SlotService(object):
 
     def set_talk(self, slot_id, proposal_id):
         slot = self.get_one(slot_id, strict=True)
-        proposal = self.proposals.get_one(proposal_id, strict=True)
-
-        slot.proposal = proposal
+        talk = self.proposals.get_one(proposal_id, strict=True)
+        slot.talk = talk
+        slot.status = 'dirty'
         db.session.add(slot)
         db.session.commit()
         return slot
 
     def empty_slot(self, slot_id):
         slot = self.get_one(slot_id, strict=True)
-        slot.proposal = None
+        slot.talk = None
+        slot.status = 'empty'
         db.session.add(slot)
         db.session.commit()
         return slot

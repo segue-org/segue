@@ -29,13 +29,15 @@ class SlotServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(slot.id)
 
         self.assertEquals(result, retrieved)
-        self.assertEquals(result.proposal, proposal)
+        self.assertEquals(result.talk, talk)
+        self.assertEquals(result.status, 'dirty')
 
     def test_empty_slot(self):
         slot = self.create_from_factory(ValidSlotFactory)
         result = self.service.empty_slot(slot.id)
         retrieved = self.service.get_one(slot.id)
-        self.assertEquals(result.proposal, None)
+        self.assertEquals(result.talk, None)
+        self.assertEquals(result.status, 'empty')
 
     def setUpComplexScenario(self):
         day1 = datetime(2015,7,8)

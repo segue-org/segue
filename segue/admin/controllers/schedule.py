@@ -1,7 +1,7 @@
 from flask import request, abort
 from flask.ext.jwt import current_user
 
-from segue.core import cache
+from segue.core import cache, logger
 from segue.decorators import jsoned, jwt_only, admin_only
 
 from segue.schedule.services import RoomService, SlotService
@@ -40,12 +40,28 @@ class AdminScheduleController(object):
     @admin_only
     @jsoned
     def block_slot(self, slot_id):
-        result = self.slots.set_blocked(slot_id,True) or abort(404)
+        result = self.slots.set_blocked(slot_id, True) or abort(404)
         return SlotResponse.create(result, links=False), 200
 
     @jwt_only
     @admin_only
     @jsoned
     def unblock_slot(self, slot_id):
-        result = self.slots.set_blocked(slot_id,False) or abort(404)
+        result = self.slots.set_blocked(slot_id, False) or abort(404)
         return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def set_talk(self, slot_id):
+        proposal_id = request.get_json().get('proposal_id', None) or abort(400)
+        logger.info("user {} set the talk of slot {} to be {}".format(self.current_user.email, slot_id, proposal_id))
+        result = self.slots.set_talk(slot_id, proposal_id) or abort(404)
+        return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def empty_slot(self, slot_id):
+        logger.info("user {} set the talk of slot {} to be empty".format(self.current_user.email, slot_id))
+        result = self.slots.empty_slot(slot_id) or abort(404)
