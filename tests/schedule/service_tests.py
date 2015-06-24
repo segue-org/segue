@@ -97,6 +97,12 @@ class SlotServiceTestCases(SegueApiTestCase):
         self.assertIn(ctx.slot1, result)
         self.assertIn(ctx.slot2, result)
 
+    def test_annotate_slot(self):
+        slot = self.create_from_factory(ValidSlotFactory)
+        self.service.annotate(slot.id, 'uma anotacao')
+
+        retrieved = self.service.get_one(slot.id)
+        self.assertEquals(retrieved.annotation, 'uma anotacao')
 
 class NotificationServiceTestCase(SegueApiTestCase):
     def setUp(self):

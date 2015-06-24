@@ -22,6 +22,7 @@ class Slot(db.Model):
     begins      = db.Column(db.DateTime)
     duration    = db.Column(db.Integer)
     status      = db.Column(db.Enum(*SLOT_STATUSES, name="slot_statuses"), default='empty')
+    annotation  = db.Column(db.Text)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)

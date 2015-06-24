@@ -45,12 +45,13 @@ class AdminSlotBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminSlotBlueprint, self).__init__('admin.slot', __name__, url_prefix="/admin/slots")
         self.controller = AdminScheduleController()
-        self.add_url_rule('',                       methods=['GET'],    view_func=self.controller.query_slots)
-        self.add_url_rule('/<int:slot_id>',         methods=['GET'],    view_func=self.controller.get_slot)
-        self.add_url_rule('/<int:slot_id>/block',   methods=['POST'],   view_func=self.controller.block_slot)
-        self.add_url_rule('/<int:slot_id>/unblock', methods=['POST'],   view_func=self.controller.unblock_slot)
-        self.add_url_rule('/<int:slot_id>/talk',    methods=['POST'],   view_func=self.controller.set_talk)
-        self.add_url_rule('/<int:slot_id>/talk',    methods=['DELETE'], view_func=self.controller.empty_slot)
+        self.add_url_rule('',                          methods=['GET'],    view_func=self.controller.query_slots)
+        self.add_url_rule('/<int:slot_id>',            methods=['GET'],    view_func=self.controller.get_slot)
+        self.add_url_rule('/<int:slot_id>/block',      methods=['POST'],   view_func=self.controller.block_slot)
+        self.add_url_rule('/<int:slot_id>/unblock',    methods=['POST'],   view_func=self.controller.unblock_slot)
+        self.add_url_rule('/<int:slot_id>/talk',       methods=['POST'],   view_func=self.controller.set_talk)
+        self.add_url_rule('/<int:slot_id>/talk',       methods=['DELETE'], view_func=self.controller.empty_slot)
+        self.add_url_rule('/<int:slot_id>/annotation', methods=['POST'],   view_func=self.controller.annotate_slot)
 
 class AdminBlueprint(flask.Blueprint):
     def __init__(self):

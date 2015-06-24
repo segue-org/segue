@@ -49,12 +49,13 @@ class SlotShortResponse(BaseResponse):
 
 class SlotResponse(BaseResponse):
     def __init__(self, slot, links=True, embeds=True):
-        self.id       = slot.id
-        self.begins   = slot.begins
-        self.duration = slot.duration
-        self.blocked  = slot.blocked
-        self.status   = slot.status
-        self.hour     = slot.begins.hour
+        self.id         = slot.id
+        self.begins     = slot.begins
+        self.duration   = slot.duration
+        self.blocked    = slot.blocked
+        self.status     = slot.status
+        self.hour       = slot.begins.hour
+        self.annotation = slot.annotation
 
         if embeds:
             self.room = RoomResponse.create(slot.room, links=False)

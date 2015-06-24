@@ -66,3 +66,11 @@ class AdminScheduleController(object):
         logger.info("user {} set the talk of slot {} to be empty".format(self.current_user.email, slot_id))
         result = self.slots.empty_slot(slot_id) or abort(404)
         return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def annotate_slot(self, slot_id):
+        content = request.get_json().get('content')
+        result = self.slots.annotate(slot_id, content) or abort(404)
+        return SlotResponse.create(result, links=False), 200
