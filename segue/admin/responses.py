@@ -37,6 +37,7 @@ class TalkShortResponse(BaseResponse):
         self.id    = talk.id
         self.title = talk.title
         self.owner = talk.owner.name
+        self.track = talk.track.name_pt
 
 class SlotResponse(BaseResponse):
     def __init__(self, slot, links=True):
