@@ -22,10 +22,10 @@ class SlotServiceTestCases(SegueApiTestCase):
             self.service.get_one(123, strict=True)
 
     def test_set_talk(self):
-        proposal = self.create_from_factory(ValidProposalWithOwnerFactory)
-        slot     = self.create_from_factory(ValidSlotFactory)
+        talk = self.create_from_factory(ValidProposalWithOwnerFactory)
+        slot = self.create_from_factory(ValidSlotFactory)
 
-        result = self.service.set_talk(slot.id, proposal.id)
+        result = self.service.set_talk(slot.id, talk.id)
         retrieved = self.service.get_one(slot.id)
 
         self.assertEquals(result, retrieved)

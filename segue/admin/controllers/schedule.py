@@ -64,4 +64,4 @@ class AdminScheduleController(object):
     @jsoned
     def empty_slot(self, slot_id):
         logger.info("user {} set the talk of slot {} to be empty".format(self.current_user.email, slot_id))
-        result = self.slots.empty_slot(slot_id) or abort(404)
+        result = self.slots.empty_slot(slot_id, links=False) or abort(404)

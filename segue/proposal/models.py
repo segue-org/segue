@@ -31,9 +31,14 @@ class Proposal(JsonSerializable, db.Model):
 
     tags          = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
     notifications = db.relationship("CallNotification", backref="proposal", lazy="dynamic")
+    slots         = db.relationship("Slot", backref="talk", lazy="dynamic")
 
     as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
     as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
+
+    @property
+    def slotted(self):
+        return self.slots.count() > 0
 
     @property
     def coauthors(self):

@@ -39,16 +39,26 @@ class TalkShortResponse(BaseResponse):
         self.owner = talk.owner.name
         self.track = talk.track.name_pt
 
-class SlotResponse(BaseResponse):
-    def __init__(self, slot, links=True):
+class SlotShortResponse(BaseResponse):
+    def __init__(self, slot, links=True, embeds=True):
         self.id       = slot.id
         self.begins   = slot.begins
         self.duration = slot.duration
-        self.room     = RoomResponse.create(slot.room, links=False)
+        self.room     = slot.room.name
+        self.status   = slot.status
+
+class SlotResponse(BaseResponse):
+    def __init__(self, slot, links=True, embeds=True):
+        self.id       = slot.id
+        self.begins   = slot.begins
+        self.duration = slot.duration
         self.blocked  = slot.blocked
         self.status   = slot.status
         self.hour     = slot.begins.hour
-        self.talk     = TalkShortResponse.create(slot.talk)
+
+        if embeds:
+            self.room = RoomResponse.create(slot.room, links=False)
+            self.talk = TalkShortResponse.create(slot.talk)
 
         if links:
             self.add_link('room', slot.room, 'rooms.get_one', room_id=slot.room_id)
@@ -139,7 +149,7 @@ class TrackDetailResponse(BaseResponse):
         self.track   = track.name_pt.split(" - ")[1]
 
 class ProposalDetailResponse(BaseResponse):
-    def __init__(self, proposal, links=True):
+    def __init__(self, proposal, links=True, embeds=True):
         self.id           = proposal.id
         self.title        = proposal.title
         self.full         = proposal.full
@@ -149,24 +159,28 @@ class ProposalDetailResponse(BaseResponse):
         self.last_updated = proposal.last_updated
         self.tags         = proposal.tag_names
         self.status       = proposal.status
-        self.track     = TrackDetailResponse.create(proposal.track, links=False)
+        self.slotted      = proposal.slotted
 
-        self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
-        self.owner     = AccountShortResponse.create(proposal.owner, links=False)
-
+        if embeds:
+            self.track     = TrackDetailResponse.create(proposal.track, links=False)
+            self.coauthors = ProposalInviteResponse.create(proposal.coauthors.all(), links=False)
+            self.owner     = AccountShortResponse.create(proposal.owner, links=False)
+            self.slots     = SlotShortResponse.create(proposal.slots.all())
 
         if links:
             self.add_link('invites', proposal.invites.all(), 'admin.proposal.list_invites', proposal_id=proposal.id)
             self.add_link('owner',   proposal.owner,         'admin.account.get_one',       account_id =proposal.owner.id)
 
 class ProposalShortResponse(BaseResponse):
-    def __init__(self, proposal, links=False):
-        self.id     = proposal.id
-        self.title  = proposal.title
-        self.tags   = proposal.tag_names
-        self.status = proposal.status
-        self.owner  = AccountShortResponse.create(proposal.owner, links=False)
-        self.track  = TrackDetailResponse.create(proposal.track, links=False)
+    def __init__(self, proposal, links=False, embeds=True):
+        self.id      = proposal.id
+        self.title   = proposal.title
+        self.tags    = proposal.tag_names
+        self.status  = proposal.status
+        self.slotted = proposal.slotted
+        if embeds:
+            self.owner  = AccountShortResponse.create(proposal.owner, links=False)
+            self.track  = TrackDetailResponse.create(proposal.track, links=False)
 
 class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):

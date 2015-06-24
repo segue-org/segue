@@ -23,8 +23,6 @@ class Slot(db.Model):
     duration    = db.Column(db.Integer)
     status      = db.Column(db.Enum(*SLOT_STATUSES, name="slot_statuses"), default='empty')
 
-    talk        = db.relationship("Proposal", backref="slot")
-
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
