@@ -51,7 +51,7 @@ def populate(clean=False):
 def populate_slots(start=0,end=0):
     init_command()
     dates = [ datetime(2015,7,8), datetime(2015,7,9), datetime(2015,7,10), datetime(2015,7,11) ]
-    hours = [ 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
+    hours = [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
 
     rooms = Room.query.filter(Room.id.between(int(start), int(end))).all()
     for room in rooms:
