@@ -92,7 +92,7 @@ class CallNotificationResponse(BaseResponse):
         self.proposal_id  = notification.proposal.id
         self.proposal     = notification.proposal.title
         self.author       = notification.proposal.owner.name
-
+        self.slots        = SlotShortResponse.create(notification.proposal.slots.all())
 
 class RankingResponse(BaseResponse):
     def __init__(self, ranked, links=False):
