@@ -12,7 +12,7 @@ from segue.product.services import ProductService
 from segue.caravan.services import CaravanService, CaravanInviteService
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
-from segue.purchase.boleto.models import BoletoPayment
+from segue.purchase.boleto.models import BoletoPayment, BoletoTransition
 
 ds = tablib.Dataset()
 
@@ -26,6 +26,7 @@ def import_caravan(in_file, caravan_yaml):
     caravan_data = yaml.load(open(caravan_yaml))
     product = product_service.get_product(caravan_data['product_id'])
     our_number = caravan_data['our_number']
+    payment_date = caravan_data['payment_date']
     print "################## IMPORTAR CARAVANA #######################"
     print "Caravana:", caravan_data['caravan_name']
     print "Produto:", product.description, product.price
@@ -42,13 +43,13 @@ def import_caravan(in_file, caravan_yaml):
             print "lider da caravana:", item['NOME'], item['EMAIL']
             first = False
             has_caravan = True
-            purchase = add_leader_purchase(caravan, product, item, our_number)
+            purchase = add_leader_purchase(caravan, product, item, our_number, payment_date)
         else:
             if has_caravan:
                 account = add_account(item)
                 print "convidado da caravana: ", account.email
                 add_caravan_rider(caravan, account)
-                add_rider_purchase_and_payment(product, account, caravan, purchase.buyer, our_number)
+                add_rider_purchase_and_payment(product, account, caravan, purchase.buyer, our_number, payment_date)
 
     print "####################### DONE! #############################"
 
@@ -79,7 +80,7 @@ def add_caravan_rider(caravan, account):
 
     invite = caravan_invite_service.create(caravan.id, invite_data, by=caravan.owner, send_email=False)
 
-def add_leader_purchase(caravan, product, owner_data, our_number):
+def add_leader_purchase(caravan, product, owner_data, our_number, payment_date):
     # creates fake purchase for the caravan leader
     buyer_data = {
         'kind': 'person',
@@ -106,13 +107,25 @@ def add_leader_purchase(caravan, product, owner_data, our_number):
         'amount': product.price,
         'our_number': our_number
     }
-    rider_payment = BoletoPayment(**payment_data)
-    db.session.add(rider_payment)
+    leader_payment = BoletoPayment(**payment_data)
+
+    transition_data = {
+        'old_status': 'pending',
+        'new_status': 'paid',
+        'source': 'script',
+        'payment': leader_payment,
+        'payment_date': payment_date,
+        'paid_amount' : product.price
+    }
+    transition = BoletoTransition(**transition_data)
+
+    db.session.add(leader_payment)
+    db.session.add(transition)
     db.session.commit()
 
     return purchase
 
-def add_rider_purchase_and_payment(product, account, caravan, buyer, our_number):
+def add_rider_purchase_and_payment(product, account, caravan, buyer, our_number, payment_date):
     # create fake purchase/payment for the caravan rider (account)
 
     purchase_data = {
@@ -134,7 +147,19 @@ def add_rider_purchase_and_payment(product, account, caravan, buyer, our_number)
         'our_number': our_number
     }
     rider_payment = BoletoPayment(**payment_data)
+
+    transition_data = {
+        'old_status': 'pending',
+        'new_status': 'paid',
+        'source': 'script',
+        'payment': rider_payment,
+        'payment_date': payment_date,
+        'paid_amount' : product.price
+    }
+    transition = BoletoTransition(**transition_data)
+
     db.session.add(rider_payment)
+    db.session.add(transition)
     db.session.commit()
 
 def add_caravan(caravan_data, account):
