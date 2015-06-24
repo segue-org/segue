@@ -60,8 +60,9 @@ class ProposalService(object):
 
     def lookup(self, as_user=None, **kw):
         needle = kw.pop('q',None)
+        limit  = kw.pop('limit',None)
         filter_list = self.filter_strategies.needle(needle, as_user, **kw)
-        return Proposal.query.filter(*filter_list).all()
+        return Proposal.query.filter(*filter_list).limit(limit).all()
 
     def modify(self, proposal_id, data, by=None):
         self.deadline.enforce()
