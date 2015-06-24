@@ -43,7 +43,14 @@ def import_caravan(in_file, caravan_yaml):
             print "lider da caravana:", item['NOME'], item['EMAIL']
             first = False
             has_caravan = True
-            purchase = add_leader_purchase(caravan, product, item, our_number, payment_date)
+            leader_purchase = CaravanLeaderPurchase.query.filter(
+                                CaravanLeaderPurchase.caravan == caravan and
+                                CaravanLeaderPurchase.customer.email == item['EMAIL']
+                              ).first()
+            if not leader_purchase:
+                purchase = add_leader_purchase(caravan, product, item, our_number, payment_date)
+            else:
+                purchase = leader_purchase
         else:
             if has_caravan:
                 account = add_account(item)
