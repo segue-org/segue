@@ -10,6 +10,7 @@ import clean
 import report
 import judge
 import notificate
+import slotize
 
 def _make_context():
     import segue.models
@@ -38,3 +39,4 @@ manager.command(judge.generate_round)
 manager.command(judge.freeze_judging)
 manager.command(notificate.notify_proposals)
 manager.command(report.adempiere_format)
+manager.command(slotize.slotize)
