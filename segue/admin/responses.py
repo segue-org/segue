@@ -39,6 +39,20 @@ class TalkShortResponse(BaseResponse):
         self.owner = talk.owner.name
         self.track = talk.track.name_pt
 
+class SlotSituationResponse(BaseResponse):
+    def __init__(self):
+        self.days = {}
+
+    def add_date(self, date, slots):
+        date_rep = date.replace(microsecond=0).isoformat()
+        self.days[date_rep] = dict(
+            used_blocked     = len(filter(lambda x:     x.blocked and x.talk, slots)),
+            used_non_blocked = len(filter(lambda x: not x.blocked and x.talk, slots)),
+
+            free_blocked     = len(filter(lambda x:     x.blocked and x.talk is None, slots)),
+            free_non_blocked = len(filter(lambda x: not x.blocked and x.talk is None, slots))
+        )
+
 class SlotShortResponse(BaseResponse):
     def __init__(self, slot, links=True, embeds=True):
         self.id       = slot.id

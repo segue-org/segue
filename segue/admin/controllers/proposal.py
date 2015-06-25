@@ -1,4 +1,5 @@
 import flask
+
 from flask import request
 from flask.ext.jwt import current_user
 

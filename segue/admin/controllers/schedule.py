@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import request, abort
 from flask.ext.jwt import current_user
 
@@ -28,6 +30,16 @@ class AdminScheduleController(object):
         criteria = request.args.to_dict()
         result = self.slots.query(**criteria)
         return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def overall_situation(self):
+        result = SlotSituationResponse()
+        dates = [ datetime(2015,7,8), datetime(2015,7,9), datetime(2015,7,10), datetime(2015,7,11) ]
+        for date in dates:
+            result.add_date(date, self.slots.query(day=date))
+        return result, 200
 
     @jwt_only
     @admin_only

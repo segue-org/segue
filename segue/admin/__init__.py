@@ -46,6 +46,7 @@ class AdminSlotBlueprint(flask.Blueprint):
         super(AdminSlotBlueprint, self).__init__('admin.slot', __name__, url_prefix="/admin/slots")
         self.controller = AdminScheduleController()
         self.add_url_rule('',                          methods=['GET'],    view_func=self.controller.query_slots)
+        self.add_url_rule('/situation',                methods=['GET'],    view_func=self.controller.overall_situation)
         self.add_url_rule('/<int:slot_id>',            methods=['GET'],    view_func=self.controller.get_slot)
         self.add_url_rule('/<int:slot_id>/block',      methods=['POST'],   view_func=self.controller.block_slot)
         self.add_url_rule('/<int:slot_id>/unblock',    methods=['POST'],   view_func=self.controller.unblock_slot)
