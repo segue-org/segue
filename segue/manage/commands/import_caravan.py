@@ -13,6 +13,7 @@ from segue.caravan.services import CaravanService, CaravanInviteService
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
 from segue.purchase.boleto.models import BoletoPayment, BoletoTransition
+from segue.mailer import MailerService
 
 ds = tablib.Dataset()
 
@@ -21,6 +22,7 @@ caravan_service = CaravanService()
 caravan_invite_service = CaravanInviteService()
 account_service = AccountService()
 purchase_service = PurchaseService()
+mailer_service = MailerService()
 
 def import_caravan(in_file, caravan_yaml):
     caravan_data = yaml.load(open(caravan_yaml))
@@ -57,6 +59,8 @@ def import_caravan(in_file, caravan_yaml):
                 print "convidado da caravana: ", account.email
                 add_caravan_rider(caravan, account)
                 add_rider_purchase_and_payment(product, account, caravan, purchase.buyer, our_number, payment_date)
+
+    caravan_service.update_leader_exemption(caravan.id, caravan.owner)
 
     print "####################### DONE! #############################"
 
@@ -109,7 +113,7 @@ def add_leader_purchase(caravan, product, owner_data, our_number, payment_date):
 
     payment_data = {
         'type': 'boleto',
-        'purchase_id': purchase.id,
+        'purchase': purchase,
         'status': 'paid',
         'amount': product.price,
         'our_number': our_number
@@ -130,25 +134,25 @@ def add_leader_purchase(caravan, product, owner_data, our_number, payment_date):
     db.session.add(transition)
     db.session.commit()
 
+    mailer_service.notify_payment(purchase, leader_payment)
+
     return purchase
 
 def add_rider_purchase_and_payment(product, account, caravan, buyer, our_number, payment_date):
     # create fake purchase/payment for the caravan rider (account)
 
     purchase_data = {
-        'product_id': product.id,
-        'customer_id': account.id,
-        'buyer_id': buyer.id,
+        'product': product,
+        'customer': account,
+        'buyer': buyer,
         'status': 'paid',
-        'caravan_id': caravan.id
+        'caravan': caravan
     }
     rider_purchase = CaravanRiderPurchase(**purchase_data)
-    db.session.add(rider_purchase)
-    db.session.commit()
 
     payment_data = {
         'type': 'boleto',
-        'purchase_id': rider_purchase.id,
+        'purchase': rider_purchase,
         'status': 'paid',
         'amount': product.price,
         'our_number': our_number
@@ -165,9 +169,12 @@ def add_rider_purchase_and_payment(product, account, caravan, buyer, our_number,
     }
     transition = BoletoTransition(**transition_data)
 
+    db.session.add(rider_purchase)
     db.session.add(rider_payment)
     db.session.add(transition)
     db.session.commit()
+
+    mailer_service.notify_payment(rider_purchase, rider_payment)
 
 def add_caravan(caravan_data, account):
     data = {
