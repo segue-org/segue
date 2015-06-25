@@ -43,11 +43,15 @@ class SlotService(object):
         elif strict: raise NoSuchSlot()
         return None
 
-    def set_talk(self, slot_id, proposal_id):
+    def available_slots(self):
+        return Slot.query.filter(Slot.blocked == False, Slot.talk == None).all()
+
+    def set_talk(self, slot_id, proposal_id, annotation=None):
         slot = self.get_one(slot_id, strict=True)
         talk = self.proposals.get_one(proposal_id, strict=True)
         slot.talk = talk
         slot.status = 'dirty'
+        if annotation: slot.annotation = annotation
         db.session.add(slot)
         db.session.commit()
         return slot
