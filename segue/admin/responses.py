@@ -41,16 +41,22 @@ class TalkShortResponse(BaseResponse):
 
 class SlotSituationResponse(BaseResponse):
     def __init__(self):
-        self.days = {}
+        self.slots = {}
+        self.proposals = {}
 
     def add_date(self, date, slots):
         date_rep = date.isoformat()
-        self.days[date_rep] = dict(
+        self.slots[date_rep] = dict(
             used_blocked     = len(filter(lambda x:     x.blocked and x.talk, slots)),
             used_non_blocked = len(filter(lambda x: not x.blocked and x.talk, slots)),
 
             free_blocked     = len(filter(lambda x:     x.blocked and x.talk is None, slots)),
             free_non_blocked = len(filter(lambda x: not x.blocked and x.talk is None, slots))
+        )
+    def add_proposals(self, proposals):
+        self.proposals = dict(
+            slotted = len(filter(lambda x: x.slotted, proposals)),
+            pending = len(filter(lambda x: not x.slotted, proposals)),
         )
 
 class SlotShortResponse(BaseResponse):

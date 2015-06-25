@@ -7,14 +7,16 @@ from segue.core import cache, logger
 from segue.decorators import jsoned, jwt_only, admin_only
 
 from segue.schedule.services import RoomService, SlotService
+from segue.proposal.services import ProposalService
 
 from ..responses import *
 
 class AdminScheduleController(object):
-    def __init__(self, rooms=None, slots=None):
+    def __init__(self, rooms=None, slots=None, proposals=None):
         self.current_user = current_user
         self.rooms = rooms or RoomService()
         self.slots = slots or SlotService()
+        self.proposals = proposals or ProposalService()
 
     @jwt_only
     @admin_only
@@ -39,6 +41,8 @@ class AdminScheduleController(object):
         dates = [ date(2015,7,8), date(2015,7,9), date(2015,7,10), date(2015,7,11) ]
         for day in dates:
             result.add_date(day, self.slots.query(day=day))
+
+        result.add_proposals(self.proposals.query(status='confirmed'))
         return result, 200
 
     @jwt_only
