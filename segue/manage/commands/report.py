@@ -151,6 +151,7 @@ def adempiere_filter(data):
         address = d[5]
         address_number = d[6] or "nulo"
         address_extra = d[7] or "nulo"
+        address_district = get_district(zipcode)
         #TODO: in the future, allow for multiple tickets in one single document.
         quantity = 1
         amount = d[13]
@@ -159,9 +160,13 @@ def adempiere_filter(data):
         content += u"{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}\n".format(
             purchase_id, "PF", cpf, cnpj, name,
             email, phone_1, phone_2, zipcode, state, city, address, address_number,
-            "nulo", address_extra, quantity, amount, "0", ticket_type)
+            address_district, address_extra, quantity, amount, "0", ticket_type)
 
     return content
+
+def get_district(zipcode):
+    r = c.cep(zipcode)
+    return r['bairro'] if 'bairro' in r else "CENTRO"
 
 def format_document(value, type="CPF"):
     if type == "CPF" and value:
