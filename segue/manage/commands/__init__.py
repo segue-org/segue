@@ -12,6 +12,7 @@ import judge
 import notificate
 import slotize
 import import_caravan
+import slotize
 
 def _make_context():
     import segue.models
