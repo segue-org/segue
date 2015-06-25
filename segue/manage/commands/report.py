@@ -74,7 +74,7 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
     for account in Account.query.all():
         if testing:
             counter += 1
-            if counter > 10:
+            if counter > 100:
                 break
 
         purchases = account.purchases
