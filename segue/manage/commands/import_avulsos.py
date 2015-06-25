@@ -13,13 +13,16 @@ from segue.caravan.services import CaravanService, CaravanInviteService
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
 from segue.purchase.boleto.models import BoletoPayment, BoletoTransition
+from segue.mailer import MailerService
 
 ds = tablib.Dataset()
 
 product_service = ProductService()
+caravan_service = CaravanService()
 caravan_invite_service = CaravanInviteService()
 account_service = AccountService()
 purchase_service = PurchaseService()
+mailer_service = MailerService()
 
 def import_avulsos(in_file):
     with open(in_file, "r") as f:
@@ -85,6 +88,7 @@ def import_avulsos(in_file):
         if item['caravan_id'] and item['Categoria'] == 'caravan':
             purchase.kind = 'caravan-rider'
             purchase.caravan = caravan
+            caravan_service.update_leader_exemption(caravan.id, caravan.owner)
         else:
             purchase.kind = 'single'
 
@@ -110,6 +114,8 @@ def import_avulsos(in_file):
             'paid_amount' : product.price
         }
         transition = BoletoTransition(**transition_data)
+
+        mailer_service.notify_payment(purchase, payment)
 
         db.session.add(purchase)
         db.session.add(payment)
