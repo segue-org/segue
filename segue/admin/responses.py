@@ -44,20 +44,14 @@ class SlotSituationResponse(BaseResponse):
         self.slots = {}
         self.proposals = {}
 
-    def add_date(self, date, slots):
+    def add_date_info(self, date, situation, count):
         date_rep = date.isoformat()
-        self.slots[date_rep] = dict(
-            used_blocked     = len(filter(lambda x:     x.blocked and x.talk, slots)),
-            used_non_blocked = len(filter(lambda x: not x.blocked and x.talk, slots)),
+        if date_rep not in self.slots:
+            self.slots[date_rep] = {}
+        self.slots[date_rep][situation] = count
 
-            free_blocked     = len(filter(lambda x:     x.blocked and x.talk is None, slots)),
-            free_non_blocked = len(filter(lambda x: not x.blocked and x.talk is None, slots))
-        )
-    def add_proposals(self, proposals):
-        self.proposals = dict(
-            slotted = len(filter(lambda x: x.slotted, proposals)),
-            pending = len(filter(lambda x: not x.slotted, proposals)),
-        )
+    def add_proposal_info(self, situation, count):
+        self.proposals[situation] = count
 
 class SlotShortResponse(BaseResponse):
     def __init__(self, slot, links=True, embeds=True):

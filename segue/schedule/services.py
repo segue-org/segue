@@ -32,6 +32,11 @@ class SlotService(object):
         filters = self.filters.given(**kw)
         return base.filter(*filters).order_by(Slot.begins).all()
 
+    def count(self, **kw):
+        base    = self.filters.joins_for(Slot.query, **kw)
+        filters = self.filters.given(**kw)
+        return base.filter(*filters).count()
+
     def lookup(self, needle):
         base    = self.filters.all_joins(Slot.query)
         filters = self.filters.needle(needle)

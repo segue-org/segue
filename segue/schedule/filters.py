@@ -27,6 +27,14 @@ class SlotFilterStrategies(FilterStrategies):
         day_end   = value.replace(hour=23, minute=59, second=59)
         return Slot.begins.between(day_start, day_end)
 
+    def by_blocked(self, value, as_user=None):
+        return Slot.blocked == value
+
+    def by_available(self, value, as_user=None):
+        if value:
+            return Slot.talk == None
+        return Slot.talk != None
+
     def by_title(self, value, as_user=None):
         return Proposal.title.ilike('%'+value+'%')
 

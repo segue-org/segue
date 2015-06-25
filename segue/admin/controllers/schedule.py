@@ -40,9 +40,13 @@ class AdminScheduleController(object):
         result = SlotSituationResponse()
         dates = [ date(2015,7,8), date(2015,7,9), date(2015,7,10), date(2015,7,11) ]
         for day in dates:
-            result.add_date(day, self.slots.query(day=day))
+            result.add_date_info(day, 'used_blocked',     self.slots.count(day=day, blocked=True,  available=False))
+            result.add_date_info(day, 'used_non_blocked', self.slots.count(day=day, blocked=False, available=False))
+            result.add_date_info(day, 'free_blocked',     self.slots.count(day=day, blocked=True,  available=True))
+            result.add_date_info(day, 'free_non_blocked', self.slots.count(day=day, blocked=False, available=True))
 
-        result.add_proposals(self.proposals.query(status='confirmed'))
+        result.add_proposal_info('slotted', self.proposals.count(status='confirmed', slotted=True))
+        result.add_proposal_info('pending', self.proposals.count(status='confirmed', slotted=False))
         return result, 200
 
     @jwt_only

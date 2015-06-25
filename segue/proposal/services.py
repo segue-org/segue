@@ -59,6 +59,11 @@ class ProposalService(object):
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).all()
 
+    def count(self, **kw):
+        base        = self.filter_strategies.joins_for(Proposal.query, **kw)
+        filter_list = self.filter_strategies.given(**kw)
+        return base.filter(*filter_list).count()
+
     def lookup(self, as_user=None, **kw):
         needle = kw.pop('q',None)
         limit  = kw.pop('limit',None)
