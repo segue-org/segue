@@ -55,8 +55,9 @@ class ProposalService(object):
         return None
 
     def query(self, **kw):
+        base        = self.filter_strategies.joins_for(Proposal.query, **kw)
         filter_list = self.filter_strategies.given(**kw)
-        return Proposal.query.filter(*filter_list).all()
+        return base.filter(*filter_list).all()
 
     def lookup(self, as_user=None, **kw):
         needle = kw.pop('q',None)

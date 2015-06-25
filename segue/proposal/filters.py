@@ -29,3 +29,14 @@ class ProposalFilterStrategies(FilterStrategies):
 
     def by_status(self, value, as_user=None):
         return Proposal.status == value
+
+    def by_slotted(self, value, as_user=None):
+        from segue.schedule.models import Slot
+        if value:
+            return Slot.id != None
+        else:
+            return Slot.id == None
+
+    def join_for_slotted(self, queryset):
+        from segue.schedule.models import Slot
+        return queryset.outerjoin(Slot)
