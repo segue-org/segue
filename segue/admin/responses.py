@@ -44,7 +44,7 @@ class SlotSituationResponse(BaseResponse):
         self.days = {}
 
     def add_date(self, date, slots):
-        date_rep = date.replace(microsecond=0).isoformat()
+        date_rep = date.isoformat()
         self.days[date_rep] = dict(
             used_blocked     = len(filter(lambda x:     x.blocked and x.talk, slots)),
             used_non_blocked = len(filter(lambda x: not x.blocked and x.talk, slots)),

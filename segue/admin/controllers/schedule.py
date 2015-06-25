@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from flask import request, abort
 from flask.ext.jwt import current_user
@@ -36,9 +36,9 @@ class AdminScheduleController(object):
     @jsoned
     def overall_situation(self):
         result = SlotSituationResponse()
-        dates = [ datetime(2015,7,8), datetime(2015,7,9), datetime(2015,7,10), datetime(2015,7,11) ]
-        for date in dates:
-            result.add_date(date, self.slots.query(day=date))
+        dates = [ date(2015,7,8), date(2015,7,9), date(2015,7,10), date(2015,7,11) ]
+        for day in dates:
+            result.add_date(day, self.slots.query(day=day))
         return result, 200
 
     @jwt_only
