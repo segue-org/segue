@@ -46,7 +46,9 @@ class AdminProposalController(object):
         new_track_id = data.get('track_id', None) or flask.abort(400)
         result = self.service.change_track(proposal_id, new_track_id)
 
-        logger.info("user %s changed track of proposal %d. track was %d, now is %d", self.current_user.email, proposal_id, old_track_id, new_track_id)
+        logger.info("user %s changed track of proposal %d. track was %d, now is %d",
+            self.current_user.email, proposal_id, old_track_id, new_track_id
+        )
 
         return ProposalDetailResponse(result), 200
 

@@ -32,7 +32,9 @@ class ProposalFilterStrategies(FilterStrategies):
 
     def by_slotted(self, value, as_user=None):
         from segue.schedule.models import Slot
-        if value:
+        if not isinstance(value, bool):
+            return
+        elif value:
             return Slot.id != None
         else:
             return Slot.id == None
