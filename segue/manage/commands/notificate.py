@@ -52,12 +52,13 @@ def notify_slots(deadline=None, start=0, end=sys.maxint):
 
     deadline = datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
 
-    slots = SlotService().query(status='dirty')
+    all_slots = SlotService().query(status='dirty')
+    all_slots.sort(key=lambda x: x.id)
     notification = NotificationService()
 
     operations = defaultdict(lambda: 0)
 
-    for slot in slots:
+    for slot in all_slots:
         if slot.id < int(start): continue;
         if slot.id > int(end): continue;
 
