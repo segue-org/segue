@@ -12,12 +12,13 @@ class RoomResponse(BaseResponse):
 
 class SlotResponse(BaseResponse):
     def __init__(self, slot, links=True):
-        self.id       = slot.id
-        self.begins   = slot.begins
-        self.duration = slot.duration
-        self.room     = slot.room.id
-        self.blocked  = slot.blocked
-        self.status   = slot.status
+        self.id        = slot.id
+        self.begins    = slot.begins
+        self.duration  = slot.duration
+        self.room      = slot.room.id
+        self.room_name = slot.room.name
+        self.blocked   = slot.blocked
+        self.status    = slot.status
 
         if links:
             self.add_link('room', slot.room, 'rooms.get_one', room_id=slot.room_id)
@@ -30,8 +31,13 @@ class NotificationResponse(BaseResponse):
         self.hash         = notification.hash
         self.deadline     = notification.deadline
         self.status       = notification.status
-        self.target       = notification.target
         self.deadline     = notification.deadline
         self.sent         = notification.sent
         self.is_expired   = notification.is_expired
+
+        if self.kind == 'slot':
+            self.slot     = SlotResponse.create(notification.slot, links=False)
+            self.proposal = notification.slot.talk
+        elif self.kind == 'call':
+            self.proposal = notification.proposal
 
