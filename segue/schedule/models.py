@@ -3,7 +3,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.sql import functions as func
 from ..core import db
 
-SLOT_STATUSES = ('confirmed','pending','rejected','dirty','empty');
+SLOT_STATUSES = ('confirmed','pending','rejected','declined','dirty','empty');
 
 class Room(db.Model):
     id          = db.Column(db.Integer, primary_key=True)

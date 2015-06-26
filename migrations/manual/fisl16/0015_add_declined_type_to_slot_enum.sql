@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+
+ALTER TYPE slot_statuses ADD VALUE 'declined';
+
+COMMIT;
