@@ -121,7 +121,7 @@ class NotificationService(object):
         if not slot.talk: raise SlotIsEmpty()
         if slot.status != 'dirty': raise SlotNotDirty()
 
-        already_answered = slot.notifications.filter(Notification.status != 'pending').count() > 0
+        already_answered = slot.notifications.filter(Notification.account == slot.talk.owner, Notification.status != 'pending').count() > 0
         if already_answered: raise NotificationAlreadyAnswered()
 
         notification = SlotNotification(slot=slot)
