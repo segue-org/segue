@@ -16,17 +16,26 @@ from segue.core import db
 from segue.hasher import Hasher
 from support import *;
 
-c = Correios()
-ds = tablib.Dataset()
-cache_file = './states.cache'
+def get_Correios():
+    return Correios()
 
-f_cache_content = codecs.open(cache_file, 'w+')
-if os.path.getsize(cache_file) == 0:
-    states_cache = {}
-else:
-    states_cache = json.load(f_cache_content)
+def get_Dataset():
+    return tablib.Dataset()
+
+def get_states_cache():
+    cache_file = '/tmp/states.cache'
+
+    f_cache_content = codecs.open(cache_file, 'w+')
+    if os.path.getsize(cache_file) == 0:
+        states_cache = {}
+    else:
+        states_cache = json.load(f_cache_content)
+
+    return states_cache
 
 def caravan_report(out_file = "caravan_report"):
+    ds = get_Dataset()
+    states_cache = get_states_cache()
     filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + ".xls"
     print "generating report " + filename
     f = codecs.open('./' + filename,'w')
@@ -45,7 +54,7 @@ def caravan_report(out_file = "caravan_report"):
             caravan.owner.name,
             caravan.owner.email,
             caravan.city,
-            guess_state(buyer)
+            guess_state(buyer, states_cache)
         ]
         ds.append(data_list)
 
@@ -60,6 +69,9 @@ def adempiere_format(out_file = "adempiere_export"):
     buyers_report(out_file, adempiere=True, testing=False)
 
 def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
+    ds = get_Dataset()
+    states_cache = get_states_cache()
+
     counter = 0
     extension = ".txt" if adempiere else ".xls"
 
@@ -90,7 +102,7 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
                 buyer = purchase.buyer
                 if not buyer:
                     continue
-                guessed_state = guess_state(buyer)
+                guessed_state = guess_state(buyer, states_cache)
                 ongoing_payments = [ payment for payment in p.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES) ]
                 if ongoing_payments:
                     payment = ongoing_payments[0]
@@ -165,6 +177,7 @@ def adempiere_filter(data):
     return content
 
 def get_district(zipcode):
+    c = get_Correios()
     r = c.cep(zipcode)
     return r['bairro'] if 'bairro' in r else "CENTRO"
 
@@ -192,7 +205,8 @@ def get_date_pagseguro(transition):
     naive = date.replace(tzinfo=None)
     return naive
 
-def guess_state(buyer):
+def guess_state(buyer, states_cache):
+    c = get_Correios()
     if buyer.address_zipcode in states_cache.keys():
         return states_cache[buyer.address_zipcode]
     else:
