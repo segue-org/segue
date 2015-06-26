@@ -20,6 +20,15 @@ class NoSuchSlot(SegueError):
     def to_json(self):
         return { 'message': 'no such slot' }
 
+class SlotIsEmpty(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'slot is not empty' }
+
+class SlotNotDirty(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'slot is not dirty' }
 
 
 

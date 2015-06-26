@@ -24,6 +24,8 @@ class Slot(db.Model):
     status      = db.Column(db.Enum(*SLOT_STATUSES, name="slot_statuses"), default='empty')
     annotation  = db.Column(db.Text)
 
+    notifications = db.relationship("SlotNotification", backref="slot", lazy="dynamic")
+
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
@@ -63,5 +65,8 @@ class CallNotification(Notification):
 
 class SlotNotification(Notification):
     slot_id = db.Column(db.Integer, db.ForeignKey('slot.id'), name='sn_slot_id')
-    slot    = db.relationship("Slot")
     __mapper_args__ = { 'polymorphic_identity': 'slot' }
+
+    def update_target_status(self):
+        self.slot.status = self.status
+        return self.slot

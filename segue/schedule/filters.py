@@ -30,6 +30,9 @@ class SlotFilterStrategies(FilterStrategies):
     def by_blocked(self, value, as_user=None):
         return Slot.blocked == value
 
+    def by_status(self, value, as_user=None):
+        return Slot.status == value
+
     def by_available(self, value, as_user=None):
         if value:
             return Slot.talk == None

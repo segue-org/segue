@@ -128,6 +128,24 @@ class NotificationServiceTestCase(SegueApiTestCase):
 
         mockito.verify(self.mock_mailer).call_proposal(notification)
 
+    def test_notify_slot(self):
+        deadline = datetime.now() + timedelta(days=2)
+        proposal = self.create(ValidProposalWithOwnerFactory)
+        slot = self.create(ValidSlotFactory, talk=proposal, status='dirty')
+
+        mockito.when(self.mock_hasher).generate().thenReturn('ABCD')
+
+        notification = self.service.notify_slot(slot.id, deadline)
+
+        self.assertEquals(notification.account, proposal.owner)
+        self.assertEquals(notification.slot.id, slot.id)
+        self.assertEquals(notification.slot.status, 'pending')
+        self.assertEquals(notification.status, 'pending')
+        self.assertEquals(notification.kind, 'slot')
+        self.assertEquals(notification.hash, 'ABCD')
+
+        mockito.verify(self.mock_mailer).notify_slot(notification)
+
     def test_call_proposal_does_not_resend_if_a_similar_one_has_been_answered_already(self):
         deadline = datetime.now() + timedelta(days=2)
         proposal = self.create_from_factory(ValidProposalWithOwnerFactory)

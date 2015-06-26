@@ -262,3 +262,11 @@ class ValidCallNotificationFactory(SegueFactory):
     account  = SubFactory(ValidAccountFactory)
     status   = 'pending'
     hash     = _Sequence('C0FFE#{:04d}')
+
+class ValidSlotNotificationFactory(SegueFactory):
+    class Meta:
+        model = SlotNotification
+    slot     = SubFactory(ValidSlotFactory)
+    account  = SubFactory(ValidAccountFactory)
+    status   = 'pending'
+    hash     = _Sequence('C0FFE#{:04d}')

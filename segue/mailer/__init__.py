@@ -92,3 +92,18 @@ class MailerService(object):
         )
         message.to(notification.account.name, notification.account.email)
         return mailer.send(message.build())
+
+    def notify_slot(self, notification):
+        message = self.message_factory.from_template('schedule/notify_slot')
+        message.given(
+            room               = notification.slot.room,
+            account            = notification.account,
+            proposal           = notification.slot.talk,
+            notification       = notification,
+            deadline_day       = notification.deadline.strftime("%d/%m/%Y"),
+            deadline_hours     = notification.deadline.strftime("%H:%M"),
+            presentation_day   = notification.slot.begins.strftime("%d/%m/%Y"),
+            presentation_hours = notification.slot.begins.strftime("%H:%M")
+        )
+        message.to(notification.account.name, notification.account.email)
+        return mailer.send(message.build())

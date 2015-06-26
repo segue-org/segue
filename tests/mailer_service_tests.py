@@ -103,3 +103,29 @@ class MailerServiceTestCases(SegueApiTestCase):
 
         the_url   = 'http://192.168.33.91:9001/api/notifications/{}'.format(notification.hash)
         self.assertIn(the_url,      outbox[0].body)
+
+    @record_messages
+    def test_slot_notify(self, outbox):
+        proposal = self.create(ValidProposalWithOwnerFactory)
+        slot = self.create(ValidSlotFactory, begins=datetime(2015,7,8,9,0,0), talk=proposal)
+        deadline = datetime(2015,6,18,23,59,59)
+        notification = self.create_from_factory(ValidSlotNotificationFactory, deadline=deadline, slot=slot)
+
+        self.service.notify_slot(notification)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+
+        self.assertIn(notification.account.email, outbox[0].recipients[0])
+
+        self.assertIn('09:00',    outbox[0].body)
+        self.assertIn('08/07/2015', outbox[0].body)
+
+        self.assertIn(slot.talk.title, outbox[0].body)
+        self.assertIn(slot.room.name,      outbox[0].body)
+
+        self.assertIn('23:59',      outbox[0].body)
+        self.assertIn('18/06/2015', outbox[0].body)
+
+        the_url   = 'http://192.168.33.91:9001/api/notifications/{}'.format(notification.hash)
+        self.assertIn(the_url,      outbox[0].body)

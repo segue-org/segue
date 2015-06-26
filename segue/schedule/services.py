@@ -7,8 +7,8 @@ from segue.hasher import Hasher
 from segue.proposal.services import ProposalService
 from segue.proposal.errors import NoSuchProposal
 
-from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered, NoSuchSlot
-from models import Room, Slot, Notification, CallNotification
+from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered, NoSuchSlot, SlotIsEmpty, SlotNotDirty
+from models import Room, Slot, Notification, CallNotification, SlotNotification
 from filters import SlotFilterStrategies
 
 class RoomService(object):
@@ -84,10 +84,11 @@ class SlotService(object):
         return slot
 
 class NotificationService(object):
-    def __init__(self, mailer=None, hasher=None, proposals=None):
+    def __init__(self, mailer=None, hasher=None, proposals=None, slots=None):
         self.mailer = mailer or MailerService()
         self.hasher = hasher or Hasher()
         self.proposals = proposals or ProposalService()
+        self.slots = slots or SlotService()
 
     def list_by_status(self, kind, status):
         return Notification.query.filter(Notification.kind == kind, Notification.status == status).all()
@@ -108,6 +109,30 @@ class NotificationService(object):
         target = notification.update_target_status()
 
         self.mailer.call_proposal(notification)
+
+        db.session.add(target)
+        db.session.add(notification)
+        db.session.commit()
+
+        return notification
+
+    def notify_slot(self, slot_id, deadline):
+        slot = self.slots.get_one(slot_id, strict=True)
+        if not slot.talk: raise SlotIsEmpty()
+        if slot.status != 'dirty': raise SlotNotDirty()
+
+        already_answered = slot.notifications.filter(Notification.status != 'pending').count() > 0
+        if already_answered: raise NotificationAlreadyAnswered()
+
+        notification = SlotNotification(slot=slot)
+        notification.account  = slot.talk.owner
+        notification.sent     = datetime.now()
+        notification.deadline = deadline
+        notification.status   = 'pending'
+        notification.hash     = self.hasher.generate()
+        target = notification.update_target_status()
+
+        self.mailer.notify_slot(notification)
 
         db.session.add(target)
         db.session.add(notification)
