@@ -2,7 +2,7 @@
 
 template: notify_slot
 language: pt
-subject: "FISL16 - notifiação de horário de palestra"
+subject: "FISL16 - notificação de horário de palestra"
 
 body: |
 
