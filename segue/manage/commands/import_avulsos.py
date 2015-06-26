@@ -88,7 +88,6 @@ def import_avulsos(in_file):
         if item['caravan_id'] and item['Categoria'] == 'caravan':
             purchase.kind = 'caravan-rider'
             purchase.caravan = caravan
-            caravan_service.update_leader_exemption(caravan.id, caravan.owner)
         else:
             purchase.kind = 'single'
 
@@ -115,12 +114,15 @@ def import_avulsos(in_file):
         }
         transition = BoletoTransition(**transition_data)
 
-        mailer_service.notify_payment(purchase, payment)
-
         db.session.add(purchase)
         db.session.add(payment)
         db.session.add(transition)
         db.session.commit()
+
+        if item['caravan_id'] and item['Categoria'] == 'caravan':
+            caravan_service.update_leader_exemption(caravan.id, caravan.owner)
+
+        mailer_service.notify_payment(purchase, payment)
 
         counter += 1
 
