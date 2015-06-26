@@ -12,7 +12,6 @@ import judge
 import notificate
 import slotize
 import import_caravan
-import slotize
 
 def _make_context():
     import segue.models
@@ -43,4 +42,4 @@ manager.command(notificate.notify_proposals)
 manager.command(notificate.notify_slots)
 manager.command(report.adempiere_format)
 manager.command(slotize.slotize)
-manager.command(import_caravan.import_carvan)
+manager.command(import_caravan.import_caravan)
