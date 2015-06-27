@@ -1,6 +1,6 @@
 import flask
 
-from segue.core import config
+from segue.core import config, cache
 from segue.decorators import jsoned, accepts_html
 
 from responses import RoomResponse, SlotResponse, NotificationResponse
@@ -15,6 +15,7 @@ class RoomController(object):
         result = self.service.get_one(room_id) or flask.abort(404)
         return RoomResponse.create(result), 200
 
+    @cache.cached(timeout=60 * 10)
     @jsoned
     def list_all(self):
         result = self.service.query()
@@ -24,10 +25,11 @@ class SlotController(object):
     def __init__(self, service=None):
         self.service = service or SlotService()
 
+    @cache.cached(timeout=60 * 3)
     @jsoned
     def of_room(self, room_id):
         result = self.service.of_room(room_id) or flask.abort(404)
-        return SlotResponse.create(result, links=False), 200
+        return SlotResponse.create(result, embeds=True, links=False), 200
 
     @jsoned
     def get_one(self, room_id, slot_id):

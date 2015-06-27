@@ -11,7 +11,7 @@ class RoomResponse(BaseResponse):
            self.add_link('slots', room.slots, 'slots.of_room', room_id=room.id)
 
 class SlotResponse(BaseResponse):
-    def __init__(self, slot, links=True):
+    def __init__(self, slot, embeds=False, links=True):
         self.id        = slot.id
         self.begins    = slot.begins
         self.duration  = slot.duration
@@ -19,10 +19,19 @@ class SlotResponse(BaseResponse):
         self.room_name = slot.room.name
         self.blocked   = slot.blocked
         self.status    = slot.status
+        if embeds:
+            self.talk = TalkShortResponse.create(slot.talk)
 
         if links:
             self.add_link('room', slot.room, 'rooms.get_one', room_id=slot.room_id)
             self.add_link('talk', slot.talk, 'talks.get_one', talk_id=slot.talk_id)
+
+class TalkShortResponse(BaseResponse):
+    def __init__(self, talk):
+        self.id    = talk.id
+        self.title = talk.title
+        self.owner = talk.owner.name
+        self.track = talk.track.name_pt
 
 class NotificationResponse(BaseResponse):
     def __init__(self, notification):
