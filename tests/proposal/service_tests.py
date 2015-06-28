@@ -3,14 +3,14 @@ import sys;
 import json
 import mockito
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from freezegun import freeze_time
 
 from segue.proposal.services import ProposalService, InviteService
 from segue.proposal.errors import DeadlineReached, NoSuchProposal
 from segue.errors import SegueValidationError, NotAuthorized
 
-from ..support import SegueApiTestCase
+from ..support import SegueApiTestCase, Context
 from ..support.factories import *
 
 class ProposalServiceTestCases(SegueApiTestCase):

@@ -95,7 +95,8 @@ class ProponentProduct(Product):
 
     def check_eligibility(self, buyer_data, account=None):
         if not account: return False;
-        logger.info('start check_eligibility for %s', account.email)
+        # logger.debug('start check_eligibility for %s', account.email)
+
 
         coauthorship = Proposal.invites.any(and_(ProposalInvite.recipient == account.email, ProposalInvite.status == 'accepted'))
 
@@ -103,16 +104,19 @@ class ProponentProduct(Product):
         proposals_coauthored = Proposal.query.filter(coauthorship).all()
         proposals_involved = proposals_owned + proposals_coauthored
 
-        logger.info('-- proposals: owned %s, coauthored %s', len(proposals_owned), len(proposals_coauthored))
+        if not proposals_involved: return False
+        # logger.debug('-- proposals: owned %s, coauthored %s', len(proposals_owned), len(proposals_coauthored))
 
         proposals_judged    = filter(lambda x: x.tagged_as('player'), proposals_involved)
         proposals_confirmed = filter(lambda x: x.is_talk,             proposals_involved)
-
-        logger.info('-- proposals: judged %s, confirmed %s', len(proposals_judged), len(proposals_confirmed))
+        # logger.debug('-- proposals: judged %s, confirmed %s', len(proposals_judged), len(proposals_confirmed))
 
         was_not_accepted = len(proposals_judged) > 0 and len(proposals_confirmed) == 0
+        # logger.debug('-- was not accepted? %s', was_not_accepted)
 
-        logger.info('-- FINAL VERDICT is: %s', was_not_accepted)
+        earliest_proposal = min(proposals_involved, key=lambda x: x.created)
+        timely_proponent  = earliest_proposal.created < self.sold_until
+        # logger.debug('-- submitted before product expiration?', timely_proponent)
 
-        return was_not_accepted
+        return was_not_accepted and timely_proponent
 

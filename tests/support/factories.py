@@ -7,7 +7,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
 from segue.models import Account, ResetPassword
-from segue.models import ProposalTag, Proposal, ProposalInvite, Track
+from segue.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
@@ -148,6 +148,11 @@ class ValidCaravanProductFactory(ValidProductFactory):
     class Meta:
         model = CaravanProduct
     category    = "caravan"
+
+class ValidProponentProductFactory(ValidProductFactory):
+    class Meta:
+        model = ProponentProduct
+    category    = "proponent"
 
 class ValidStudentProductFactory(ValidProductFactory):
     class Meta:
