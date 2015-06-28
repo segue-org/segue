@@ -38,7 +38,7 @@ class ProductService(object):
 
     def purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
-        product.check_eligibility(buyer_data)
+        product.check_eligibility(buyer_data, account=account)
         extra_fields = product.extra_purchase_fields_for(buyer_data)
         return self.purchases.create(buyer_data, product, account, **extra_fields)
 

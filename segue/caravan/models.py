@@ -52,8 +52,8 @@ class CaravanProduct(Product):
     def special_purchase_class(self):
         return CaravanRiderPurchase
 
-    def check_eligibility(self, buyer_data):
-        super(CaravanProduct, self).check_eligibility(buyer_data)
+    def check_eligibility(self, buyer_data, account=None):
+        super(CaravanProduct, self).check_eligibility(buyer_data, account)
         invites = CaravanInvite.query.filter(CaravanInvite.hash == buyer_data['caravan_invite_hash']).all()
         if not invites:
             raise WrongBuyerForProduct()

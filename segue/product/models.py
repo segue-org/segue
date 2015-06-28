@@ -22,7 +22,7 @@ class Product(JsonSerializable, db.Model):
     __tablename__ = 'product'
     __mapper_args__ = { 'polymorphic_on': category, 'polymorphic_identity': 'normal' }
 
-    def check_eligibility(self, buyer_data):
+    def check_eligibility(self, buyer_data, account=None):
         if self.sold_until < datetime.now():
             raise ProductExpired()
 

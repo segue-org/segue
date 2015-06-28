@@ -1,11 +1,14 @@
 import datetime
 
+from sqlalchemy import or_, and_
 from sqlalchemy.sql import functions as func
 from sqlalchemy.dialects import postgresql
 
 from ..json import JsonSerializable
-from ..core import db
+from ..core import db, logger
 from .serializers import *
+
+from segue.product.models import Product
 
 import schema
 
@@ -52,6 +55,10 @@ class Proposal(JsonSerializable, db.Model):
     def tag_names(self):
         return [ tag.name for tag in self.tags.all() ]
 
+    @property
+    def is_talk(self):
+        return self.status == 'confirmed'
+
     def tagged_as(self, tag_name):
         return tag_name in self.tag_names
 
@@ -81,3 +88,31 @@ class Track(JsonSerializable, db.Model):
     public       = db.Column(db.Boolean, default=True)
 
     proposals    = db.relationship("Proposal", backref="track")
+
+
+class ProponentProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'proponent' }
+
+    def check_eligibility(self, buyer_data, account=None):
+        if not account: return False;
+        logger.info('start check_eligibility for %s', account.email)
+
+        coauthorship = Proposal.invites.any(and_(ProposalInvite.recipient == account.email, ProposalInvite.status == 'accepted'))
+
+        proposals_owned      = Proposal.query.filter(Proposal.owner == account).all()
+        proposals_coauthored = Proposal.query.filter(coauthorship).all()
+        proposals_involved = proposals_owned + proposals_coauthored
+
+        logger.info('-- proposals: owned %s, coauthored %s', len(proposals_owned), len(proposals_coauthored))
+
+        proposals_judged    = filter(lambda x: x.tagged_as('player'), proposals_involved)
+        proposals_confirmed = filter(lambda x: x.is_talk,             proposals_involved)
+
+        logger.info('-- proposals: judged %s, confirmed %s', len(proposals_judged), len(proposals_confirmed))
+
+        was_not_accepted = len(proposals_judged) > 0 and len(proposals_confirmed) == 0
+
+        logger.info('-- FINAL VERDICT is: %s', was_not_accepted)
+
+        return was_not_accepted
+

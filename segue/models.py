@@ -1,5 +1,5 @@
 from account.models  import Account, ResetPassword
-from proposal.models import ProposalTag, Proposal, ProposalInvite, Track
+from proposal.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct
 from product.models  import Product, StudentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
@@ -11,7 +11,7 @@ from schedule.models import Room, Slot, Notification, CallNotification, SlotNoti
 
 __all__ = [
     'Account', 'ResetPassword',
-    'ProposalTag', 'Proposal', 'ProposalInvite', 'Track',
+    'ProposalTag', 'Proposal', 'ProposalInvite', 'Track', 'ProponentProduct',
     'Product', 'StudentProduct',
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
