@@ -54,9 +54,9 @@ class AccountService(object):
         if isinstance(account, int): account = self._get_account(id)
         return account and account.can_be_acessed_by(alleged)
 
-    def create(self, data):
+    def create(self, data, rules='signup'):
         try:
-            account = AccountFactory.from_json(data, schema.signup)
+            account = AccountFactory.from_json(data, schema.whitelist[rules])
             db.session.add(account)
             db.session.commit()
             return account

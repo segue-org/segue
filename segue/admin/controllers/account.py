@@ -1,3 +1,5 @@
+import json
+
 from flask import request, abort
 from flask.ext.jwt import current_user
 
@@ -10,6 +12,14 @@ class AdminAccountController(object):
     def __init__(self, service=None):
         self.current_user = current_user
         self.service = service or AccountService()
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def create(self):
+        data = json.loads(request.data)
+        result = self.service.create(data, rules='admin_create')
+        return AccountDetailResponse.create(result), 200
 
     @jsoned
     @jwt_only

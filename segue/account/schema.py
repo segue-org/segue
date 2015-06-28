@@ -32,8 +32,22 @@ reset = {
     "required": ["hash_code", "password" ],
 }
 
+admin_create = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "email":        { "type": "string", "minLength": 5, "maxLength": 80, "format": "email" },
+        "name":         { "type": "string", "minLength": 5, "maxLength": 80 },
+        "document":     { "type": "string", "minLength": 5, "maxLength": 14 },
+        "country":      { "type": "string", "minLength": 5, "maxLength": 30 },
+        "role":         { "enum": ACCOUNT_ROLES }
+    },
+    "required": ["email", "name", "country", "document" ],
+}
+
 whitelist = dict(
   signup=signup,
   edit_account=edit_account,
-  reset=reset
+  reset=reset,
+  admin_create=admin_create
 )
