@@ -9,6 +9,7 @@ from segue.caravan.errors import InvalidCaravan
 from segue.purchase.services import PurchaseService
 from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct
+from segue.proposal.models import ProponentProduct
 
 from models import Product
 from errors import ProductExpired
@@ -32,6 +33,10 @@ class ProductService(object):
 
     def caravan_products(self, hash_code):
         return CaravanProduct.query.filter(self._in_time()).order_by(DEFAULT_ORDERING).all()
+
+    def proponent_products(self, account):
+        products = ProponentProduct.query.order_by(DEFAULT_ORDERING).all()
+        return [ p for p in products if p.check_eligibility({}, account) ]
 
     def get_product(self, product_id):
         return Product.query.get(product_id)

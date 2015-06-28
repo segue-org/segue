@@ -28,3 +28,9 @@ class ProductController(object):
     def caravan_products(self, hash_code):
         result = self.service.caravan_products(hash_code)
         return JsonFor(result).using('ProductJsonSerializer'), 200
+
+    @jwt_only
+    @jsoned
+    def proponent_products(self):
+        result = self.service.proponent_products(self.current_user) or flask.abort(404)
+        return JsonFor(result).using('ProductJsonSerializer'), 200

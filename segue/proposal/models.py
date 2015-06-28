@@ -120,3 +120,5 @@ class ProponentProduct(Product):
 
         return was_not_accepted and timely_proponent
 
+class StudentProponentProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'proponent-student' }

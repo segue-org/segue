@@ -102,7 +102,6 @@ class ProponentEligibilityTestCases(SegueApiTestCase):
         result = ctx.product.check_eligibility({}, acc)
         self.assertEquals(result, True)
 
-
     def test_valid_cases_are_eligible(self):
         ctx = self.setUpScenario()
         acc = self.create(ValidAccountFactory)
