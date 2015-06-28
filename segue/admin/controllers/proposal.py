@@ -6,13 +6,14 @@ from flask.ext.jwt import current_user
 from segue.decorators import jsoned, jwt_only, admin_only
 from segue.core import logger
 
-from segue.proposal.services import ProposalService
+from segue.proposal.services import ProposalService, InviteService
 
 from ..responses import ProposalDetailResponse, ProposalShortResponse, ProposalInviteResponse
 
 class AdminProposalController(object):
-    def __init__(self, service=None):
+    def __init__(self, service=None, invites=None):
         self.service = service or ProposalService()
+        self.invites = invites or InviteService()
         self.current_user = current_user
 
     @jwt_only
@@ -22,6 +23,24 @@ class AdminProposalController(object):
         parms = request.args.to_dict()
         result = self.service.lookup(as_user=self.current_user, **parms)
         return ProposalShortResponse.create(result), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def create(self):
+        data = request.get_json()
+        owner_id = data.get('owner_id', None) or abort(400)
+        result = self.service.create(data, owner_id, enforce_deadline=False)
+        return result, 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def set_coauthors(self, proposal_id=None):
+        data = request.get_json()
+        if not isinstance(data, list): abort(400)
+        result = self.invites.set_coauthors(proposal_id, data)
+        return result, 200
 
     @jwt_only
     @admin_only

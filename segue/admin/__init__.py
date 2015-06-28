@@ -14,8 +14,10 @@ class AdminProposalBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminProposalBlueprint, self).__init__('admin.proposal', __name__, url_prefix='/admin/proposals')
         self.controller = AdminProposalController()
-        self.add_url_rule('',                                          methods=['GET'], view_func=self.controller.list)
+        self.add_url_rule('',                                          methods=['GET'],    view_func=self.controller.list)
+        self.add_url_rule('',                                          methods=['POST'],   view_func=self.controller.create)
         self.add_url_rule('/<int:proposal_id>/invites',                methods=['GET'],    view_func=self.controller.list_invites)
+        self.add_url_rule('/<int:proposal_id>/coauthors',              methods=['POST'],   view_func=self.controller.set_coauthors)
         self.add_url_rule('/<int:proposal_id>',                        methods=['GET'],    view_func=self.controller.get_one)
         self.add_url_rule('/<int:proposal_id>/set-track',              methods=['POST'],   view_func=self.controller.change_track)
         self.add_url_rule('/<int:proposal_id>/tags/<string:tag_name>', methods=['POST'],   view_func=self.controller.add_tag)

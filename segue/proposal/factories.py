@@ -14,3 +14,11 @@ class ProposalFactory(Factory):
 
 class InviteFactory(Factory):
     model = ProposalInvite
+
+    @classmethod
+    def for_account(cls, proposal, account, status='accepted'):
+        invite = ProposalInvite(recipient = account.email)
+        invite.name = account.name
+        invite.status = status
+        invite.proposal = proposal
+        return invite;

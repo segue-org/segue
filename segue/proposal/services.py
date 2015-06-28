@@ -28,10 +28,11 @@ class CallForPapersDeadline(object):
             raise DeadlineReached()
 
 class ProposalService(object):
-    def __init__(self, db_impl=None, deadline=None):
+    def __init__(self, db_impl=None, deadline=None, accounts=None):
         self.db = db_impl or db
         self.filter_strategies = ProposalFilterStrategies()
         self.deadline = deadline or CallForPapersDeadline()
+        self.accounts = accounts or AccountService()
 
     def cfp_state(self):
         return 'closed' if self.deadline.is_past() else 'open'
@@ -39,8 +40,11 @@ class ProposalService(object):
     def all_with_tags(self, *tags):
         return Proposal.query.join(ProposalTag).filter(ProposalTag.name.in_(tags)).order_by(Proposal.id).all()
 
-    def create(self, data, owner):
-        self.deadline.enforce()
+    def create(self, data, owner, enforce_deadline=True):
+        if enforce_deadline:
+            self.deadline.enforce()
+        if isinstance(owner, int):
+            owner = self.accounts.get_one(owner, check_owner=False, strict=True)
 
         proposal = ProposalFactory.from_json(data, schema.new_proposal)
         proposal.owner = owner
@@ -181,4 +185,25 @@ class InviteService(object):
             raise NotAuthorized
 
         return self.accounts.create(account_data)
+
+    def set_coauthors(self, proposal_id, coauthor_ids):
+        proposal = self.proposals.get_one(proposal_id, strict=True)
+        existing_set = { a.id for a in proposal.coauthor_accounts }
+        wanted_set   = set(coauthor_ids)
+
+        for acc_id in wanted_set - existing_set:
+            account = self.accounts.get_one(acc_id, strict=True, check_owner=False)
+            invite = InviteFactory.for_account(proposal, account)
+            db.session.add(invite)
+
+        for acc_id in existing_set - wanted_set:
+            account = self.accounts.get_one(acc_id, strict=True, check_owner=False)
+            invite = ProposalInvite.query.filter(ProposalInvite.proposal == proposal, ProposalInvite.recipient == account.email).first()
+            db.session.delete(invite)
+
+        db.session.commit()
+
+        return proposal
+
+
 

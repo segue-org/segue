@@ -18,7 +18,7 @@ class ProposalServiceTestCases(SegueApiTestCase):
         super(ProposalServiceTestCases, self).setUp()
         self.mock_deadline = mockito.Mock()
         self.service = ProposalService(deadline=self.mock_deadline)
-        self.mock_owner = ValidAccountFactory.create()
+        self.mock_owner = self.create(ValidAccountFactory)
 
     def test_cfp_state_open(self):
         mockito.when(self.mock_deadline).is_past().thenReturn(False)
@@ -50,6 +50,15 @@ class ProposalServiceTestCases(SegueApiTestCase):
         retrieved = self.service.get_one(saved.id)
 
         self.assertEquals(saved, retrieved)
+
+    def test_create_with_just_owner_id(self):
+        proposal = ValidProposalFactory().to_json()
+
+        saved = self.service.create(proposal, self.mock_owner.id)
+        retrieved = self.service.get_one(saved.id)
+
+        self.assertEquals(saved, retrieved)
+        self.assertEquals(retrieved.owner_id, self.mock_owner.id)
 
     def test_cannot_create_nor_modify_proposal_past_deadline(self):
         proposal = ValidProposalFactory().to_json()
@@ -275,5 +284,23 @@ class InviteServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(DeadlineReached):
             self.service.register('ANY', {})
+
+    def test_set_coauthors(self):
+        prop = self.create(ValidProposalFactory)
+
+        acc1 = self.create(ValidAccountFactory)
+        acc2 = self.create(ValidAccountFactory)
+        acc3 = self.create(ValidAccountFactory)
+        acc4 = self.create(ValidAccountFactory)
+
+        inv1 = self.create(ValidInviteFactory, proposal=prop, status='accepted', recipient=acc1.email)
+        inv2 = self.create(ValidInviteFactory, proposal=prop, status='accepted', recipient=acc2.email)
+        inv3 = self.create(ValidInviteFactory, proposal=prop, status='accepted', recipient=acc3.email)
+
+        result = self.service.set_coauthors(prop.id, [ inv1.account.id, acc4.id ])
+
+        self.assertEquals(len(result.coauthor_accounts), 2)
+        self.assertIn(acc1, result.coauthor_accounts)
+        self.assertIn(acc4, result.coauthor_accounts)
 
 

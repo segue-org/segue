@@ -27,9 +27,10 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
-    def get_one(self, account_id, by=None, check_owner=True):
+    def get_one(self, account_id, by=None, check_owner=True, strict=False):
         account = self._get_account(account_id)
         if check_owner and not self.check_ownership(account, by): raise NotAuthorized
+        if strict and not account: raise NoSuchAccount()
         return account
 
     def _get_account(self, id):

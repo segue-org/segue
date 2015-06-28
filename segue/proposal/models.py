@@ -45,6 +45,10 @@ class Proposal(JsonSerializable, db.Model):
         return self.invites.filter(ProposalInvite.status == 'accepted')
 
     @property
+    def coauthor_accounts(self):
+        return [ x.account for x in self.coauthors.all() ]
+
+    @property
     def tag_names(self):
         return [ tag.name for tag in self.tags.all() ]
 

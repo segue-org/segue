@@ -64,7 +64,7 @@ class CallNotification(Notification):
         return self.proposal
 
 class SlotNotification(Notification):
-    slot_id = db.Column(db.Integer, db.ForeignKey('slot.id'), name='sn_slot_id')
+    slot_id         = db.Column(db.Integer, db.ForeignKey('slot.id'), name='sn_slot_id')
     __mapper_args__ = { 'polymorphic_identity': 'slot' }
 
     def update_target_status(self):
