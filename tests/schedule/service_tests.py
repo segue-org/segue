@@ -32,6 +32,15 @@ class SlotServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.talk, talk)
         self.assertEquals(result.status, 'dirty')
 
+    def test_set_status(self):
+        slot = self.create_from_factory(ValidSlotFactory)
+
+        result = self.service.set_status(slot.id, 'confirmed')
+        retrieved = self.service.get_one(slot.id)
+
+        self.assertEquals(result, retrieved)
+        self.assertEquals(result.status, 'confirmed')
+
     def test_empty_slot(self):
         slot = self.create_from_factory(ValidSlotFactory)
         result = self.service.empty_slot(slot.id)

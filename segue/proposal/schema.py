@@ -36,7 +36,7 @@ admin_create = {
         "track_id":  { "type": "integer" },
         "owner_id ": { "type": "integer" },
     },
-    "required": [ "title", "full", "language", "level", "owner_id" ]
+    "required": [ "title", "full", "language", "level", "owner_id", "track_id" ]
     }
 
 whitelist = dict(

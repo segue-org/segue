@@ -94,3 +94,13 @@ class AdminScheduleController(object):
         content = request.get_json().get('content')
         result = self.slots.annotate(slot_id, content) or abort(404)
         return SlotResponse.create(result, links=False), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def set_status(self, slot_id):
+        status = request.get_json().get('status')
+        if not status: abort(400)
+        result = self.slots.set_status(slot_id, status) or abort(404)
+        return SlotResponse.create(result, links=False), 200
+

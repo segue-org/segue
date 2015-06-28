@@ -61,6 +61,15 @@ class SlotService(object):
         db.session.commit()
         return slot
 
+    def set_status(self, slot_id, new_status):
+        slot = self.get_one(slot_id, strict=True)
+        slot.status = new_status
+
+        db.session.add(slot)
+        db.session.commit()
+
+        return slot
+
     def empty_slot(self, slot_id):
         slot = self.get_one(slot_id, strict=True)
         slot.talk = None
@@ -93,7 +102,7 @@ class NotificationService(object):
     def list_by_status(self, kind, status):
         return Notification.query.filter(Notification.kind == kind, Notification.status == status).all()
 
-    def call_proposal(self, proposal_id, deadline):
+    def call_proposal(self, proposal_id, deadline, do_send=True):
         proposal = self.proposals.get_one(proposal_id)
         if not proposal: raise NoSuchProposal()
 
@@ -108,7 +117,8 @@ class NotificationService(object):
         notification.hash     = self.hasher.generate()
         target = notification.update_target_status()
 
-        self.mailer.call_proposal(notification)
+        if do_send:
+            self.mailer.call_proposal(notification)
 
         db.session.add(target)
         db.session.add(notification)

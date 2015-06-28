@@ -28,11 +28,12 @@ class CallForPapersDeadline(object):
             raise DeadlineReached()
 
 class ProposalService(object):
-    def __init__(self, db_impl=None, deadline=None, accounts=None):
+    def __init__(self, db_impl=None, deadline=None, accounts=None, notifications=None):
         self.db = db_impl or db
         self.filter_strategies = ProposalFilterStrategies()
         self.deadline = deadline or CallForPapersDeadline()
         self.accounts = accounts or AccountService()
+        self.notifications = notifications
 
     def cfp_state(self):
         return 'closed' if self.deadline.is_past() else 'open'
@@ -116,6 +117,13 @@ class ProposalService(object):
 
     def by_coauthor(self, coauthor_id):
         return Proposal.query.filter(Proposal.invites.any(recipient=coauthor_id)).all()
+
+    def set_status(self, proposal_id, new_status):
+        proposal = self.get_one(proposal_id)
+        proposal.status = new_status
+        db.session.add(proposal)
+        db.session.commit()
+        return proposal
 
     def change_track(self, proposal_id, new_track_id):
         proposal = self.get_one(proposal_id)

@@ -17,7 +17,8 @@ class ProposalServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(ProposalServiceTestCases, self).setUp()
         self.mock_deadline = mockito.Mock()
-        self.service = ProposalService(deadline=self.mock_deadline)
+        self.mock_notifications = mockito.Mock()
+        self.service = ProposalService(deadline=self.mock_deadline,notifications=self.mock_notifications)
         self.mock_owner = self.create(ValidAccountFactory)
 
     def test_cfp_state_open(self):
@@ -153,6 +154,14 @@ class ProposalServiceTestCases(SegueApiTestCase):
 
         result = self.service.query(owner_id = owner.id, as_user=proposal2.owner)
         self.assertEquals(len(result), 0)
+
+    def test_set_proposal_status(self):
+        proposal = self.create(ValidProposalWithOwnerFactory)
+
+        self.service.set_status(proposal.id, 'pending')
+
+        retrieved = self.service.get_one(proposal.id)
+        self.assertEquals(retrieved.status, 'pending')
 
     def test_query_proposals_by_coauthor(self):
         account1 = self.create_from_factory(ValidAccountFactory)

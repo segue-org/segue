@@ -45,6 +45,15 @@ class AdminProposalController(object):
     @jwt_only
     @admin_only
     @jsoned
+    def set_status(self, proposal_id=None):
+        status = request.get_json().get('status')
+        if not status: abort(400)
+        result = self.service.set_status(proposal_id, status)
+        return result, 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
     def list_invites(self, proposal_id=None):
         proposal = self.service.get_one(proposal_id) or abort(404)
         return ProposalInviteResponse.create(proposal.invites.all()), 200

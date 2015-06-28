@@ -60,6 +60,9 @@ class SegueApiTestCase(unittest.TestCase):
     def build_from_factory(self, factory, *args, **kw):
         return factory.build(*args, **kw)
 
+    def build(self, *args, **kw):
+        return self.build_from_factory(*args, **kw)
+
     def jput(self, *args, **kw):
         return self.jrequest(self.client.put, *args, **kw)
 
