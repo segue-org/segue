@@ -30,6 +30,6 @@ class ProductController(object):
         return JsonFor(result).using('ProductJsonSerializer'), 200
 
     @jsoned
-    def proponent_products(self, hash_code=None):
-        result = self.service.proponent_products(hash_code) or flask.abort(404)
+    def proponent_products(self, hash_code):
+        result = self.service.proponent_products(hash_code)
         return JsonFor(result).using('ProductJsonSerializer'), 200

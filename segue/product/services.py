@@ -12,7 +12,7 @@ from segue.caravan.models import CaravanProduct
 from segue.proposal.services import NonSelectionService
 
 from models import Product
-from errors import ProductExpired
+from errors import ProductExpired, NoSuchProduct
 
 DEFAULT_ORDERING = Product.sold_until
 

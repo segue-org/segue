@@ -53,7 +53,10 @@ class NonSelectionService(object):
         return NonSelectionNotice.query.filter(NonSelectionNotice.hash == hash_code).first()
 
     def products_for(self, account):
-        products = ProponentProduct.query.order_by(ProponentProduct.original_deadline).all()
+        products = ProponentProduct.query \
+                                   .filter(ProponentProduct.sold_until >= datetime.now()) \
+                                   .order_by(ProponentProduct.original_deadline) \
+                                   .all()
         return [ p for p in products if p.check_eligibility({}, account) ]
 
 class ProposalService(object):
