@@ -11,6 +11,9 @@
   roles:
     - nodesource.node
     - realtime
+    - database
+    - segue
+    - server
 
   vars_files:
     - secret/vagrant.yml
