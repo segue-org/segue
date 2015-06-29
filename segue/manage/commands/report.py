@@ -40,17 +40,18 @@ def get_Dataset():
 def get_states_cache():
     cache_file = '/tmp/states.cache'
 
-    f_cache_content = codecs.open(cache_file, 'w+')
+    f_cache_content = codecs.open(cache_file, 'a+')
     if os.path.getsize(cache_file) == 0:
         states_cache = {}
     else:
         states_cache = json.load(f_cache_content)
 
-    return states_cache
+    f_cache_content.close()
+    return states_cache, cache_file
 
 def caravan_report(out_file = "caravan_report"):
     ds = get_Dataset()
-    states_cache = get_states_cache()
+    states_cache, cache_file = get_states_cache()
     filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + ".xls"
     print "generating report " + filename
     f = codecs.open('./' + filename,'w')
@@ -85,7 +86,7 @@ def adempiere_format(out_file = "adempiere_export"):
 
 def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
     ds = get_Dataset()
-    states_cache = get_states_cache()
+    states_cache, cache_file = get_states_cache()
 
     counter = 0
     extension = ".txt" if adempiere else ".xls"
@@ -101,7 +102,7 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
     for account in Account.query.all():
         if testing:
             counter += 1
-            if counter > 100:
+            if counter > 200:
                 break
 
         purchases = account.purchases
@@ -145,17 +146,18 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
 
     print "fechando arquivo..."
     if adempiere:
-        f.write(adempiere_filter(ds))
+        f.write(adempiere_filter(ds, states_cache))
     else:
         f.write(ds.xls)
     f.close()
 
     print "escrevendo arquivo states_cache..."
-    json.dump(states_cache, f_cache_content)
-    f_cache_content.close()
+    f_cache_file = codecs.open(cache_file, "w")
+    json.dump(states_cache, f_cache_file)
+    f_cache_file.close()
     print "done!"
 
-def adempiere_filter(data):
+def adempiere_filter(data, states_cache):
     content = u""
     s = "þ"
     # ["0CODIGO DA INSCRICAO","1EMAIL","2NOME",
@@ -178,7 +180,7 @@ def adempiere_filter(data):
         address = d[5]
         address_number = d[6] or "nulo"
         address_extra = d[7] or "nulo"
-        address_district = get_district(zipcode)
+        address_district = get_district(zipcode, states_cache)
         #TODO: in the future, allow for multiple tickets in one single document.
         quantity = 1
         amount = d[13]
@@ -191,13 +193,23 @@ def adempiere_filter(data):
 
     return content
 
-def get_district(zipcode):
+def get_district(zipcode, states_cache):
     c = get_Correios()
-    r = c.cep(zipcode)
-    return r['bairro'] if 'bairro' in r else "CENTRO"
+    if zipcode in states_cache.keys():
+        return states_cache[zipcode]['estado']
+    else:
+        result = c.cep(zipcode)
+        if 'bairro' in result:
+            states_cache[zipcode] = { 'estado': result['estado'], 'bairro': result['bairro'] }
+
+    return result['bairro'] if 'bairro' in result else "CENTRO"
 
 def format_document(value, type="CPF"):
-    if type == "CPF" and value:
+    #possibilites:
+        #None
+        #formatted
+        #not formatted
+    if type == "CPF" and value and len(value) == 11:
         return "{}{}{}.{}{}{}.{}{}{}-{}{}".format(*list(value))
     else:
         return "nulo"
@@ -223,15 +235,19 @@ def get_date_pagseguro(transition):
 def guess_state(buyer, states_cache):
     c = get_Correios()
     if buyer.address_zipcode in states_cache.keys():
-        return states_cache[buyer.address_zipcode]
+        return states_cache[buyer.address_zipcode]['estado']
     else:
         result = c.cep(buyer.address_zipcode)
-        if 'uf' in result:
-            states_cache[buyer.address_zipcode] = result['uf']
-            return result['uf']
+        bairro = ''
+        if 'estado' in result:
+            if 'bairro' in result:
+                bairro = result['bairro']
+            states_cache[buyer.address_zipcode] = { 'estado': result['estado'], 'bairro': bairro }
+            return result['estado']
         else:
             found = City.query.filter_by(name = strip_accents(buyer.address_city.upper())).all()
             if len(found):
+                states_cache[buyer.address_zipcode] = { 'estado': found[0].state, 'bairro': bairro }
                 return found[0].state
             else:
                 return ""
