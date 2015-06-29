@@ -10,11 +10,26 @@ import xmltodict
 import dateutil.parser
 
 from unidecode import unidecode
-from pycorreios import Correios
 from segue.models import *
 from segue.core import db
 from segue.hasher import Hasher
-from support import *;
+from support import *
+
+class Correios():
+    url = "http://api.postmon.com.br/v1/cep/{}"
+
+    def cep(self, zipcode):
+        ret = {}
+        if zipcode is not None and zipcode is not 'nulo':
+            print "checking zipcode: ", zipcode
+            query_url = self.url.format(zipcode)
+            result = requests.get(query_url)
+            if result.status_code == 200:
+                ret = result.json()
+            else:
+                ret = {}
+
+        return ret
 
 def get_Correios():
     return Correios()
