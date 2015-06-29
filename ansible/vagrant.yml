@@ -9,9 +9,8 @@
   sudo: true
   accelerate: true
   roles:
-    - database
-    - segue
-    - server
+    - nodesource.node
+    - realtime
 
   vars_files:
     - secret/vagrant.yml

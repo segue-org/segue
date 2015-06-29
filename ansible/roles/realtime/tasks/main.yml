@@ -1,0 +1,24 @@
+---
+
+- name: installs required npm packages
+  tags: realtime
+  npm: name={{ item }}
+       state=present
+       path={{ app_path }}
+  with_items:
+    - socket.io
+
+- name: creates the service for realtime grid
+  tags:
+    - realtime
+    - config
+  template: src=segue_realtime_grid.j2
+            dest=/etc/init.d/segue_realtime_grid
+            mode=0755
+  notify:
+    - restart segue_realtime_grid
+
+- name: ensures realtime service is enabled
+  tags: realtime
+  service: name=segue_realtime_grid
+           enabled=yes
