@@ -107,3 +107,12 @@ class MailerService(object):
         )
         message.to(notification.account.name, notification.account.email)
         return mailer.send(message.build())
+
+    def non_selection(self, notice):
+        message = self.message_factory.from_template('proposal/non_selection')
+        message.given(
+            notice = notice,
+            account = notice.account
+        )
+        message.to(notice.account.name, notice.account.email)
+        return mailer.send(message.build())

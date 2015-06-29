@@ -9,4 +9,3 @@ class NoSuchProposal(SegueError):
     code = 404
     def to_json(self):
         return { 'message': 'no such proposal' }
-

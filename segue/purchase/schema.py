@@ -8,7 +8,7 @@ buyer = {
         "kind":            { "enum": BUYER_TYPES },
         "name":            { "type": "string", "minLength": 5,  "maxLength": 50 },
         "document":        { "type": "string", "minLength": 11, "maxLength": 20, "pattern": CPF_CNPJ_PATTERN },
-        "contact":         { "type": "string", "minLength": 5,  "maxLength": 100 },
+        "contact":         { "type": "string", "minLength": 0,  "maxLength": 100 },
         "address_street":  { "type": "string", "minLength": 5,  "maxLength": 80  },
         "address_number":  { "type": "string", "minLength": 1,  "maxLength": 20  },
         "address_extra":   { "type": "string", "minLength": 1,  "maxLength": 40  },

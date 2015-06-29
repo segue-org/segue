@@ -9,7 +9,24 @@ from segue.decorators import jsoned, jwt_only, accepts_html
 
 import schema
 from factories import ProposalFactory
-from services  import ProposalService, InviteService
+from services  import ProposalService, InviteService, NonSelectionService
+from responses import NonSelectionResponse
+
+class NonSelectionController(object):
+    def __init__(self, service=None):
+        self.service = service or NonSelectionService()
+        self.current_user = current_user
+
+    @jsoned
+    @accepts_html
+    def get_by_hash(self, hash_code=None, wants_html=False):
+        notice = self.service.get_by_hash(hash_code) or flask.abort(404)
+        if wants_html:
+            path = '/#/proponent-offer/{}'.format(hash_code)
+            return flask.redirect(config.FRONTEND_URL + path)
+        else:
+            return NonSelectionResponse.create(notice), 200
+
 
 class ProposalController(object):
     def __init__(self, service=None):

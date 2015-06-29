@@ -24,6 +24,9 @@ class AccountService(object):
         self.hasher = hasher or Hasher()
         self.filters = AccountFilterStrategies()
 
+    def by_range(self, start, end):
+        return Account.query.filter(Account.id.between(start, end)).order_by(Account.id)
+
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 

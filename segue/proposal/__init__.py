@@ -1,5 +1,5 @@
 import flask
-from controllers import ProposalController, ProposalInviteController
+from controllers import ProposalController, ProposalInviteController, NonSelectionController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -13,6 +13,12 @@ class ProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/tracks',                methods=['GET'],  view_func=self.controller.list_tracks)
         self.add_url_rule('/tracks/<int:track_id>', methods=['GET'],  view_func=self.controller.get_track)
         self.add_url_rule('/cfp-state',             methods=['GET'],  view_func=self.controller.cfp_state)
+
+class NonSelectionBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(NonSelectionBlueprint, self).__init__('non-selection', __name__, url_prefix='/non-selection')
+        self.controller = NonSelectionController()
+        self.add_url_rule('/<string:hash_code>', methods=['GET'], view_func=self.controller.get_by_hash)
 
 class ProposalInviteBluePrint(flask.Blueprint):
     def __init__(self):

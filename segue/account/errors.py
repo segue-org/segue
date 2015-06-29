@@ -5,6 +5,11 @@ class InvalidResetPassword(SegueError):
     def to_json(self):
         return { 'message': 'invalid reset password code' }
 
+class AccountAlreadyHasPurchase(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this account already has a purchase' }
+
 class NoSuchAccount(SegueError):
     code = 404
     def to_json(self):

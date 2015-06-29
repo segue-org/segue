@@ -1,6 +1,6 @@
 import schema
 from segue.factory import Factory
-from models import Proposal, ProposalInvite
+from models import Proposal, ProposalInvite, NonSelectionNotice
 
 class ProposalFactory(Factory):
     model = Proposal

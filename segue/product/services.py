@@ -9,7 +9,7 @@ from segue.caravan.errors import InvalidCaravan
 from segue.purchase.services import PurchaseService
 from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct
-from segue.proposal.models import ProponentProduct
+from segue.proposal.services import NonSelectionService
 
 from models import Product
 from errors import ProductExpired
@@ -17,10 +17,11 @@ from errors import ProductExpired
 DEFAULT_ORDERING = Product.sold_until
 
 class ProductService(object):
-    def __init__(self, db_impl=None, purchases=None, caravans=None):
-        self.db         = db_impl or db
-        self.purchases  = purchases or PurchaseService()
-        self.caravans   = caravans or CaravanService()
+    def __init__(self, db_impl=None, purchases=None, caravans=None, non_selection=None):
+        self.db            = db_impl or db
+        self.purchases     = purchases or PurchaseService()
+        self.caravans      = caravans or CaravanService()
+        self.non_selection = non_selection or NonSelectionService()
 
     def _in_time(self):
         return Product.sold_until >= datetime.now()
@@ -34,9 +35,11 @@ class ProductService(object):
     def caravan_products(self, hash_code):
         return CaravanProduct.query.filter(self._in_time()).order_by(DEFAULT_ORDERING).all()
 
-    def proponent_products(self, account):
-        products = ProponentProduct.query.order_by(DEFAULT_ORDERING).all()
-        return [ p for p in products if p.check_eligibility({}, account) ]
+    def proponent_products(self, hash_code):
+        notice = self.non_selection.get_by_hash(hash_code)
+        if not notice: raise NoSuchProduct()
+
+        return self.non_selection.products_for(notice.account)
 
     def get_product(self, product_id):
         return Product.query.get(product_id)

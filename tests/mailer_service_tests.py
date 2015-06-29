@@ -35,6 +35,19 @@ class MailerServiceTestCases(SegueApiTestCase):
         self.assertIn(the_url, outbox[0].body)
 
     @record_messages
+    def test_non_selection(self, outbox):
+        notice = self.create(ValidNonSelectionNoticeFactory)
+
+        self.service.non_selection(notice)
+
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(len(outbox[0].recipients), 1)
+        self.assertIn(notice.account.email, outbox[0].recipients[0])
+
+        the_url = 'http://192.168.33.91:9001/api/non-selection/{}'.format(notice.hash)
+        self.assertIn(the_url, outbox[0].body)
+
+    @record_messages
     def test_notify_payment(self, outbox):
         product    = self.create_from_factory(ValidProductFactory, price=200)
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product, status='paid')

@@ -11,9 +11,9 @@ from segue.mailer import MailerService
 from segue.account.services import AccountService
 
 import schema
-from errors import DeadlineReached, NoSuchProposal
+from errors import DeadlineReached, NoSuchProposal, SegueError
 from factories import ProposalFactory, InviteFactory
-from models    import ProposalTag, Proposal, ProposalInvite, Track
+from models import ProposalTag, Proposal, ProposalInvite, Track, NonSelectionNotice, ProponentProduct
 from filters import ProposalFilterStrategies
 
 class CallForPapersDeadline(object):
@@ -26,6 +26,35 @@ class CallForPapersDeadline(object):
     def enforce(self):
         if self.is_past():
             raise DeadlineReached()
+
+class NonSelectionService(object):
+    def __init__(self, hasher=None, mailer=None):
+        self.hasher = hasher or Hasher()
+        self.mailer = mailer or MailerService()
+
+    def create_and_send(self, account):
+        existing = NonSelectionNotice.query.filter(NonSelectionNotice.account==account).first()
+        if existing: return existing
+
+        notice = NonSelectionNotice(account=account)
+        notice.hash = self.hasher.generate()
+        db.session.add(notice)
+        db.session.commit()
+        self.mailer.non_selection(notice)
+        return notice
+
+    def qualify(self, account):
+        try:
+            return NonSelectionNotice.qualify(account)
+        except SegueError, e:
+            return False, None
+
+    def get_by_hash(self, hash_code):
+        return NonSelectionNotice.query.filter(NonSelectionNotice.hash == hash_code).first()
+
+    def products_for(self, account):
+        products = ProponentProduct.query.order_by(ProponentProduct.original_deadline).all()
+        return [ p for p in products if p.check_eligibility({}, account) ]
 
 class ProposalService(object):
     def __init__(self, db_impl=None, deadline=None, accounts=None, notifications=None):

@@ -7,7 +7,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
 from segue.models import Account, ResetPassword
-from segue.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct
+from segue.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
 from segue.models import PagSeguroPayment, BoletoPayment
@@ -65,6 +65,12 @@ class ValidAccountFactory(SegueFactory):
     phone        = "51 2345678"
     organization = "manos da quebrada"
     resume       = "um cara legal"
+
+class ValidNonSelectionNoticeFactory(SegueFactory):
+    class Meta:
+        model = NonSelectionNotice
+    account = SubFactory(ValidAccountFactory)
+    hash    = _Sequence('C0FFEE{0:04x}')
 
 class ValidTournamentFactory(SegueFactory):
     class Meta:

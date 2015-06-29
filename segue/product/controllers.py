@@ -9,7 +9,7 @@ from services import ProductService
 
 class ProductController(object):
     def __init__(self, service=None):
-        self.service = service or ProductService()
+        self.service      = service or ProductService()
         self.current_user = current_user
 
     @jsoned
@@ -29,8 +29,7 @@ class ProductController(object):
         result = self.service.caravan_products(hash_code)
         return JsonFor(result).using('ProductJsonSerializer'), 200
 
-    @jwt_only
     @jsoned
-    def proponent_products(self):
-        result = self.service.proponent_products(self.current_user) or flask.abort(404)
+    def proponent_products(self, hash_code=None):
+        result = self.service.proponent_products(hash_code) or flask.abort(404)
         return JsonFor(result).using('ProductJsonSerializer'), 200

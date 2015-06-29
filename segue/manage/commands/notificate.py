@@ -4,9 +4,42 @@ from collections import defaultdict
 from datetime import datetime
 
 from segue.errors import SegueError
-from segue.proposal.services import ProposalService
+from segue.account.services import AccountService
+from segue.proposal.services import ProposalService, NonSelectionService
 from segue.schedule.services import NotificationService, SlotService
 from support import *;
+
+def non_selection(start=0, end=sys.maxint):
+    init_command()
+
+    accounts = AccountService().by_range(int(start), int(end)).all()
+    service = NonSelectionService()
+
+    results = { True: 0, False: 0 }
+
+    for account in accounts:
+        print "{}{}{} - account owned by {}{}{}...".format(
+                F.RED, account.id, F.RESET,
+                F.RED, account.email, F.RESET
+        ),
+
+        qualifies, earliest_proposal = service.qualify(account)
+        results[qualifies] += 1
+
+        message = F.GREEN+'qualifies...' if qualifies else F.RED+'does not qualify!'
+        print message+F.RESET,
+
+        if qualifies:
+            print "{}sending{}...".format(F.GREEN, F.RESET),
+            service.create_and_send(account)
+
+        print F.GREEN+"OK"+F.RESET
+
+    print "============== RESULTS ==============="
+    print "start: {}{}{}, end: {}{}{}".format(F.GREEN, start, F.RESET, F.GREEN, end, F.RESET)
+    print "accounts scanned: {}{}{}".format(F.GREEN, len(accounts),  F.RESET)
+    print "       qualified: {}{}{}".format(F.GREEN, results[True],  F.RESET)
+    print "   not qualified: {}{}{}".format(F.GREEN, results[False], F.RESET)
 
 def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
     init_command()
