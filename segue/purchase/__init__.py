@@ -17,5 +17,6 @@ class PaymentBlueprint(flask.Blueprint):
     def __init__(self):
         super(PaymentBlueprint, self).__init__('purchase_payments', __name__, url_prefix='/purchases/<int:purchase_id>/payments')
         self.controller = PaymentController()
+        self.add_url_rule('/<int:payment_id>/guide',    methods=['GET'],  view_func=self.controller.guide)
         self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
         self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)

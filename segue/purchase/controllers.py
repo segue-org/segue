@@ -8,6 +8,7 @@ from segue.decorators import jsoned, jwt_only
 
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
+from responses import GuideResponse
 
 import schema
 
@@ -53,6 +54,12 @@ class PurchaseController(object):
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
+
+    @jsoned
+    @jwt_only
+    def guide(self, purchase_id=None, payment_id=None):
+        payment = self.service.get_one(purchase_id, payment_id) or flask.abort(404)
+        return GuideResponse(payment), 200
 
     @jsoned
     def notify(self, purchase_id=None, payment_id=None):

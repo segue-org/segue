@@ -127,5 +127,5 @@ class Transition(JsonSerializable, db.Model):
 
     @property
     def is_payment(self):
-        return self.old_status != 'paid' and self.old_status == 'paid'
+        return self.old_status != 'paid' and self.new_status == 'paid'
 

@@ -85,7 +85,8 @@ class PurchaseService(object):
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
         pagseguro = PagSeguroPaymentService,
-        boleto    = BoletoPaymentService
+        boleto    = BoletoPaymentService,
+        cash      = CashPaymentService
     )
 
     def __init__(self, mailer=None, caravans=None, filters=None, **processors_overrides):
@@ -154,6 +155,7 @@ class PaymentService(object):
             db.session.commit()
 
             if purchase.satisfied:
+                # TODO: mailer should have special case for cash payments
                 logger.debug('transition is good payment! notifying customer via e-mail!')
                 self.mailer.notify_payment(purchase, payment)
 
