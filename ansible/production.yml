@@ -3,7 +3,6 @@
 - hosts: production
   sudo: true
   roles:
-    - realtime
     - server
     - git-down
     - database

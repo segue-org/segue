@@ -9,16 +9,17 @@ class ProductJsonSerializer(SQLAlchemyJsonSerializer):
 
 class Product(JsonSerializable, db.Model):
     _serializers = [ ProductJsonSerializer ]
-    id          = db.Column(db.Integer, primary_key=True)
-    kind        = db.Column(db.Enum('ticket', 'swag', name="product_kinds"))
-    category    = db.Column(db.Text)
-    public      = db.Column(db.Boolean, default=True)
-    price       = db.Column(db.Numeric)
-    sold_until  = db.Column(db.DateTime)
-    description = db.Column(db.Text)
-    is_promo    = db.Column(db.Boolean, default=False, server_default='f')
-    is_speaker  = db.Column(db.Boolean, default=False, server_default='f')
-    gives_kit   = db.Column(db.Boolean, default=True, server_default='t')
+    id           = db.Column(db.Integer, primary_key=True)
+    kind         = db.Column(db.Enum('ticket', 'swag', name="product_kinds"))
+    category     = db.Column(db.Text)
+    public       = db.Column(db.Boolean, default=True)
+    price        = db.Column(db.Numeric)
+    sold_until   = db.Column(db.DateTime)
+    description  = db.Column(db.Text)
+    is_promo     = db.Column(db.Boolean, server_default='f')
+    is_speaker   = db.Column(db.Boolean, server_default='f')
+    gives_kit    = db.Column(db.Boolean, server_default='t')
+    can_pay_cash = db.Column(db.Boolean, server_default='f')
 
     purchases  = db.relationship("Purchase", backref="product")
 
