@@ -1,4 +1,5 @@
-from segue.core import db, logger
+from datetime import datetime
+from segue.core import db, logger, config
 
 from segue.errors import NotAuthorized
 from segue.purchase.errors import NoSuchPayment, PurchaseAlreadySatisfied
@@ -11,15 +12,31 @@ from segue.mailer import MailerService
 
 from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
+from cash      import CashPaymentService
 from models    import Purchase, Payment
 
 import schema
 
+class OnlinePaymentDeadline(object):
+    def __init__(self, override_config=None):
+        self.config = override_config or config
+
+    def is_past(self):
+        return datetime.now() > self.config.ONLINE_PAYMENT_DEADLINE
+
+    def enforce(self):
+        if self.is_past():
+            raise DeadlineReached()
+
 class PurchaseService(object):
-    def __init__(self, db_impl=None, payments=None, filters=None):
+    def __init__(self, db_impl=None, payments=None, filters=None, deadline=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
         self.filters = filters or PurchaseFilterStrategies()
+        self.deadline = deadline or OnlinePaymentDeadline()
+
+    def current_mode(self):
+        return 'reservation' if self.deadline.is_past() else 'online'
 
     def query(self, by=None, **kw):
         filter_list = self.filters.given(**kw)
@@ -81,6 +98,7 @@ class PaymentService(object):
     def query(self, by=None, **kw):
         filter_list = self.filters.given(**kw)
         return Payment.query.filter(*filter_list).all()
+
 
     def create(self, purchase, method, data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()

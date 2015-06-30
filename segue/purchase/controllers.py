@@ -17,6 +17,10 @@ class PurchaseController(object):
         self.current_user = current_user
 
     @jsoned
+    def current_mode(self):
+        return { 'mode': self.service.current_mode() }, 200
+
+    @jsoned
     @jwt_only
     def list(self):
         parms = { c: request.args.get(c) for c in PurchaseFactory.QUERY_WHITELIST if c in request.args }
