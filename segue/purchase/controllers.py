@@ -18,6 +18,10 @@ class PurchaseController(object):
         self.current_user = current_user
 
     @jsoned
+    def current_mode(self):
+        return { 'mode': self.service.current_mode() }, 200
+
+    @jsoned
     @jwt_only
     def list(self):
         parms = { c: request.args.get(c) for c in PurchaseFactory.QUERY_WHITELIST if c in request.args }
@@ -56,6 +60,12 @@ class PurchaseController(object):
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
+
+    @jsoned
+    @jwt_only
+    def guide(self, purchase_id=None, payment_id=None):
+        payment = self.service.get_one(purchase_id, payment_id) or flask.abort(404)
+        return GuideResponse(payment), 200
 
     @jsoned
     def notify(self, purchase_id=None, payment_id=None):
