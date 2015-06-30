@@ -31,22 +31,15 @@ class OnlinePaymentDeadline(object):
             raise DeadlineReached()
 
 class PurchaseService(object):
-<<<<<<< HEAD
-    def __init__(self, db_impl=None, payments=None, filters=None, deadline=None):
+    def __init__(self, db_impl=None, payments=None, filters=None, deadline=None, promocode=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
         self.filters = filters or PurchaseFilterStrategies()
         self.deadline = deadline or OnlinePaymentDeadline()
+        self.promocode_service = promocode or PromoCodeService()
 
     def current_mode(self):
         return 'reservation' if self.deadline.is_past() else 'online'
-=======
-    def __init__(self, db_impl=None, payments=None, filters=None, promocode=None):
-        self.db = db_impl or db
-        self.payments = payments or PaymentService()
-        self.filters = filters or PurchaseFilterStrategies()
-        self.promocode_service = promocode or PromoCodeService()
->>>>>>> WIP promocodes
 
     def query(self, by=None, **kw):
         filter_list = self.filters.given(**kw)
