@@ -16,9 +16,9 @@ class Product(JsonSerializable, db.Model):
     price       = db.Column(db.Numeric)
     sold_until  = db.Column(db.DateTime)
     description = db.Column(db.Text)
-    is_promo    = db.Column(db.Boolean, server_default='f')
-    is_speaker  = db.Column(db.Boolean, server_default='f')
-    gives_kit   = db.Column(db.Boolean, server_default='t')
+    is_promo    = db.Column(db.Boolean, default=False, server_default='f')
+    is_speaker  = db.Column(db.Boolean, default=False, server_default='f')
+    gives_kit   = db.Column(db.Boolean, default=True, server_default='t')
 
     purchases  = db.relationship("Purchase", backref="product")
 
