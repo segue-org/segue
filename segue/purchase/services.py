@@ -15,6 +15,8 @@ from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
 
+from segue.purchase.promocode import PromoCodeService
+
 import schema
 
 class OnlinePaymentDeadline(object):
@@ -29,6 +31,7 @@ class OnlinePaymentDeadline(object):
             raise DeadlineReached()
 
 class PurchaseService(object):
+<<<<<<< HEAD
     def __init__(self, db_impl=None, payments=None, filters=None, deadline=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
@@ -37,6 +40,13 @@ class PurchaseService(object):
 
     def current_mode(self):
         return 'reservation' if self.deadline.is_past() else 'online'
+=======
+    def __init__(self, db_impl=None, payments=None, filters=None, promocode=None):
+        self.db = db_impl or db
+        self.payments = payments or PaymentService()
+        self.filters = filters or PurchaseFilterStrategies()
+        self.promocode_service = promocode or PromoCodeService()
+>>>>>>> WIP promocodes
 
     def query(self, by=None, **kw):
         filter_list = self.filters.given(**kw)
@@ -81,6 +91,10 @@ class PurchaseService(object):
         db.session.add(cloned_purchase)
         db.session.commit()
         return cloned_purchase
+
+    def check_promocode(self, hash, by=None):
+        logger.info("received promocode hash: " + hash)
+        return self.promocode_service.check(hash)
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
@@ -175,4 +189,3 @@ class PaymentService(object):
         if method in self.DEFAULT_PROCESSORS:
             return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
-
