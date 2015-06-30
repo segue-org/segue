@@ -34,6 +34,13 @@ class AdminProposalController(object):
         return result, 200
 
     @jwt_only
+    @jsoned
+    def modify(self, proposal_id):
+        data = request.get_json()
+        result = self.service.modify(proposal_id, data, by=self.current_user, allow_modify_owner=True, enforce_deadline=False) or flask.abort(404)
+        return result, 200
+
+    @jwt_only
     @admin_only
     @jsoned
     def set_coauthors(self, proposal_id=None):

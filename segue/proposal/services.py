@@ -107,11 +107,16 @@ class ProposalService(object):
         filter_list = self.filter_strategies.needle(needle, as_user, **kw)
         return Proposal.query.filter(*filter_list).limit(limit).all()
 
-    def modify(self, proposal_id, data, by=None):
-        self.deadline.enforce()
+    def modify(self, proposal_id, data, by=None, allow_modify_owner=False, enforce_deadline=True):
+        if enforce_deadline:
+            self.deadline.enforce()
 
         proposal = self.get_one(proposal_id)
         if not self.check_ownership(proposal, by): raise NotAuthorized
+
+        new_owner_id = data.get('owner_id',None)
+        if new_owner_id and new_owner_id != proposal.owner.id:
+            proposal.owner = self.accounts.get_one(data.get('owner_id',None), check_owner=False, strict=True)
 
         for name, value in ProposalFactory.clean_for_update(data).items():
             setattr(proposal, name, value)
@@ -139,7 +144,7 @@ class ProposalService(object):
 
     def check_ownership(self, proposal, alleged):
         if isinstance(proposal, int): proposal = self.get_one(proposal)
-        return proposal and alleged and proposal.owner_id == alleged.id
+        return proposal and proposal.can_be_acessed_by(alleged)
 
     def list_tracks(self):
         return Track.query.all()

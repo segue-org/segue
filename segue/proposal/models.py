@@ -40,6 +40,12 @@ class Proposal(JsonSerializable, db.Model):
     as_player1 = db.relationship("Match", backref="player1", lazy="dynamic", foreign_keys="Match.player1_id")
     as_player2 = db.relationship("Match", backref="player2", lazy="dynamic", foreign_keys="Match.player2_id")
 
+    def can_be_acessed_by(self, alleged):
+        if not alleged: return False
+        if self.owner.id == alleged.id: return True
+        if alleged.role == 'admin': return True
+        return False
+
     @property
     def slotted(self):
         return self.slots.count() > 0
