@@ -4,6 +4,7 @@ from product.models  import Product, StudentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
+from purchase.promocode.models import PromoCode, PromoCodePayment, PromoCodeTransition
 from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderPurchase, CaravanLeaderPurchase
 from judge.models import Judge, Match, Tournament
@@ -19,5 +20,6 @@ __all__ = [
     'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanRiderPurchase', 'CaravanLeaderPurchase',
     'City', 'Country',
     'Judge', 'Match', 'Tournament',
-    'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification'
+    'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification',
+    'PromoCode', 'PromoCodePayment', 'PromoCodeTransition'
 ]

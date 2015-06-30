@@ -12,6 +12,7 @@ class PurchaseBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
         self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
+        self.add_url_rule('/promocode/<string:hash>',               methods=['GET'],  view_func=self.controller.check_promocode)
 
 class PaymentBlueprint(flask.Blueprint):
     def __init__(self):
