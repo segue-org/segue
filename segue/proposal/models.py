@@ -112,6 +112,9 @@ class ProponentProduct(Product):
 class StudentProponentProduct(ProponentProduct):
     __mapper_args__ = { 'polymorphic_identity': 'proponent-student' }
 
+class SpeakerProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'speaker' }
+
 class NonSelectionNotice(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     hash       = db.Column(db.String(64))
