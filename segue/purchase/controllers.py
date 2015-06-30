@@ -8,7 +8,7 @@ from segue.decorators import jsoned, jwt_only
 
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
-from responses import GuideResponse
+from responses import PromoCodeResponse
 
 import schema
 
@@ -16,10 +16,6 @@ class PurchaseController(object):
     def __init__(self, service=None):
         self.service = service or PurchaseService()
         self.current_user = current_user
-
-    @jsoned
-    def current_mode(self):
-        return { 'mode': self.service.current_mode() }, 200
 
     @jsoned
     @jwt_only
@@ -55,17 +51,11 @@ class PurchaseController(object):
     @jsoned
     def check_promocode(self, hash=None):
         result = self.service.check_promocode(hash, by=self.current_user) or flask.abort(404)
-        return result, 200
+        return PromoCodeResponse.create(result), 200
 
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
-
-    @jsoned
-    @jwt_only
-    def guide(self, purchase_id=None, payment_id=None):
-        payment = self.service.get_one(purchase_id, payment_id) or flask.abort(404)
-        return GuideResponse(payment), 200
 
     @jsoned
     def notify(self, purchase_id=None, payment_id=None):
