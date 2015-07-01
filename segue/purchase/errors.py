@@ -20,8 +20,11 @@ class InvalidPaymentNotification(SegueError):
     def to_json(self):
         return { 'message': 'the notification data from payment provider is not correct for this payment method' }
 
+class InvalidHashCode(SegueError):
+    def to_json(self):
+        return { 'message': 'invalid hash code: {}'.format(self.args) }
+
 class MustProvideDescription(SegueFieldError):
     FIELD = 'description'
     LABEL = 'object_required'
     MESSAGE = 'please provide promocode description'
-
