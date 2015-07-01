@@ -18,6 +18,7 @@ class PromoCodePaymentFactory(PaymentFactory):
     def create(self, purchase, promocode):
         payment = super(PromoCodePaymentFactory, self).create(purchase, target_model=self.model)
         payment.promocode = promocode
+        payment.amount    = purchase.product.price
         return payment
 
 class PromoCodeTransitionFactory(TransitionFactory):

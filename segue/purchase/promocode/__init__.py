@@ -53,23 +53,22 @@ class PromoCodeService(object):
         return promocode
 
 class PromoCodePaymentService(object):
-    def __init__(self, sessions=None, cash_service=None, factory=None):
+    def __init__(self, cash_service=None, promocodes=None, factory=None):
         self.factory  = factory  or PromoCodePaymentFactory()
         self.cash_service = cash_service or CashPaymentService()
+        self.promocodes = promocodes or PromoCodeService()
 
-    def create(self, purchase, data=None):
-        if 'promocode' in data:
-            promocode = data['promocode']
-        else:
-            promocode = None
+    def create(self, purchase, data=dict()):
+        hash_code = data.get('hash_code',None)
+        if not hash_code: return InvalidHashCode()
+
+        promocode = self.promocodes.check(hash_code)
+        if not promocode: return InvalidHashCode()
+
         payment = self.factory.create(purchase, promocode)
+        purchase.recalculate_status()
 
-        if 'status' in data:
-            payment.status = data['status']
-            if data['status'] == 'paid':
-                purchase.status = 'paid'
-                db.session.add(purchase)
-
+        db.session.add(purchase)
         db.session.add(payment)
         db.session.commit()
         return payment
