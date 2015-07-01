@@ -24,7 +24,7 @@ class PromoCodeService(object):
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).order_by(PromoCode.description).all()
 
-    def create(self, product, description=None, creator=None, discount=1, quantity=1):
+    def create(self, product, description=None, creator=None, discount=100, quantity=1):
         if not description: raise MustProvideDescription()
 
         result = []
@@ -36,7 +36,7 @@ class PromoCodeService(object):
             p.product     = product
             p.description = str_description
             p.hash_code   = self.hasher.generate()
-            p.discount    = discount
+            p.discount    = float(discount) / 100
 
             db.session.add(p)
             result.append(p)

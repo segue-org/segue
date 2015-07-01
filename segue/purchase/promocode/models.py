@@ -14,11 +14,11 @@ class PromoCode(JsonSerializable, db.Model):
 
     creator = db.relationship('Account')
     product = db.relationship('Product', backref='promocodes')
-    payment = db.relationship('PromoCodePayment', backref=db.backref('promocode', uselist=False))
+    payment = db.relationship('PromoCodePayment', uselist=False, backref=db.backref('promocode', uselist=False))
 
     @property
     def used(self):
-        return len(self.payment) > 0
+        return self.payment is not None
 
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }

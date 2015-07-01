@@ -11,7 +11,7 @@ from segue.caravan.services import CaravanService
 from segue.caravan.models import CaravanProduct
 from segue.proposal.services import NonSelectionService
 
-from models import Product
+from models import Product, PromoCodeProduct
 from errors import ProductExpired, NoSuchProduct
 
 DEFAULT_ORDERING = Product.sold_until
@@ -40,6 +40,9 @@ class ProductService(object):
         if not notice: raise NoSuchProduct()
 
         return self.non_selection.products_for(notice.account)
+
+    def promocode_products(self):
+        return PromoCodeProduct.query.filter(self._in_time()).all()
 
     def get_product(self, product_id, strict=False):
         product = Product.query.get(product_id)

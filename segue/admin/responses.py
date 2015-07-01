@@ -25,10 +25,19 @@ class TournamentDetailResponse(TournamentShortResponse):
 class PromoCodeResponse(BaseResponse):
     def __init__(self, promocode, links=False):
         self.id          = promocode.id
-        self.description = promocode.description
         self.discount    = promocode.discount
+        self.hash_code   = promocode.hash_code
+        self.description = promocode.description
+
         self.product     = ProductDetailResponse.create(promocode.product)
-        self.payment     = PaymentDetailResponse.create(promocode.payment)
+        if promocode.payment:
+            self.spent_with  = PurchasePersonIdentifierResponse(promocode.payment.purchase)
+
+class PurchasePersonIdentifierResponse(BaseResponse):
+    def __init__(self, purchase, links=False):
+        self.id     = purchase.id
+        self.name   = purchase.customer.name
+        self.status = purchase.status
 
 class RoomResponse(BaseResponse):
     def __init__(self, room, links=True):
