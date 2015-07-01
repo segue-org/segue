@@ -18,7 +18,7 @@ class PromoCode(JsonSerializable, db.Model):
 
     @property
     def used(self):
-        return self.payment is not None
+        return len(self.payment) > 0
 
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
@@ -29,7 +29,8 @@ class PromoCodePayment(Payment):
     def paid_amount(self):
         valid = self.promocode != None
         total_value = self.purchase.product.price
-        discounted  = self.promocode.discount * total_value
+        if valid:
+            discounted  = self.promocode.discount * total_value
         return discounted if valid else 0
 
 class PromoCodeTransition(Transition):

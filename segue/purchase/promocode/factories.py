@@ -15,9 +15,9 @@ class PromoCodePaymentFactory(PaymentFactory):
     def __init__(self):
         pass
 
-    def create(self, purchase):
+    def create(self, purchase, promocode):
         payment = super(PromoCodePaymentFactory, self).create(purchase, target_model=self.model)
-        #payment.reference = "A{0:05d}-PU{1:05d}".format(purchase.customer.id, purchase.id)
+        payment.promocode = promocode
         return payment
 
 class PromoCodeTransitionFactory(TransitionFactory):
