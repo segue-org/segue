@@ -10,7 +10,7 @@ from segue.models import Account, ResetPassword
 from segue.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice
 from segue.models import Product, CaravanProduct, StudentProduct
 from segue.models import Purchase, Buyer, Payment, Transition
-from segue.models import PagSeguroPayment, BoletoPayment
+from segue.models import PagSeguroPayment, BoletoPayment, PromoCode, PromoCodePayment
 from segue.models import Judge, Match, Tournament
 from segue.models import Room, Slot, CallNotification, SlotNotification
 from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
@@ -221,6 +221,19 @@ class ValidBoletoPaymentFactory(ValidPaymentFactory):
     our_number    = 101234
     due_date      = FuzzyDate(date.today())
     document_hash = _Sequence("C0FFE#{:04d}")
+
+class ValidPromoCodeFactory(SegueFactory):
+    class Meta:
+        model = PromoCode
+    discount    = 1.0
+    creator     = SubFactory(ValidAccountFactory)
+    product     = SubFactory(ValidProductFactory)
+    hash_code   = _Sequence("C0FFE#{:04d}")
+    description = _Sequence("code #{:04d}")
+
+class ValidPromoCodePaymentFactory(ValidPaymentFactory):
+    class Meta:
+        model = PromoCodePayment
 
 class ValidTransitionFactory(SegueFactory):
     class Meta:

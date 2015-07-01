@@ -41,8 +41,11 @@ class ProductService(object):
 
         return self.non_selection.products_for(notice.account)
 
-    def get_product(self, product_id):
-        return Product.query.get(product_id)
+    def get_product(self, product_id, strict=False):
+        product = Product.query.get(product_id)
+        if product: return product
+        if strict: raise NoSuchProduct()
+        return None
 
     def purchase(self, buyer_data, product_id, account=None):
         product = self.get_product(product_id)
