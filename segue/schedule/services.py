@@ -26,8 +26,13 @@ class SlotService(object):
 
     def stretch_slot(self, slot_id):
         slot = self.get_one(slot_id, strict=True)
-        if not slot.can_be_stretched: raise CannotBeStretched()
-        db.session.delete(slot.next_contiguous_slot)
+        next_contiguous_slot = slot.next_contiguous_slot
+
+        if not slot.can_be_stretched:
+            raise CannotBeStretched()
+        if slot.next_contiguous_slot:
+            db.session.delete(slot.next_contiguous_slot)
+
         slot.duration += 60
         db.session.add(slot)
         db.session.commit()
