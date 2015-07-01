@@ -6,6 +6,7 @@ from segue.hasher import Hasher
 from filters import PromoCodeFilterStrategies
 from factories import PromoCodePaymentFactory, PromoCodeTransitionFactory
 from models import PromoCode
+from segue.purchase.cash import CashPaymentService
 
 class PromoCodeService(object):
     def __init__(self, hasher=None, products=None, filters=None):
@@ -44,23 +45,38 @@ class PromoCodeService(object):
         return result
 
     def check(self, hash_code):
+        logger.info("PromoCodeService.check, hash_code: %s", hash_code)
         promocode = PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
+        logger.info(promocode)
         if not promocode: return None
         if promocode.used: return None
         return promocode
 
 class PromoCodePaymentService(object):
-    def __init__(self, sessions=None, factory=None):
+    def __init__(self, sessions=None, cash_service=None, factory=None):
         self.factory  = factory  or PromoCodePaymentFactory()
+        self.cash_service = cash_service or CashPaymentService()
 
     def create(self, purchase, data=None):
-        payment = self.factory.create(purchase)
+        if 'promocode' in data:
+            promocode = data['promocode']
+        else:
+            promocode = None
+        payment = self.factory.create(purchase, promocode)
+
+        if 'status' in data:
+            payment.status = data['status']
+            if data['status'] == 'paid':
+                purchase.status = 'paid'
+                db.session.add(purchase)
+
         db.session.add(payment)
         db.session.commit()
         return payment
 
     def process(self, payment):
-        pass
+        # the endpoint is the same of CashPaymentService
+        return self.cash_service.process(payment)
 
     def notify(self, purchase, payment, payload=None, source='notification'):
         pass

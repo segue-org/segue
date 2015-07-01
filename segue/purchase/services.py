@@ -59,11 +59,16 @@ class PurchaseService(object):
             promocode = self.check_promocode(buyer_data['hash_code'])
             if promocode:
                 logger.info("found valid hashcode!")
+                extra_data = {
+                    'promocode': promocode
+                }
                 if promocode.discount == 1:
                     logger.info("full discount, free ticket")
-                    payment = self.payments.create(purchase, 'promocode', None)
+                    extra_data['status'] = 'paid'
                 else:
                     logger.info("partial discount: %d%%", promocode.discount*100)
+
+                payment = self.payments.create(purchase, 'promocode', extra_data)
             else:
                 logger.info("invalid hashcode :(")
                 return ProductExpired()
