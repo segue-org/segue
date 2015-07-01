@@ -56,22 +56,7 @@ class PurchaseService(object):
         self.db.session.add(purchase)
 
         if 'hash_code' in buyer_data:
-            promocode = self.check_promocode(buyer_data['hash_code'])
-            if promocode:
-                logger.info("found valid hashcode!")
-                extra_data = {
-                    'promocode': promocode
-                }
-                if promocode.discount == 1:
-                    logger.info("full discount, free ticket")
-                    extra_data['status'] = 'paid'
-                else:
-                    logger.info("partial discount: %d%%", promocode.discount*100)
-
-                payment = self.payments.create(purchase, 'promocode', extra_data)
-            else:
-                logger.info("invalid hashcode :(")
-                return ProductExpired()
+            self.payments.create(purchase, 'promocode', { 'hash_code': buyer_data['hash_code'] })
 
         self.db.session.commit()
         return purchase
@@ -132,10 +117,10 @@ class PaymentService(object):
         return Payment.query.filter(*filter_list).all()
 
 
-    def create(self, purchase, method, data):
+    def create(self, purchase, method, extra_data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
         processor = self.processor_for(method)
-        payment = processor.create(purchase, data)
+        payment = processor.create(purchase, extra_data)
         instructions = processor.process(payment)
         db.session.add(payment)
         db.session.commit()
