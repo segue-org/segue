@@ -22,6 +22,14 @@ class TournamentDetailResponse(TournamentShortResponse):
         super(TournamentDetailResponse, self).__init__(tournament)
         self.rounds = [ tournament.status_of_round(i) for i in range(1, tournament.current_round+1) ]
 
+class PromoCodeResponse(BaseResponse):
+    def __init__(self, promocode, links=False):
+        self.id          = promocode.id
+        self.description = promocode.description
+        self.discount    = promocode.discount
+        self.product     = ProductDetailResponse.create(promocode.product)
+        self.payment     = PaymentDetailResponse.create(promocode.payment)
+
 class RoomResponse(BaseResponse):
     def __init__(self, room, links=True):
         self.id          = room.id

@@ -26,6 +26,14 @@ class AdminProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>/tags/<string:tag_name>', methods=['POST'],   view_func=self.controller.add_tag)
         self.add_url_rule('/<int:proposal_id>/tags/<string:tag_name>', methods=['DELETE'], view_func=self.controller.remove_tag)
 
+class AdminPromoCodeBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminPromoCodeBlueprint, self).__init__('admin.promocodes', __name__, url_prefix="/admin/promocodes")
+        self.controller = AdminPromoCodeController()
+        self.add_url_rule('',                    methods=['GET'],  view_func=self.controller.list_promocodes)
+        self.add_url_rule('',                    methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('/<int:promocode_id>', methods=['GET'],  view_func=self.controller.get_one)
+
 class AdminTournamentsBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminTournamentsBlueprint, self).__init__('admin.tournaments', __name__, url_prefix="/admin/tournaments")
@@ -76,6 +84,7 @@ blueprints = [
     AdminAccountBlueprint(),
     AdminProposalBlueprint(),
     AdminTournamentsBlueprint(),
+    AdminPromoCodeBlueprint(),
     AdminCallBlueprint(),
     AdminRoomBlueprint(),
     AdminSlotBlueprint(),

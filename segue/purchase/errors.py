@@ -1,4 +1,4 @@
-from segue.errors import SegueError
+from segue.errors import SegueError, SegueFieldError
 
 class PaymentVerificationFailed(SegueError):
     code = 500
@@ -20,4 +20,8 @@ class InvalidPaymentNotification(SegueError):
     def to_json(self):
         return { 'message': 'the notification data from payment provider is not correct for this payment method' }
 
+class MustProvideDescription(SegueFieldError):
+    FIELD = 'description'
+    LABEL = 'object_required'
+    MESSAGE = 'please provide promocode description'
 

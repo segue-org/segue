@@ -19,9 +19,9 @@ class PromoCode(JsonSerializable, db.Model):
     description    = db.Column(db.Text)
     discount       = db.Column(db.Numeric)
 
-    creator        = db.relationship('Account')
-    product        = db.relationship('Product', backref='promocodes')
-    payment        = db.relationship('PromoCodePayment', backref=db.backref('promocode', uselist=False))
+    creator = db.relationship('Account')
+    product = db.relationship('Product', backref='promocodes')
+    payment = db.relationship('PromoCodePayment', backref=db.backref('promocode', uselist=False))
 
     @property
     def used(self):
