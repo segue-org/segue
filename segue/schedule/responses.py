@@ -33,7 +33,7 @@ class TalkShortResponse(BaseResponse):
         self.title = talk.title
         self.owner = talk.owner.name
         self.track = talk.track.name_pt
-        self.coauthors = [ x.name for x in talk.coauthor_accounts ]
+        self.coauthors = [ x.name for x in talk.coauthors ]
 
 class NotificationResponse(BaseResponse):
     def __init__(self, notification):
