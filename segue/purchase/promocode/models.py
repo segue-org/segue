@@ -1,7 +1,8 @@
 from segue.core import db
 from ..models import Payment, Transition
+from segue.json import JsonSerializable
 
-class PromoCode(db.Model):
+class PromoCode(JsonSerializable, db.Model):
     # 1 - EXPOSITOR
     # 2 - PATROCINADOR
     # 3 - CORTESIA c/kit
@@ -17,6 +18,7 @@ class PromoCode(db.Model):
     payment_id     = db.Column(db.Integer, db.ForeignKey('payment.id'))
     hash_code      = db.Column(db.String(32))
     description    = db.Column(db.Text)
+    discount       = db.Column(db.Numeric)
 
     creator        = db.relationship('Account')
     product        = db.relationship('Product', backref='promocodes')
@@ -24,7 +26,7 @@ class PromoCode(db.Model):
 
     @property
     def used(self):
-        return self.payment.count() > 0
+        return self.payment is not None
 
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }

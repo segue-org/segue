@@ -11,15 +11,16 @@ class PromoCodeService(object):
     def __init__(self, sessions=None, factory=None):
         self.hasher = Hasher(length=10, prefix="PC")
 
-    def create(self, product, description=None, creator=None, qty=1):
+    def create(self, product, description=None, creator=None, discount=1, qty=1):
         for counter in xrange(qty):
             str_description = "{} - {}/{}".format(description, counter+1, qty)
 
             p = PromoCode()
-            p.creator = creator
-            p.product = product
+            p.creator     = creator
+            p.product     = product
             p.description = str_description
-            p.hash_code = self.hasher.generate()
+            p.hash_code   = self.hasher.generate()
+            p.discount    = discount
 
             db.session.add(p)
             db.session.commit()
@@ -27,8 +28,11 @@ class PromoCodeService(object):
         return qty
 
     def check(self, hash_code):
-        return PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
-        
+        promocode = PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
+        if promocode:
+            if promocode.used: return None
+        return promocode
+
 class PromoCodePaymentService(object):
     def __init__(self, sessions=None, factory=None):
         self.factory  = factory  or PromoCodePaymentFactory()

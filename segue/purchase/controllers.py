@@ -55,7 +55,7 @@ class PurchaseController(object):
     @jsoned
     def check_promocode(self, hash=None):
         result = self.service.check_promocode(hash, by=self.current_user) or flask.abort(404)
-        return PromoCodeResponse.create(result), 200
+        return PromoCodeResponse(result), 200
 
 class PaymentController(object):
     def __init__(self, service=None):

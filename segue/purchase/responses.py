@@ -12,4 +12,5 @@ class PromoCodeResponse(BaseResponse):
         self.creator     = promocode.creator
         self.product     = promocode.product
         self.payment     = promocode.payment
+        self.discount    = promocode.discount
         self.description = promocode.description
