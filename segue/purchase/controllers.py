@@ -8,7 +8,7 @@ from segue.decorators import jsoned, jwt_only
 
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
-from responses import PromoCodeResponse
+from responses import GuideResponse, PromoCodeResponse
 
 import schema
 
