@@ -15,7 +15,7 @@ from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
 
-from segue.purchase.promocode import PromoCodeService
+from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
 import schema
 
@@ -48,8 +48,26 @@ class PurchaseService(object):
     def create(self, buyer_data, product, account, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
         purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
+        logger.info(buyer_data)
+
+        payment = None
+
         self.db.session.add(buyer)
         self.db.session.add(purchase)
+
+        if 'hash_code' in buyer_data:
+            promocode = self.check_promocode(buyer_data['hash_code'])
+            if promocode:
+                logger.info("found valid hashcode!")
+                if promocode.discount == 1:
+                    logger.info("full discount, free ticket")
+                    payment = self.payments.create(purchase, 'promocode', None)
+                else:
+                    logger.info("partial discount: %d%%", promocode.discount*100)
+            else:
+                logger.info("invalid hashcode :(")
+                return ProductExpired()
+
         self.db.session.commit()
         return purchase
 
@@ -93,7 +111,8 @@ class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
         pagseguro = PagSeguroPaymentService,
         boleto    = BoletoPaymentService,
-        cash      = CashPaymentService
+        cash      = CashPaymentService,
+        promocode = PromoCodePaymentService
     )
 
     def __init__(self, mailer=None, caravans=None, filters=None, **processors_overrides):

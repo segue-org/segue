@@ -15,7 +15,6 @@ class PromoCode(JsonSerializable, db.Model):
     id             = db.Column(db.Integer, primary_key=True)
     creator_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
-    payment_id     = db.Column(db.Integer, db.ForeignKey('payment.id'))
     hash_code      = db.Column(db.String(32))
     description    = db.Column(db.Text)
     discount       = db.Column(db.Numeric)
@@ -30,6 +29,9 @@ class PromoCode(JsonSerializable, db.Model):
 
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
+
+    promocode_id     = db.Column(db.Integer, db.ForeignKey('promocode.id'), name='pc_promocode_id')
+
 
 class PromoCodeTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }

@@ -45,3 +45,5 @@ class Product(JsonSerializable, db.Model):
 class StudentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'student' }
 
+class PromoCodeProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'promocode' }
