@@ -26,6 +26,15 @@ class PurchaseFactory(Factory):
         result.customer = account
         return result
 
+    @classmethod
+    def get_or_create(cls, buyer, product, account, **extra_fields):
+        existing_purchase = Purchase.query.filter(Purchase.product == product, Purchase.customer == account, Purchase.status == 'pending').first()
+        if existing_purchase:
+            existing_purchase.buyer = buyer
+            return existing_purchase
+        else:
+            return cls.create(buyer, product, account, **extra_fields)
+
 class PaymentFactory(Factory):
     model = Payment
 

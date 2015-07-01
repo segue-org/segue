@@ -44,7 +44,7 @@ class PurchaseService(object):
 
     def create(self, buyer_data, product, account, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
-        purchase = PurchaseFactory.create(buyer, product, account, **extra)
+        purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
         self.db.session.add(buyer)
         self.db.session.add(purchase)
         self.db.session.commit()
