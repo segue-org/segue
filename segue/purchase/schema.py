@@ -22,6 +22,18 @@ buyer = {
     ]
 }
 
+promocode = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "hash_code": { "type": "string", "minLength": 12, "maxLength": 12 }
+    },
+    "required": [
+        "hash_code"
+    ]
+}
+
 whitelist = dict(
     buyer = buyer,
+    promocode = promocode
 )
