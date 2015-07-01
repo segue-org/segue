@@ -24,9 +24,6 @@ class SlotService(object):
         self.proposals = proposals or ProposalService()
         self.filters = SlotFilterStrategies()
 
-    def of_room(self, room_id):
-        return Slot.query.filter(Slot.room_id == room_id, Slot.status == 'confirmed').all()
-
     def query(self, **kw):
         base    = self.filters.joins_for(Slot.query, **kw)
         filters = self.filters.given(**kw)

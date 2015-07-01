@@ -20,7 +20,8 @@ class SlotBlueprint(flask.Blueprint):
     def __init__(self):
         super(SlotBlueprint, self).__init__('slots', __name__, url_prefix='/rooms/<int:room_id>/slots')
         self.controller = SlotController()
-        self.add_url_rule('',               methods=['GET'], view_func=self.controller.of_room)
-        self.add_url_rule('/<int:slot_id>', methods=['GET'], view_func=self.controller.get_one)
+        self.add_url_rule('',                     methods=['GET'], view_func=self.controller.of_room)
+        self.add_url_rule('/of-day/<string:day>', methods=['GET'], view_func=self.controller.of_room)
+        self.add_url_rule('/<int:slot_id>',       methods=['GET'], view_func=self.controller.get_one)
 
 

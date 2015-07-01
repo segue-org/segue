@@ -14,6 +14,7 @@ class SlotResponse(BaseResponse):
     def __init__(self, slot, embeds=False, links=True):
         self.id        = slot.id
         self.begins    = slot.begins
+        self.hour      = slot.begins.hour
         self.duration  = slot.duration
         self.room      = slot.room.id
         self.room_name = slot.room.name

@@ -1,5 +1,7 @@
 import flask
 
+from flask import request
+
 from segue.core import config, cache
 from segue.decorators import jsoned, accepts_html
 
@@ -27,8 +29,11 @@ class SlotController(object):
 
     @cache.cached(timeout=60 * 3)
     @jsoned
-    def of_room(self, room_id):
-        result = self.service.of_room(room_id) or flask.abort(404)
+    def of_room(self, room_id, day=None):
+        if day:
+            result = self.service.query(room=room_id, status='confirmed', day=day)
+        else:
+            result = self.service.query(room=room_id, status='confirmed')
         return SlotResponse.create(result, embeds=True, links=False), 200
 
     @jsoned
