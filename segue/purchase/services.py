@@ -50,8 +50,6 @@ class PurchaseService(object):
         purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
         logger.info(buyer_data)
 
-        payment = None
-
         self.db.session.add(buyer)
         self.db.session.add(purchase)
 
