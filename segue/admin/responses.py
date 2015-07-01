@@ -25,7 +25,7 @@ class TournamentDetailResponse(TournamentShortResponse):
 class PromoCodeResponse(BaseResponse):
     def __init__(self, promocode, links=False):
         self.id          = promocode.id
-        self.discount    = promocode.discount
+        self.discount    = promocode.discount * 100
         self.hash_code   = promocode.hash_code
         self.description = promocode.description
 

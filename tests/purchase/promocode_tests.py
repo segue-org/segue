@@ -1,3 +1,4 @@
+from decimal import Decimal
 import mockito
 
 from segue.purchase.promocode import PromoCodeService
@@ -78,7 +79,7 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         self.assertEqual(len(result), 3)
 
         discounts = [ x.discount for x in result ]
-        self.assertEqual(discounts, [ 0.7, 0.7, 0.7 ])
+        self.assertEqual(set(discounts), set([ Decimal('0.7') ]))
 
         products = [ x.product for x in result ]
         self.assertEqual(set(products), set([product]))
