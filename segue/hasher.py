@@ -1,7 +1,7 @@
 import random
 
 class Hasher(object):
-    def __init__(self, length=32, prefix=None):
+    def __init__(self, length=32, prefix=""):
         self.length = length
         self.prefix = prefix
 
