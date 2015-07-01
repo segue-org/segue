@@ -33,6 +33,7 @@ class AdminPromoCodeBlueprint(flask.Blueprint):
         self.add_url_rule('',                    methods=['GET'],  view_func=self.controller.list_promocodes)
         self.add_url_rule('',                    methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<int:promocode_id>', methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/products',           methods=['GET'],  view_func=self.controller.get_products)
 
 class AdminTournamentsBlueprint(flask.Blueprint):
     def __init__(self):

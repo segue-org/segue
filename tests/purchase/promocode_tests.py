@@ -73,9 +73,12 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
 
         mockito.when(self.mock_hasher).generate().thenReturn('A').thenReturn('B').thenReturn('C')
 
-        result = self.service.create(product, "empresa x", creator, 1, 3)
+        result = self.service.create(product, "empresa x", creator, 70, 3)
 
         self.assertEqual(len(result), 3)
+
+        discounts = [ x.discount for x in result ]
+        self.assertEqual(discounts, [ 0.7, 0.7, 0.7 ])
 
         products = [ x.product for x in result ]
         self.assertEqual(set(products), set([product]))

@@ -32,8 +32,22 @@ promocode = {
         "hash_code"
     ]
 }
+create_promocode = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "description": { "type": "string",  "minLength": 5, "maxLength": 50 },
+        "quantity":    { "type": "integer", "minimum":   1, "maximum":   100 },
+        "discount":    { "type": "integer", "minimum":   0, "maximum":   100 },
+        "product_id":  { "type": "integer" }
+    },
+    "required": [
+        "description", "product_id"
+    ]
+}
 
 whitelist = dict(
     buyer = buyer,
-    promocode = promocode
+    promocode = promocode,
+    create_promocode = create_promocode
 )

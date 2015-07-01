@@ -7,7 +7,7 @@ from segue.decorators import jsoned, jwt_only, admin_only
 from segue.purchase.promocode import PromoCodeService
 from segue.product.services import ProductService
 
-from ..responses import PromoCodeResponse
+from ..responses import PromoCodeResponse, ProductDetailResponse
 
 class AdminPromoCodeController(object):
     def __init__(self, promocodes=None, products=None):
@@ -27,8 +27,15 @@ class AdminPromoCodeController(object):
     @admin_only
     @jsoned
     def get_one(self, promocode_id):
-        result = self.promocodes.get_one(tournament_id)
+        result = self.promocodes.get_one(promocode_id)
         return PromoCodeResponse.create(result), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def get_products(self):
+        result = self.products.promocode_products()
+        return ProductDetailResponse.create(result), 200
 
     @jwt_only
     @admin_only
