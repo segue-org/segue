@@ -15,6 +15,11 @@ class NoSuchNotification(SegueError):
     def to_json(self):
         return { 'message': 'no such notification' }
 
+class CannotBeStretched(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this slot cannot be stretched' }
+
 class NoSuchSlot(SegueError):
     code = 404
     def to_json(self):

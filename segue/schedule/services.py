@@ -24,6 +24,15 @@ class SlotService(object):
         self.proposals = proposals or ProposalService()
         self.filters = SlotFilterStrategies()
 
+    def stretch_slot(self, slot_id):
+        slot = self.get_one(slot_id, strict=True)
+        if not slot.can_be_stretched: raise CannotBeStretched()
+        db.session.delete(slot.next_contiguous_slot)
+        slot.duration += 60
+        db.session.add(slot)
+        db.session.commit()
+        return slot
+
     def query(self, **kw):
         base    = self.filters.joins_for(Slot.query, **kw)
         filters = self.filters.given(**kw)

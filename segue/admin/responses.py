@@ -62,7 +62,7 @@ class SlotShortResponse(BaseResponse):
         self.status   = slot.status
 
 class SlotResponse(BaseResponse):
-    def __init__(self, slot, links=True, embeds=True):
+    def __init__(self, slot, links=True, embeds=True, stretchability=False):
         self.id         = slot.id
         self.begins     = slot.begins
         self.duration   = slot.duration
@@ -70,6 +70,9 @@ class SlotResponse(BaseResponse):
         self.status     = slot.status
         self.hour       = slot.begins.hour
         self.annotation = slot.annotation
+
+        if stretchability:
+            self.can_be_stretched = slot.can_be_stretched
 
         if embeds:
             self.room = RoomResponse.create(slot.room, links=False)

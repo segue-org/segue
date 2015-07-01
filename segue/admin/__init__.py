@@ -55,6 +55,7 @@ class AdminSlotBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:slot_id>',            methods=['GET'],    view_func=self.controller.get_slot)
         self.add_url_rule('/<int:slot_id>/status',     methods=['POST'],   view_func=self.controller.set_status)
         self.add_url_rule('/<int:slot_id>/block',      methods=['POST'],   view_func=self.controller.block_slot)
+        self.add_url_rule('/<int:slot_id>/stretch',    methods=['POST'],   view_func=self.controller.stretch_slot)
         self.add_url_rule('/<int:slot_id>/unblock',    methods=['POST'],   view_func=self.controller.unblock_slot)
         self.add_url_rule('/<int:slot_id>/talk',       methods=['POST'],   view_func=self.controller.set_talk)
         self.add_url_rule('/<int:slot_id>/talk',       methods=['DELETE'], view_func=self.controller.empty_slot)

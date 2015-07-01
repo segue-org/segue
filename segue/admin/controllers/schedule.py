@@ -54,7 +54,14 @@ class AdminScheduleController(object):
     @jsoned
     def get_slot(self, slot_id):
         result = self.slots.get_one(slot_id) or abort(404)
-        return SlotResponse.create(result, links=False), 200
+        return SlotResponse.create(result, links=False, stretchability=True), 200
+
+    @jwt_only
+    @admin_only
+    @jsoned
+    def stretch_slot(self, slot_id):
+        result = self.slots.stretch_slot(slot_id) or abort(404)
+        return SlotResponse.create(result, links=False, stretchability=True), 200
 
     @jwt_only
     @admin_only

@@ -29,6 +29,18 @@ class Slot(db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
+    @property
+    def next_contiguous_slot(self):
+        same_room   = Slot.query.filter(Slot.room == self.room)
+        my_end_hour = self.begins + timedelta(minutes=self.duration)
+        return same_room.filter(Slot.begins == my_end_hour).first()
+
+    @property
+    def can_be_stretched(self):
+        next_slot = self.next_contiguous_slot
+        if not next_slot: return True
+        return next_slot.talk == None
+
 class Notification(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     kind       = db.Column(db.Text)
@@ -50,6 +62,7 @@ class Notification(db.Model):
     @property
     def is_expired(self):
         return self.status == 'pending' and (datetime.now() > self.deadline)
+
 
 class CallNotification(Notification):
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), name='cn_proposal_id')
