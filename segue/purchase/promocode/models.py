@@ -3,14 +3,7 @@ from ..models import Payment, Transition
 from segue.json import JsonSerializable
 
 class PromoCode(JsonSerializable, db.Model):
-    # 1 - EXPOSITOR
-    # 2 - PATROCINADOR
-    # 3 - CORTESIA c/kit
-    # 4 - CORTESIA s/kit
-    # 5 - COMUNIDADES
-    # 6 - ASSOCIADOS
-    # 7 - CONVIDADOS
-    # 8 - ESPECIAL
+    __tablename__ = 'promocode'
 
     id             = db.Column(db.Integer, primary_key=True)
     creator_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
