@@ -57,7 +57,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def paid_amount(self):
-        return self.valid_payments.with_entities(func.sum(Payment.amount)).first()[0] or 0
+        return sum([ p.paid_amount for p in self.payments ])
 
     @property
     def outstanding_amount(self):
@@ -104,6 +104,11 @@ class Payment(JsonSerializable, db.Model):
 
     __tablename__ = 'payment'
     __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'payment' }
+
+    @property
+    def paid_amount(self):
+        valid = self.status in Payment.VALID_PAYMENT_STATUSES
+        return self.amount if valid else 0
 
     @property
     def most_recent_transition(self):

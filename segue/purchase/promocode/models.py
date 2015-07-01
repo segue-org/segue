@@ -32,6 +32,12 @@ class PromoCodePayment(Payment):
 
     promocode_id     = db.Column(db.Integer, db.ForeignKey('promocode.id'), name='pc_promocode_id')
 
+    @property
+    def paid_amount(self):
+        valid = self.promocode != None
+        total_value = self.purchase.product.price
+        discounted  = self.promocode.discount * total_value
+        return discounted if valid else 0
 
 class PromoCodeTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }

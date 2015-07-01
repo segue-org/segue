@@ -11,6 +11,16 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         self.mock_hasher = mockito.mock()
         self.service = PromoCodeService(hasher=self.mock_hasher)
 
+    def test_calculates_paid_amount(self):
+        promo = self.create(ValidPromoCodeFactory, hash_code="DEFG5678", discount=0.2)
+
+        product = self.create(ValidProductFactory, price=100)
+        purchase = self.create(ValidPurchaseFactory, product=product)
+        payment = self.create(ValidPromoCodePaymentFactory, purchase=purchase, promocode=promo)
+
+        self.assertEqual(payment.paid_amount, 20)
+        self.assertEqual(purchase.outstanding_amount, 80)
+
     def test_query(self):
         payment = self.create(ValidPromoCodePaymentFactory)
         pc1 = self.create(ValidPromoCodeFactory, hash_code="ABCD1234", description="amigo do rei")
