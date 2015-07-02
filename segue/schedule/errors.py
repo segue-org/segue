@@ -20,6 +20,11 @@ class CannotBeStretched(SegueError):
     def to_json(self):
         return { 'message': 'this slot cannot be stretched' }
 
+class CannotBeUnstretched(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this slot cannot be unstretched' }
+
 class NoSuchSlot(SegueError):
     code = 404
     def to_json(self):

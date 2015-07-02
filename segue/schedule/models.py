@@ -41,6 +41,10 @@ class Slot(db.Model):
         if not next_slot: return True
         return next_slot.talk == None
 
+    @property
+    def can_be_unstretched(self):
+        return self.duration > 60
+
 class Notification(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     kind       = db.Column(db.Text)

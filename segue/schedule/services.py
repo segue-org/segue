@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from segue.core import db
 from segue.mailer import MailerService
@@ -7,7 +7,8 @@ from segue.hasher import Hasher
 from segue.proposal.services import ProposalService
 from segue.proposal.errors import NoSuchProposal
 
-from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered, NoSuchSlot, SlotIsEmpty, SlotNotDirty
+from errors import NoSuchNotification, NotificationExpired, NotificationAlreadyAnswered, \
+                   CannotBeStretched, CannotBeUnstretched, NoSuchSlot, SlotIsEmpty, SlotNotDirty
 from models import Room, Slot, Notification, CallNotification, SlotNotification
 from filters import SlotFilterStrategies
 
@@ -23,6 +24,19 @@ class SlotService(object):
     def __init__(self, proposals=None):
         self.proposals = proposals or ProposalService()
         self.filters = SlotFilterStrategies()
+
+    def unstretch_slot(self, slot_id):
+        slot = self.get_one(slot_id, strict=True)
+        if not slot.can_be_unstretched: raise CannotBeUnstretched()
+        slot.duration -= 60
+
+        new_slot = Slot(room=slot.room, status='empty', blocked=slot.blocked, duration=60)
+        new_slot.begins = slot.begins + timedelta(minutes=slot.duration)
+
+        db.session.add(new_slot)
+        db.session.add(slot)
+        db.session.commit()
+        return slot
 
     def stretch_slot(self, slot_id):
         slot = self.get_one(slot_id, strict=True)

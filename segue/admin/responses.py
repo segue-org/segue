@@ -90,6 +90,7 @@ class SlotResponse(BaseResponse):
 
         if stretchability:
             self.can_be_stretched = slot.can_be_stretched
+            self.can_be_unstretched = slot.can_be_unstretched
 
         if embeds:
             self.room = RoomResponse.create(slot.room, links=False)
