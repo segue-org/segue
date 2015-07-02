@@ -35,9 +35,10 @@ class PromoCodeResponse(BaseResponse):
 
 class PurchasePersonIdentifierResponse(BaseResponse):
     def __init__(self, purchase, links=False):
-        self.id     = purchase.id
-        self.name   = purchase.customer.name
-        self.status = purchase.status
+        self.id       = purchase.id
+        self.name     = purchase.customer.name
+        self.status   = purchase.status
+        self.category = purchase.product.category
 
 class RoomResponse(BaseResponse):
     def __init__(self, room, links=True):
@@ -149,6 +150,7 @@ class AccountShortResponse(BaseResponse):
         self.email        = account.email
 
         self.has_valid_purchases = account.has_valid_purchases
+        self.identifier   = PurchasePersonIdentifierResponse.create(account.identifier_purchase)
 
 class AccountDetailResponse(BaseResponse):
     def __init__(self, account, links=True):
@@ -167,6 +169,7 @@ class AccountDetailResponse(BaseResponse):
         self.last_updated = account.last_updated
         self.resume       = account.resume
 
+        self.identifier   = PurchasePersonIdentifierResponse.create(account.identifier_purchase)
         self.has_valid_purchases = account.has_valid_purchases
 
         if links:

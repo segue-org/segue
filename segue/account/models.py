@@ -58,6 +58,13 @@ class Account(JsonSerializable, db.Model):
         return False
 
     @property
+    def identifier_purchase(self):
+        if not self.purchases: return None
+        valid_purchases = filter(lambda p:p.satisfied, self.purchases)
+        if valid_purchases: return valid_purchases[-1]
+        return self.purchases[-1]
+
+    @property
     def payments(self):
         payments = []
         for purchase in self.purchases:
