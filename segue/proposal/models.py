@@ -102,7 +102,6 @@ class Track(JsonSerializable, db.Model):
 
 
 class ProponentProduct(Product):
-    original_deadline = db.Column(db.DateTime)
     __mapper_args__ = { 'polymorphic_identity': 'proponent' }
 
     def check_eligibility(self, buyer_data, account=None):
