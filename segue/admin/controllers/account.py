@@ -33,8 +33,8 @@ class AdminAccountController(object):
     @jwt_only
     @admin_only
     def list(self):
-        criteria = request.args.to_dict()
-        result = self.service.lookup(by=self.current_user, **criteria)[:20]
+        criteria = request.args.get('q')
+        result = self.service.lookup(criteria)[:20]
         return AccountDetailResponse.create(result), 200
 
     @jsoned
