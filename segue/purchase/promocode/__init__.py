@@ -29,7 +29,7 @@ class PromoCodeService(object):
 
         result = []
         for counter in xrange(quantity):
-            str_description = "{} - {}/{}".format(description, counter+1, quantity)
+            str_description = u"{} - {}/{}".format(description, counter+1, quantity)
 
             p = PromoCode()
             p.creator     = creator
