@@ -23,5 +23,3 @@ class SlotBlueprint(flask.Blueprint):
         self.add_url_rule('',                     methods=['GET'], view_func=self.controller.of_room)
         self.add_url_rule('/of-day/<string:day>', methods=['GET'], view_func=self.controller.of_room)
         self.add_url_rule('/<int:slot_id>',       methods=['GET'], view_func=self.controller.get_one)
-
-

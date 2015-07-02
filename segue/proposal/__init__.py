@@ -1,5 +1,5 @@
 import flask
-from controllers import ProposalController, ProposalInviteController, NonSelectionController
+from controllers import ProposalController, ProposalInviteController, NonSelectionController, TalkController
 
 class ProposalBlueprint(flask.Blueprint):
     def __init__(self):
@@ -30,5 +30,11 @@ class ProposalInviteBluePrint(flask.Blueprint):
         self.add_url_rule('/<string:hash_code>/accept',   methods=['POST'],  view_func=self.controller.accept)
         self.add_url_rule('/<string:hash_code>/decline',  methods=['POST'],  view_func=self.controller.decline)
         self.add_url_rule('/<string:hash_code>/register', methods=['POST'],  view_func=self.controller.register)
+
+class TalkBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(TalkBlueprint, self).__init__('talks', __name__, url_prefix='/talks')
+        self.controller = TalkController()
+        self.add_url_rule('/<int:talk_id>', methods=['GET'], view_func=self.controller.get_one)
 
 

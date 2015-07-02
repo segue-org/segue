@@ -10,7 +10,18 @@ from segue.decorators import jsoned, jwt_only, accepts_html
 import schema
 from factories import ProposalFactory
 from services  import ProposalService, InviteService, NonSelectionService
-from responses import NonSelectionResponse
+from responses import NonSelectionResponse, TalkDetailResponse
+
+class TalkController(object):
+    def __init__(self, service=None):
+        self.service = service or ProposalService()
+
+    @jsoned
+    def get_one(self, talk_id=None):
+        print talk_id
+        result = self.service.get_one(talk_id)
+        print result
+        return TalkDetailResponse.create(result), 200
 
 class NonSelectionController(object):
     def __init__(self, service=None):
