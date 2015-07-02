@@ -9,13 +9,13 @@ signup = {
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80 },
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
         "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
+        "document":     { "type": "string", "minLength": 5,  "maxLength": 14 },
         "passport":     { "type": "string", "minLength": 5,  "maxLength": 15 },
         "country":      { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "city":         { "type": "string", "minLength": 5,  "maxLength": 30 },
+        "city":         { "type": "string", "minLength": 3,  "maxLength": 30 },
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "organization": { "type": "string", "minLength": 5,  "maxLength": 30 },
+        "organization": { "type": "string", "minLength": 3,  "maxLength": 30 },
         "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
-        "role":         { "enum": ACCOUNT_ROLES }
     },
     "required": ["email", "name", "password", "country", "city", "phone" ],
 }
@@ -40,14 +40,15 @@ admin_create = {
         "name":         { "type": "string", "minLength": 5, "maxLength": 80 },
         "document":     { "type": "string", "minLength": 5, "maxLength": 14 },
         "country":      { "type": "string", "minLength": 5, "maxLength": 30 },
-        "role":         { "enum": ACCOUNT_ROLES }
     },
     "required": ["email", "name", "country", "document" ],
 }
+admin_edit = admin_create.copy()
 
 whitelist = dict(
   signup=signup,
   edit_account=edit_account,
   reset=reset,
-  admin_create=admin_create
+  admin_create=admin_create,
+  admin_edit=admin_edit
 )

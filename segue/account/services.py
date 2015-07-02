@@ -30,6 +30,15 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
+    def try_to_change_email(self, account, new_email):
+        if account.email == new_email:
+            return account
+        if self.is_email_registered(new_email):
+            raise EmailAlreadyInUse(new_email)
+
+        account.email = new_email
+        return account
+
     def get_one(self, account_id, by=None, check_owner=True, strict=False):
         account = self._get_account(account_id)
         if check_owner and not self.check_ownership(account, by): raise NotAuthorized
@@ -39,9 +48,12 @@ class AccountService(object):
     def _get_account(self, id):
         return Account.query.get(id)
 
-    def modify(self, account_id, data, by=None):
+    def modify(self, account_id, data, by=None, allow_email_change=False):
         account = self._get_account(account_id)
         if not self.check_ownership(account, by): raise NotAuthorized
+
+        if allow_email_change:
+            self.try_to_change_email(account, data.get('email', account.email))
 
         for name, value in AccountFactory.clean_for_update(data).items():
             setattr(account, name, value)
