@@ -79,7 +79,11 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         self.assertEqual(len(result), 3)
 
         discounts = [ x.discount for x in result ]
+<<<<<<< HEAD
         self.assertEqual(set(discounts), set([ Decimal('0.7') ]))
+=======
+        self.assertEqual(discounts, [ 0.7, 0.7, 0.7 ])
+>>>>>>> promocodes
 
         products = [ x.product for x in result ]
         self.assertEqual(set(products), set([product]))
