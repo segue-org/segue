@@ -1,6 +1,6 @@
 import schema
 from segue.factory import Factory
-from models import Caravan, CaravanInvite, CaravanLeaderPurchase
+from models import Caravan, CaravanInvite, CaravanLeaderPurchase, CaravanLeaderProduct
 
 class CaravanFactory(Factory):
     model = Caravan
@@ -20,6 +20,7 @@ class CaravanLeaderPurchaseFactory(Factory):
     @classmethod
     def create(cls, caravan):
         result = cls.model()
+        result.product  = CaravanLeaderProduct.query.first()
         result.caravan  = caravan
         result.status   = 'paid'
         result.customer = caravan.owner

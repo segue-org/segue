@@ -61,3 +61,11 @@ class CaravanProduct(Product):
     def extra_purchase_fields_for(self, buyer_data):
         invite = CaravanInvite.query.filter(CaravanInvite.hash == buyer_data['caravan_invite_hash']).first()
         return { 'caravan': invite.caravan }
+
+class CaravanLeaderProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'caravan-leader' }
+
+    def special_purchase_class(self):
+        return CaravanLeaderPurchase
+    def check_eligibility(self, *args, **kw):
+        return False
