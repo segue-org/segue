@@ -18,7 +18,6 @@ class SlotResponse(BaseResponse):
         self.duration  = slot.duration
         self.room      = slot.room.id
         self.room_name = slot.room.name
-        self.blocked   = slot.blocked
         self.status    = slot.status
         if embeds:
             self.talk = TalkShortResponse.create(slot.talk)

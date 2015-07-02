@@ -18,9 +18,7 @@ class TalkController(object):
 
     @jsoned
     def get_one(self, talk_id=None):
-        print talk_id
         result = self.service.get_one(talk_id)
-        print result
         return TalkDetailResponse.create(result), 200
 
 class NonSelectionController(object):

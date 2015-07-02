@@ -1,4 +1,5 @@
 from segue.responses import BaseResponse
+from segue.schedule.responses import SlotResponse
 
 class NonSelectionResponse(BaseResponse):
     def __init__(self, notice, links=False):
@@ -11,6 +12,7 @@ class TalkDetailResponse(BaseResponse):
         self.title = talk.title
         self.track = talk.track.name_pt
         self.full  = talk.full
+        self.slots     = SlotResponse.create(talk.slots.all(), embeds=False, links=False)
         self.owner     = OwnerResponse.create(talk.owner)
         self.coauthors = CoauthorResponse.create(talk.coauthors.all())
 
