@@ -5,4 +5,10 @@ BEGIN TRANSACTION;
 
     INSERT INTO slot (room_id, begins, duration, status)
               (SELECT id, '2015-07-09 09:00:00', 60, 'empty' FROM room WHERE name = 'Sindicato Afocefe');
+
+    INSERT INTO slot (room_id, begins, duration, status)
+              (SELECT id, '2015-07-09 10:00:00', 60, 'empty' FROM room WHERE name = 'Sindicato Afocefe');
+
+    INSERT INTO slot (room_id, begins, duration, status)
+              (SELECT id, '2015-07-09 11:00:00', 60, 'empty' FROM room WHERE name = 'Sindicato Afocefe');
 COMMIT;
