@@ -58,6 +58,14 @@ class Account(JsonSerializable, db.Model):
         return False
 
     @property
+    def is_speaker(self):
+        return any([ x.is_talk for x in self.proposals ])
+
+    @property
+    def is_proponent(self):
+        return any([ not x.is_talk for x in self.proposals ])
+
+    @property
     def identifier_purchase(self):
         if not self.purchases: return None
         valid_purchases = filter(lambda p:p.satisfied, self.purchases)

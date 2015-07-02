@@ -2,118 +2,127 @@ import sys
 import collections
 
 from support import *
+from segue.core import db
 
+from segue.purchase.models import Purchase
 from segue.account.services import AccountService
-from segue.purchase.services import PurchaseService
-from segue.proposal.services import ProposalService
 
-def ensure_cash_purchase(start=0, end=sys.maxint):
+def ensure_purchase(start=0, end=sys.maxint, commit=False):
     init_command()
 
     print "querying..."
     accounts = AccountService().by_range(int(start), int(end)).all()
-    purchases = PurchaseService().query()
-    proposals = ProposalService().query()
-
-    print "grouping..."
-    account_by_document = index(accounts,  lambda x: [ x.document ]    )
-    purchase_by_account = index(purchases, lambda x: [ x.customer.id ] )
-    proposal_by_email   = index(proposals, lambda x: x.related_emails  )
 
     report = collections.defaultdict(lambda: 0)
     solutions = collections.defaultdict(lambda: [])
 
+    situations = [
+        HasTicketsThatCouldBeStale(),
+        HasPaidTicket(),
+        HasPayableTicket(),
+        IsSpeaker(),
+        IsForeigner(),
+        HasZeroPayableTickets(),
+    ]
+
+    not_solved = collections.defaultdict(list)
+
     for account in accounts:
-        situation = []
-        print "{}scanning {}{}{} - {}{}{}...".format(F.RESET,
-                F.GREEN, account.id, F.RESET,
-                F.GREEN, u(account.name), F.RESET
-        )
+        known_situations = []
+        print "\n{} running {}{}-{}{}...".format(F.RESET, F.GREEN, account.id, u(account.name), F.RESET),
 
-        if not account.document:
-            situation.append('NoDocument')
-        elif len(account_by_document[account.document]) > 1:
-            situation.append('SameDocumentAsAnotherAccount')
+        for situation in situations:
 
-        proposals = proposal_by_email.get(account.email, [])
-        talks     = filter(lambda x: x.is_talk, proposals)
+            print "{}{}{}?...".format(F.BLUE, situation.__class__.__name__, F.RESET),
 
-        purchases = purchase_by_account.get(account.id, [])
-        tickets   = filter(lambda x: x.satisfied, purchases)
-        payable   = filter(lambda x: x.payable,   purchases)
+            if situation.applies(account, known_situations):
+                situation.inc()
+                known_situations.append(situation)
+                print "{}YES{}".format(F.RED, F.RESET),
 
-        if len(tickets) == 1:
-            situation.append('OK-' + tickets[0].product.category)
-            solutions['nothing-paid'].append(account)
+                solution_status = situation.solve(account, known_situations)
 
-        elif len(tickets) > 1:
-            situation.append('OK-MULTI')
-            solutions['nothing-paid'].append(account)
+                if solution_status == 'solved':
+                    print "{}SOLVED!{}".format(F.GREEN, F.RESET),
+                    break
+                elif solution_status == 'was-ok':
+                    print "{}WAS OK{}".format(F.GREEN, F.RESET),
+                    break
+                elif solution_status == 'continue':
+                    print "/",
+                    continue
+                else:
+                    print "{}NOT SOLVED!{}".format(F.REF, F.RESET),
+                    not_solved[situation.__class__.__name__].push(account)
 
-        elif talks and not purchases:
-            situation.append('PENDING-SPEAKER')
-            solutions['speaker'].append(account)
+    print "\n*************"
+    print "stale purchases now:", Purchase.query.filter(Purchase.status == 'stale').count()
+    print not_solved
+    for situation in situations:
+        print situation
+    if commit:
+        print "committing!"
+        db.session.commit()
+    else:
+        print "rolling back!"
+        db.session.rollback()
+    print "OK"
 
-        elif not account.is_brazilian:
-            situation.append('PENDING-FOREIGNER')
-            solutions['foreigner'].append(account)
+class Situation(object):
+    def __init__(self):
+        self.count = 0
+        self.solved = 0
+        self.acted = 0
+    def applies(self, account, known_situations):
+        return False
+    def solve(self, account, known_situations):
+        return "was-ok"
+    def inc(self):
+        self.count += 1
+    def __repr__(self):
+        return "{}: {} cases / {} acted / {} solved".format(self.__class__.__name__, self.count, self.acted, self.solved)
 
-        elif len(payable) == 1:
-            situation.append('PAYABLE-'+category)
-            solutions['nothing-payable'].append(account)
+class HasPaidTicket(Situation):
+    def applies(self, account, known_situations):
+        return account.has_valid_purchases
 
-        elif len(payable) > 1:
-            situation.append('PAYABLE-MULTI'+category)
-            solutions['nothing-payable'].append(account)
+class HasPayableTicket(Situation):
+    def applies(self, account, known_situations):
+        return any([ x.payable for x in account.purchases ])
 
-        elif len(purchases) == 0:
-            situation.append('PURCHASES-ZERO-???')
-            solutions['new-normal'].append(account)
+class IsSpeaker(Situation):
+    def applies(self, account, known_situations):
+        return account.is_speaker
+    def solve(self, account, known_situations):
+        self.acted += 1
+        self.solved += 1
+        return 'solved'
 
-        elif len(purchases) == 1:
-            category = purchases[0].product.category
-            situation.append('PURCHASES-ONE-'+category)
-            solutions['new-'+category].append(account)
+class IsForeigner(Situation):
+    def applies(self, account, known_situations):
+        return not account.is_brazilian
+    def solve(self, account, known_situations):
+        self.acted += 1
+        self.solved += 1
+        return 'solved'
 
-        elif len(purchases) > 1:
-            categories = [ x.product.category for x in purchases ]
-            distinct = set(categories)
-            if len(distinct) == 1:
-                situation.append('PURCHASES-MULTI-' + categories[0])
-                solutions['new-'+categories[0]].append(account)
-            else:
-                situation.append('PURCHASES-MULTI-???')
-                solutions['new-normal'].append(account)
+class HasTicketsThatCouldBeStale(Situation):
+    def applies(self, account, known_situations):
+        stale_tickets = filter(lambda x: x.could_be_stale, account.purchases)
+        return len(stale_tickets) > 0
+    def solve(self, account, known_situations):
+        stale_tickets = filter(lambda x: x.could_be_stale, account.purchases)
+        print "stalifying {}...".format(len(stale_tickets)),
+        for purchase in stale_tickets:
+            purchase.status = 'stale'
+            db.session.add(purchase)
+        self.acted += 1
+        return 'continue'
 
-        for situation in situation:
-            print "--> {}{}{}".format(F.RED, situation, F.RESET)
-            report[situation] += 1
-        if not situation:
-            report["OK"] += 1
-
-#    db.session.commit()
-
-    print "{} of the whole {}{}{} accounts on the system...".format(F.RESET, F.GREEN, len(accounts), F.RESET)
-    for situation, count in report.items():
-        print "{}we have {}{}{} accounts with {}{}{}".format(F.RESET,
-                F.RED, count, F.RESET,
-                F.RED, situation, F.RESET
-        )
-
-    print "{} our solutions would be...".format(F.RESET)
-    for solution, cases in solutions.items():
-        print "{} to execute {}{}{} on {}{}{} accounts".format(F.RESET,
-                F.GREEN, solution, F.RESET,
-                F.GREEN, len(cases), F.RESET
-        )
-
-
-def index(collection, key_fn):
-    index = {}
-    for element in collection:
-        keys = key_fn(element)
-        for key in keys:
-            if key not in index: index[key] = []
-            index[key].append(element)
-    return index
-
+class HasZeroPayableTickets(Situation):
+    def applies(self, account, known_situations):
+        return all([ x.stale for x in account.purchases])
+    def solve(self, account, known_situations):
+        self.acted += 1
+        self.solved += 1
+        return 'solved'

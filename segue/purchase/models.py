@@ -60,6 +60,14 @@ class Purchase(JsonSerializable, db.Model):
         return not self.satisfied and datetime.now() < self.product.sold_until
 
     @property
+    def stale(self):
+        return self.status == 'stale'
+
+    @property
+    def could_be_stale(self):
+        return not self.satisfied and datetime.now() > self.product.sold_until
+
+    @property
     def paid_amount(self):
         return sum([ p.paid_amount for p in self.payments ])
 
