@@ -60,6 +60,7 @@ class AccountService(object):
     def create(self, data, rules='signup'):
         try:
             account = AccountFactory.from_json(data, schema.whitelist[rules])
+            if not account.password: account.password = self.hasher.generate()
             db.session.add(account)
             db.session.commit()
             return account
