@@ -51,7 +51,6 @@ class PurchaseController(object):
         result = self.service.clone_purchase(purchase_id, by=self.current_user) or flask.abort(404)
         return result, 200
 
-    @jwt_only
     @jsoned
     def check_promocode(self, hash=None):
         result = self.service.check_promocode(hash, by=self.current_user) or flask.abort(404)
