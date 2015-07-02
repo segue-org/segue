@@ -18,10 +18,7 @@ class PromoCode(JsonSerializable, db.Model):
 
     @property
     def used(self):
-        if isinstance(self.payment, list):
-            return len(self.payment) > 0
-        else:
-            return False
+        return self.payment is not None
 
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
