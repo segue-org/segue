@@ -16,7 +16,7 @@ def clean_bad_buyers(start, end):
     buyers_to_delete = []
     payments_to_delete = []
 
-    for account in Account.query.filter(Account.id >= start, Account.id <= end):
+    for account in Account.query.filter(Account.id >= start, Account.id <= end).order_by(Account.id):
 
         purchases   = account.purchases
         buyers      = [ p.buyer for p in purchases ]
@@ -39,7 +39,7 @@ def clean_bad_buyers(start, end):
                 print F.YELLOW + ",".join([ t.new_status for t in transitions ])
                 looks_good = True
                 continue
-            ongoing_payments = [ payment for payment in p.payments if payment.code ]
+            ongoing_payments = [ payment for payment in p.payments if getattr(payment,'code',None) ]
             if ongoing_payments:
                 looks_good = True
                 print F.GREEN + "found payment with valid ps_code on id {}. success?".format(ongoing_payments[0].id)
@@ -84,9 +84,10 @@ def clean_bad_buyers(start, end):
         db.session.delete(payment)
     print F.GREEN + "done"
 
-    print F.BLACK + B.RED + "COMMITTING DELETIONS...",
-    db.session.commit()
-    print F.BLACK + B.GREEN + "DONE" + B.RESET
+    db.session.rollback();
+#    print F.BLACK + B.RED + "COMMITTING DELETIONS...",
+#    db.session.commit()
+#    print F.BLACK + B.GREEN + "DONE" + B.RESET
 
 
 def figure_errors(purchase):

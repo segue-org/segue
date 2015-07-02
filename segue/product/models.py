@@ -47,3 +47,13 @@ class StudentProduct(Product):
 
 class PromoCodeProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
+
+class ForeignerProduct(Product):
+    original_deadline = db.Column(db.DateTime)
+    __mapper_args__ = { 'polymorphic_identity': 'foreigner' }
+
+    def check_eligibility(self, buyer_data, account=None)
+        pass
+
+class ForeignerStudentProduct(ForeignerProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'foreigner-student' }

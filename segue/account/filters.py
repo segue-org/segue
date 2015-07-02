@@ -20,5 +20,3 @@ class AccountFilterStrategies(FilterStrategies):
 
     def by_document(self, value):
         return Account.document.like('%'+value+'%')
-
-

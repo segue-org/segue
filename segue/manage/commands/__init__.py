@@ -13,6 +13,7 @@ import notificate
 import slotize
 import import_caravan
 import import_avulsos
+import purchaser
 
 def _make_context():
     import segue.models
@@ -46,3 +47,4 @@ manager.command(report.adempiere_format)
 manager.command(slotize.slotize)
 manager.command(import_caravan.import_caravan)
 manager.command(import_avulsos.import_avulsos)
+manager.command(purchaser.ensure_cash_purchase)

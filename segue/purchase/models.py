@@ -56,6 +56,10 @@ class Purchase(JsonSerializable, db.Model):
         return self.payments.filter(Payment.status.in_(Payment.VALID_PAYMENT_STATUSES))
 
     @property
+    def payable(self):
+        return not self.satisfied and datetime.now() < self.product.sold_until
+
+    @property
     def paid_amount(self):
         return sum([ p.paid_amount for p in self.payments ])
 

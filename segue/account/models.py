@@ -1,3 +1,4 @@
+import re
 import datetime
 
 from sqlalchemy_utils.types.password import PasswordType
@@ -73,6 +74,10 @@ class Account(JsonSerializable, db.Model):
         for purchase in self.purchases:
             payments.extend(purchase.payments)
         return payments
+
+    @property
+    def is_brazilian(self):
+        return re.match(r"bra.*", self.country, re.IGNORECASE)
 
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)

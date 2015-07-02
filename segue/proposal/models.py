@@ -47,6 +47,10 @@ class Proposal(JsonSerializable, db.Model):
         return False
 
     @property
+    def related_emails(self):
+        return set([ self.owner.email ] + [ x.recipient for x in self.coauthors ])
+
+    @property
     def slotted(self):
         return self.slots.count() > 0
 
