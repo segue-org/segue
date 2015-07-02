@@ -11,6 +11,7 @@ import schema
 from factories import ProposalFactory
 from services  import ProposalService, InviteService, NonSelectionService
 from responses import NonSelectionResponse, TalkDetailResponse
+from errors    import NoSuchTalk
 
 class TalkController(object):
     def __init__(self, service=None):
@@ -19,6 +20,8 @@ class TalkController(object):
     @jsoned
     def get_one(self, talk_id=None):
         result = self.service.get_one(talk_id)
+        if not result: raise NoSuchTalk()
+        if not result.is_talk: raise NoSuchTalk()
         return TalkDetailResponse.create(result), 200
 
 class NonSelectionController(object):
