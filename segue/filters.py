@@ -19,7 +19,6 @@ class FilterStrategies(object):
             universe.append(self.enforce_user(as_user))
 
         universe.append(or_(*filters))
-
         return universe
 
     def given(self, as_user=None, **criteria):

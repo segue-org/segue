@@ -61,9 +61,11 @@ class AccountService(object):
         db.session.commit()
         return account
 
-    def lookup(self, needle, by=None):
-        filters = self.filters.needle(needle, by)
-        return Account.query.filter(or_(*filters)).all()
+    def lookup(self, needle=None, by=None, **kw):
+        needle  = kw.pop('q', needle)
+        base    = self.filters.all_joins(Account.query)
+        filters = self.filters.needle(needle, by, **kw)
+        return base.filter(*filters).order_by(Account.name).all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)
