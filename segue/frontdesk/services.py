@@ -1,12 +1,12 @@
 from redis import Redis
 from rq import Queue
 
-from segue.core import config
+from segue.core import db, config
 
 from segue.purchase.services import PurchaseService
 
 from errors import TicketIsNotValid
-from models import Person
+from models import Person, Badge
 
 class PrinterService(object):
     def __init__(self, name='default', queue_host=None, queue_password=None):
@@ -23,22 +23,24 @@ class BadgeService(object):
         self.config = override_config or config
         self.printers = { name: PrinterService(name) for name in config.PRINTERS }
 
-    def make_badge_for_person(self, printer, person, by_user=None):
+    def make_badge_for_person(self, printer, person, copies=1, by_user=None):
         if not person.is_valid_ticket: raise TicketIsNotValid()
 
-        return self.make_badge(
+        return self.make_badge(printer, by_user=by_user,
+            person       = person.purchase,
             name         = person.name,
-            city         = person.city,
-            purchase     = person.purchase,
             organization = person.organization,
+            city         = person.city,
             category     = person.category,
         )
 
-    def make_badge(self, printer, by_user=None, **data):
+    def make_badge(self, printer, by_user=None, copies=1, **data):
         badge = Badge(**data)
         badge.printer = printer
         badge.issuer  = by_user
-        badge.job_id  = self.printers[printer].print_badge(badge)
+        badge.copies  = copies
+        print badge.__dict__
+        badge.job_id  = self.printers[printer].print_badge(badge).id
         db.session.add(badge)
         db.session.commit()
 

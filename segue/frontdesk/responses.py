@@ -5,6 +5,7 @@ class PersonResponse(BaseResponse):
         self.id       = person.id
         self.name     = person.name
         self.email    = person.email
+        self.city     = person.city
         self.document = person.document
         self.category = person.category
         self.price    = person.price
