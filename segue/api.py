@@ -1,6 +1,7 @@
 import flask
 
 from admin import blueprints as admin_blueprints
+from frontdesk import blueprints as frontdesk_blueprints
 
 from document import DocumentBlueprint
 from judge import JudgeBlueprint, MatchBlueprint
@@ -31,3 +32,4 @@ blueprints = [
     NotificationBlueprint(),
 ]
 blueprints += admin_blueprints
+blueprints += frontdesk_blueprints

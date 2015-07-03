@@ -14,6 +14,26 @@ def admin_only(fn):
         return fn(instance, *args, **kw)
     return wrapped
 
+def cashier_only(fn):
+    @wraps(fn)
+    def wrapped(instance, *args, **kw):
+        if instance.current_user.role not in ('admin', 'cashier'):
+            logger.info("denied access to admin-only endpoint: %s", instance.current_user.__dict__)
+            raise NotAuthorized()
+        return fn(instance, *args, **kw)
+    return wrapped
+
+def frontdesk_only(fn):
+    @wraps(fn)
+    def wrapped(instance, *args, **kw):
+        if instance.current_user.role not in ('admin', 'frontdesk', 'cashier'):
+            logger.info("denied access to admin-only endpoint: %s", instance.current_user.__dict__)
+            raise NotAuthorized()
+        return fn(instance, *args, **kw)
+    return wrapped
+
+
+
 def jwt_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):
