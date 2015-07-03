@@ -14,6 +14,7 @@ import slotize
 import import_caravan
 import import_avulsos
 import purchaser
+import lister
 
 def _make_context():
     import segue.models
@@ -48,3 +49,4 @@ manager.command(slotize.slotize)
 manager.command(import_caravan.import_caravan)
 manager.command(import_avulsos.import_avulsos)
 manager.command(purchaser.ensure_purchase)
+manager.command(lister.list_speakers)

@@ -90,6 +90,10 @@ class ProposalInvite(JsonSerializable, db.Model):
         primaryjoin='Account.email == ProposalInvite.recipient',
         foreign_keys='Account.email')
 
+    @property
+    def accepted(self):
+        return self.status == 'accepted'
+
 class Track(JsonSerializable, db.Model):
     _serializers = [ TrackSerializer, ShortTrackSerializer ]
 

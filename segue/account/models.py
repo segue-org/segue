@@ -59,11 +59,18 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def is_speaker(self):
-        return any([ x.is_talk for x in self.proposals ])
+        return any([ x.is_talk for x in self.all_related_proposals ])
+
+    @property
+    def all_related_proposals(self):
+        as_coauthor = [ x.proposal for x in self.proposal_invites if x.accepted ]
+        as_owner    = self.proposals
+
+        return as_owner + as_coauthor
 
     @property
     def is_proponent(self):
-        return any([ not x.is_talk for x in self.proposals ])
+        return all([ not x.is_talk for x in self.all_related_proposals ])
 
     @property
     def identifier_purchase(self):
