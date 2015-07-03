@@ -1,6 +1,7 @@
 ---
 
 - apt: update_cache=yes
+       cache_valid_time=3600
 
 - lineinfile: dest="/etc/profile.d/set_lc_all.sh"
               line='export LC_ALL="en_US.utf-8"'
