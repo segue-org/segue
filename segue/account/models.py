@@ -54,8 +54,7 @@ class Account(JsonSerializable, db.Model):
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.id == alleged.id: return True
-        if alleged.role == 'admin': return True
-        return False
+        return alleged.role in ('admin','frontdesk','cashier')
 
     @property
     def is_speaker(self):

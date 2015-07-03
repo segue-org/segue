@@ -2,7 +2,6 @@ from datetime import datetime
 from segue.core import db, logger, config
 
 from segue.errors import NotAuthorized
-from segue.purchase.errors import NoSuchPayment, PurchaseAlreadySatisfied
 from segue.product.errors import NoSuchProduct, ProductExpired
 
 from factories import BuyerFactory, PurchaseFactory
@@ -14,6 +13,7 @@ from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
+from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
@@ -60,14 +60,16 @@ class PurchaseService(object):
             self.db.session.commit()
         return purchase
 
-    def get_one(self, purchase_id, by=None):
+    def get_one(self, purchase_id, by=None, strict=False):
         purchase = Purchase.query.get(purchase_id)
+        if strict and not purchase: raise NoSuchPurchase()
         if not purchase: return None
         if not self.check_ownership(purchase, by): raise NotAuthorized()
+
         return purchase
 
     def check_ownership(self, purchase, alleged):
-        return purchase and alleged and purchase.customer_id == alleged.id
+        return purchase.customer and purchase.customer.can_be_acessed_by(alleged)
 
     def create_payment(self, purchase_id, payment_method, payment_data, by=None):
         purchase = self.get_one(purchase_id, by=by)

@@ -1,6 +1,6 @@
 from segue.filters import FilterStrategies
 from models import PromoCode
-from segue.models import Account
+from segue.account.models import Account
 
 class PromoCodeFilterStrategies(FilterStrategies):
     def by_creator_name(self, value, as_user=None):

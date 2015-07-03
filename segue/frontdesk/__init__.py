@@ -20,8 +20,6 @@ class FrontdeskBadgeBlueprint(flask.Blueprint):
     def __init__(self):
         super(FrontdeskBadgeBlueprint, self).__init__('fd.badge', __name__, url_prefix='/fd/badges')
         self.controller = BadgeController()
-        print "loading badge blueprint"
-        self.add_url_rule('',                      methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<int:badge_id>',       methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:badge_id>/move',  methods=['POST'], view_func=self.controller.move)
         self.add_url_rule('/<int:badge_id>/give',  methods=['POST'], view_func=self.controller.give)

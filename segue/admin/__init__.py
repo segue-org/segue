@@ -7,10 +7,11 @@ class AdminAccountBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminAccountBlueprint, self).__init__('admin.account', __name__, url_prefix='/admin/accounts')
         self.controller = AdminAccountController()
-        self.add_url_rule('',                  methods=['GET'],  view_func=self.controller.list)
-        self.add_url_rule('',                  methods=['POST'], view_func=self.controller.create)
-        self.add_url_rule('/<int:account_id>', methods=['GET'],  view_func=self.controller.get_one)
-        self.add_url_rule('/<int:account_id>', methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('',                                 methods=['GET'],  view_func=self.controller.list)
+        self.add_url_rule('',                                 methods=['POST'], view_func=self.controller.create)
+        self.add_url_rule('/<int:account_id>',                methods=['GET'],  view_func=self.controller.get_one)
+        self.add_url_rule('/<int:account_id>',                methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/holder-of/<int:purchase_id>',     methods=['GET'],  view_func=self.controller.get_by_purchase)
 
 class AdminProposalBlueprint(flask.Blueprint):
     def __init__(self):
