@@ -20,7 +20,7 @@ class PromoCodeService(object):
         return PromoCode.query.filter(*filter_list).limit(limit).all()
 
     def query(self, **kw):
-        base        = self.filter_strategies.joins_for(base, **kw)
+        base        = self.filter_strategies.joins_for(PromoCode.query, **kw)
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).order_by(PromoCode.description).all()
 
