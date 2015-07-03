@@ -8,7 +8,7 @@ from models import Corporate, EmployeeAccount
 from factories import CorporateFactory, EmployeeAccountFactory, CorporatePurchaseFactory
 from errors import AccountAlreadyHasCorporate
 
-from ..account import schema as account_schema
+from segue.account import schema as account_schema
 from segue.account.errors import NotAuthorized
 
 class CorporateService(object):

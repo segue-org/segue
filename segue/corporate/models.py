@@ -39,6 +39,7 @@ class Corporate(JsonSerializable, db.Model):
 
 class GovCorporate(Corporate):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
+    employees    = db.relationship('CorporateAccount', primaryjoin='and_(Corporate.id==CorporateAccount.corporate_id)')
 
 class EmployeeAccount(Account):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
