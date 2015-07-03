@@ -7,6 +7,10 @@ TESTING = False
 
 APP_PATH = '{{ app_path }}'
 
+QUEUE_HOST= 'localhost'
+QUEUE_PASSWORD = '{{ redis_password }}'
+PRINTERS = '{{ printers }}'.split(',')
+
 SQLALCHEMY_POOL_SIZE = None
 SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None

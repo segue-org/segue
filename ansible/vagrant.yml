@@ -12,6 +12,7 @@
     - database
     - segue
     - server
+    - DavidWittman.redis
 
   vars_files:
     - secret/vagrant.yml

@@ -7,5 +7,7 @@
     - git-down
     - database
     - segue
+    - DavidWittman.redis
+
   vars_files:
     - secret/production.yml

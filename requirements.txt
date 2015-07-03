@@ -1,5 +1,7 @@
 -e git+https://github.com/avelino/pycorreios@c3476174073ec888afbafb690de097dae6ce121e#egg=pycorreios-master
 -e git+https://github.com/dwolff/python-pagseguro@f7ab95c492a1a6dbfbee1798bf7b8c07cb72e9f9#egg=pagseguro-with_sandbox
+redis==2.10.3
+rq==0.5.3
 BeautifulSoup==3.2.1
 Flask==0.10.1
 Flask-Cache==0.13.1

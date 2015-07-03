@@ -26,3 +26,7 @@ mail_pass: ""
 pagseguro_env: sandbox
 
 storage_dir: /tmp/segue/data
+
+redis_password: sshh
+
+printers: 'vagrant'
