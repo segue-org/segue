@@ -28,7 +28,7 @@ class Badge(db.Model):
         )
 
 
-class Person(BaseResponse):
+class Person(object):
     def __init__(self, purchase, links=False):
         self.id       = purchase.id
         self.name     = purchase.customer.name
