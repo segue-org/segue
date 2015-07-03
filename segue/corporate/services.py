@@ -6,7 +6,6 @@ import schema
 
 from models import Corporate, EmployeeAccount
 from factories import CorporateFactory, EmployeeAccountFactory, CorporatePurchaseFactory
-from errors import AccountAlreadyHasCorporate
 
 from ..account import schema as account_schema
 from segue.account.errors import NotAuthorized
@@ -79,7 +78,7 @@ class EmployeeAccountService(object):
         account_data = {
             'email': data['email'],
             'name': data['name'],
-            'cpf': data['document'],
+            'document': data['document'],
             'password': self.hasher.generate(),
             'corporate_id': corporate.id
         }

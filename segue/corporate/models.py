@@ -33,7 +33,7 @@ class Corporate(JsonSerializable, db.Model):
     created          = db.Column(db.DateTime, default=func.now())
     last_updated     = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    employees    = db.relationship('EmployeeAccount', primaryjoin='and_(Corporate.id==CorporateAccount.corporate_id)')
+    employees    = db.relationship('EmployeeAccount', primaryjoin='and_(Corporate.id==EmployeeAccount.corporate_id)')
 
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'business' }
 

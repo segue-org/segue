@@ -10,6 +10,7 @@ from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderP
 from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification
 from frontdesk.models import Badge
+from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase, CorporateProduct
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -18,10 +19,12 @@ __all__ = [
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
     'BoletoPayment',
-    'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanRiderPurchase', 'CaravanLeaderPurchase', 'CaravanLeaderProduct',
+    'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'City', 'Country',
+    'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanRiderPurchase', 'CaravanLeaderPurchase', 'CaravanLeaderProduct',
     'Judge', 'Match', 'Tournament',
     'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification',
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
+    'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase', 'CorporateProduct'
 ]
