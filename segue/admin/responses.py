@@ -28,8 +28,9 @@ class PromoCodeResponse(BaseResponse):
         self.discount    = promocode.discount * 100
         self.hash_code   = promocode.hash_code
         self.description = promocode.description
-
+        self.creator     = promocode.creator.name
         self.product     = ProductDetailResponse.create(promocode.product)
+
         if promocode.payment:
             self.spent_with  = PurchasePersonIdentifierResponse(promocode.payment.purchase)
 
