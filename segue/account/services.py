@@ -79,12 +79,14 @@ class AccountService(object):
         except IntegrityError:
             raise EmailAlreadyInUse(account.email)
 
-    def login(self, email=None, password=None):
+    def login(self, email=None, password=None, acceptable_roles=None):
         try:
             account = Account.query.filter(Account.email == email).one()
-            if account.password == password:
-                return self.signer.sign(account)
-            raise InvalidLogin()
+            if account.password != password:
+                raise InvalidLogin()
+            if acceptable_roles and account.role not in acceptable_roles:
+                raise InvalidLogin()
+            return self.signer.sign(account)
         except NoResultFound:
             raise InvalidLogin()
 
