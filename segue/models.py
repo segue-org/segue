@@ -9,6 +9,7 @@ from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderPurchase, CaravanLeaderPurchase, CaravanLeaderProduct
 from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification
+from frontdesk.models import Badge
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -21,5 +22,6 @@ __all__ = [
     'City', 'Country',
     'Judge', 'Match', 'Tournament',
     'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification',
-    'PromoCode', 'PromoCodePayment', 'PromoCodeTransition'
+    'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
+    'Badge',
 ]
