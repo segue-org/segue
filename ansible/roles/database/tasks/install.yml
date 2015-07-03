@@ -3,7 +3,7 @@
 - apt: update_cache=yes
 
 - lineinfile: dest="/etc/profile.d/set_lc_all.sh"
-              line='export LC_ALL="en_US"'
+              line='export LC_ALL="en_US.utf-8"'
               create=yes
               state=present
 

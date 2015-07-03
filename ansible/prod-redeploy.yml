@@ -1,0 +1,9 @@
+---
+
+- hosts: production
+  sudo: true
+  roles:
+    - git-down
+
+  vars_files:
+    - secret/production.yml
