@@ -1,7 +1,7 @@
 from segue.factory import Factory
 
 import schema
-from models import Buyer, Purchase, Payment, Transition
+from models import Buyer, Purchase, Payment, Transition, ExemptPurchase
 
 class BuyerFactory(Factory):
     model = Buyer
@@ -28,7 +28,8 @@ class PurchaseFactory(Factory):
 
     @classmethod
     def get_or_create(cls, buyer, product, account, **extra_fields):
-        existing_purchase = Purchase.query.filter(Purchase.product == product, Purchase.customer == account, Purchase.status == 'pending').first()
+        effective_class = product.special_purchase_class() or cls.model
+        existing_purchase = effective_class.query.filter(Purchase.product == product, Purchase.customer == account, Purchase.status == 'pending').first()
         if existing_purchase:
             existing_purchase.buyer = buyer
             return existing_purchase

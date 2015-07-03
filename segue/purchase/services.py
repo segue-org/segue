@@ -45,7 +45,7 @@ class PurchaseService(object):
         filter_list = self.filters.given(**kw)
         return Purchase.query.filter(*filter_list).all()
 
-    def create(self, buyer_data, product, account, **extra):
+    def create(self, buyer_data, product, account, commit=True, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
         purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
         logger.info(buyer_data)
@@ -56,7 +56,8 @@ class PurchaseService(object):
         if 'hash_code' in buyer_data:
             self.payments.create(purchase, 'promocode', { 'hash_code': buyer_data['hash_code'] })
 
-        self.db.session.commit()
+        if commit:
+            self.db.session.commit()
         return purchase
 
     def get_one(self, purchase_id, by=None):
@@ -74,7 +75,7 @@ class PurchaseService(object):
             return self.payments.create(purchase, payment_method, payment_data)
         raise ProductExpired()
 
-    def clone_purchase(self, purchase_id, by=None):
+    def clone_purchase(self, purchase_id, by=None, commit=False):
         purchase = self.get_one(purchase_id, by=by)
         if not purchase: return None
 
@@ -88,12 +89,27 @@ class PurchaseService(object):
         cloned_purchase = purchase.clone()
         cloned_purchase.product = replacement_product
         db.session.add(cloned_purchase)
-        db.session.commit()
+        if commit: db.session.commit()
         return cloned_purchase
 
     def check_promocode(self, hash, by=None):
         logger.info("received promocode hash: " + hash)
         return self.promocode_service.check(hash)
+
+    def give_speaker_ticket(self, account, commit=True):
+        from segue.proposal.models import SpeakerProduct
+        product = SpeakerProduct.query.first()
+        purchase = PurchaseFactory.get_or_create(None, product, account)
+        purchase.status = 'paid'
+        db.session.add(purchase)
+        if commit: db.session.commit()
+        return purchase
+
+    def give_fresh_purchase(self, buyer, product, account, commit=False):
+        purchase = PurchaseFactory.get_or_create(buyer, product, account)
+        db.session.add(purchase)
+        if commit: db.session.commit()
+        return purchase
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(

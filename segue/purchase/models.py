@@ -65,7 +65,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def could_be_stale(self):
-        return not self.satisfied and datetime.now() > self.product.sold_until
+        return not self.stale and not self.satisfied and datetime.now() > self.product.sold_until
 
     @property
     def paid_amount(self):
@@ -98,6 +98,8 @@ class Purchase(JsonSerializable, db.Model):
                 arguments[name] = getattr(self, name)
         return self.__class__(**arguments)
 
+class ExemptPurchase(Purchase):
+    __mapper_args__ = { 'polymorphic_identity': 'exempt' }
 
 class PaymentJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'

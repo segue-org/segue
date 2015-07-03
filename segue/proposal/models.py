@@ -121,6 +121,9 @@ class StudentProponentProduct(ProponentProduct):
 
 class SpeakerProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'speaker' }
+    def special_purchase_class(self):
+        from segue.purchase.models import ExemptPurchase
+        return ExemptPurchase
 
 class NonSelectionNotice(db.Model):
     id         = db.Column(db.Integer, primary_key=True)

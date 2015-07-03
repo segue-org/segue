@@ -4,8 +4,12 @@ import collections
 from support import *
 from segue.core import db
 
-from segue.purchase.models import Purchase
+from segue.purchase.services import PurchaseService
+from segue.product.services import ProductService
 from segue.account.services import AccountService
+
+from segue.product.models import Product
+from segue.purchase.models import Purchase
 
 def ensure_purchase(start=0, end=sys.maxint, commit=False):
     init_command()
@@ -13,14 +17,11 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
     print "querying..."
     accounts = AccountService().by_range(int(start), int(end)).all()
 
-    report = collections.defaultdict(lambda: 0)
-    solutions = collections.defaultdict(lambda: [])
-
     situations = [
         HasTicketsThatCouldBeStale(),
         HasPaidTicket(),
+        IsSpeakerWithNoTicket(),
         HasPayableTicket(),
-        IsSpeaker(),
         IsForeigner(),
         HasZeroPayableTickets(),
     ]
@@ -56,6 +57,8 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
                     not_solved[situation.__class__.__name__].push(account)
 
     print "\n*************"
+    print "accounts scanned: ", len(accounts)
+    print "speaker purchases now:", Purchase.query.join(Product).filter(Product.category == 'speaker').count()
     print "stale purchases now:", Purchase.query.filter(Purchase.status == 'stale').count()
     print not_solved
     for situation in situations:
@@ -70,15 +73,17 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
 
 class Situation(object):
     def __init__(self):
+        self.purchase_svc = PurchaseService()
+        self.product_svc = ProductService()
         self.count = 0
         self.solved = 0
         self.acted = 0
     def applies(self, account, known_situations):
         return False
-    def solve(self, account, known_situations):
-        return "was-ok"
     def inc(self):
         self.count += 1
+    def solve(self, account, known_situations):
+        return "was-ok"
     def __repr__(self):
         return "{}: {} cases / {} acted / {} solved".format(self.__class__.__name__, self.count, self.acted, self.solved)
 
@@ -90,10 +95,11 @@ class HasPayableTicket(Situation):
     def applies(self, account, known_situations):
         return any([ x.payable for x in account.purchases ])
 
-class IsSpeaker(Situation):
+class IsSpeakerWithNoTicket(Situation):
     def applies(self, account, known_situations):
         return account.is_speaker
     def solve(self, account, known_situations):
+        self.purchase_svc.give_speaker_ticket(account, commit=False)
         self.acted += 1
         self.solved += 1
         return 'solved'
@@ -123,6 +129,10 @@ class HasZeroPayableTickets(Situation):
     def applies(self, account, known_situations):
         return all([ x.stale for x in account.purchases])
     def solve(self, account, known_situations):
+        buyer   = account.last_buyer
+        product = self.product_svc.cheapest_for(account.guessed_category)
+        print account, account.last_buyer, account.guessed_category, product
+        self.purchase_svc.give_fresh_purchase(buyer, product, account, commit=False)
         self.acted += 1
         self.solved += 1
         return 'solved'

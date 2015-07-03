@@ -41,7 +41,7 @@ class Product(JsonSerializable, db.Model):
         return Product.query.filter(
                 Product.category   == self.category,
                 Product.kind       == self.kind,
-                Product.sold_until >  self.sold_until)
+                Product.sold_until >  datetime.now())
 
 class StudentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'student' }

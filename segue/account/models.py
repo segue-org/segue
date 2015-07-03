@@ -80,6 +80,19 @@ class Account(JsonSerializable, db.Model):
         return self.purchases[-1]
 
     @property
+    def guessed_category(self):
+        purchase = self.identifier_purchase
+        if purchase: return purchase.product.category
+        if self.is_proponent: return 'proponent'
+        return 'normal'
+
+    @property
+    def last_buyer(self):
+        purchase = self.identifier_purchase
+        if not purchase: return None
+        return purchase.buyer
+
+    @property
     def payments(self):
         payments = []
         for purchase in self.purchases:
