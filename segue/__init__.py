@@ -31,6 +31,7 @@ class Application(flask.Flask):
         except ImportStringError, e:
             pass
         self.config.from_object(settings_override)
+        core.config.init_app(self)
 
     def _set_logger(self):
         formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
@@ -56,14 +57,13 @@ class Application(flask.Flask):
         self.debug = True
 
     def _register_blueprints(self):
-        for blueprint in api.blueprints:
+        for blueprint in api.load_blueprints():
             self.register_blueprint(blueprint)
 
     def _init_deps(self):
         core.db.init_app(self)
         core.jwt.init_app(self)
         core.mailer.init_app(self)
-        core.config.init_app(self)
         core.cache.init_app(self)
 
     def _set_json_encoder(self):

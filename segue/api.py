@@ -1,7 +1,7 @@
 import flask
 
-from admin import blueprints as admin_blueprints
-from frontdesk import blueprints as frontdesk_blueprints
+import admin
+import frontdesk
 
 from document import DocumentBlueprint
 from judge import JudgeBlueprint, MatchBlueprint
@@ -12,24 +12,26 @@ from product import ProductBlueprint
 from caravan import CaravanBlueprint, CaravanInviteBluePrint
 from schedule import NotificationBlueprint, RoomBlueprint, SlotBlueprint
 
-blueprints = [
-    AccountBlueprint(),
-    SessionBlueprint(),
-    ProposalBlueprint(),
-    NonSelectionBlueprint(),
-    ProposalInviteBluePrint(),
-    ProductBlueprint(),
-    PurchaseBlueprint(),
-    PaymentBlueprint(),
-    DocumentBlueprint(),
-    CaravanBlueprint(),
-    CaravanInviteBluePrint(),
-    JudgeBlueprint(),
-    MatchBlueprint(),
-    RoomBlueprint(),
-    SlotBlueprint(),
-    TalkBlueprint(),
-    NotificationBlueprint(),
-]
-blueprints += admin_blueprints
-blueprints += frontdesk_blueprints
+def load_blueprints():
+    blueprints = [
+        AccountBlueprint(),
+        SessionBlueprint(),
+        ProposalBlueprint(),
+        NonSelectionBlueprint(),
+        ProposalInviteBluePrint(),
+        ProductBlueprint(),
+        PurchaseBlueprint(),
+        PaymentBlueprint(),
+        DocumentBlueprint(),
+        CaravanBlueprint(),
+        CaravanInviteBluePrint(),
+        JudgeBlueprint(),
+        MatchBlueprint(),
+        RoomBlueprint(),
+        SlotBlueprint(),
+        TalkBlueprint(),
+        NotificationBlueprint(),
+    ]
+    blueprints += admin.load_blueprints()
+    blueprints += frontdesk.load_blueprints()
+    return blueprints

@@ -16,6 +16,7 @@ class Config():
     def init_app(self, app):
         self._data = app.config
 
+
 class Logger():
     def __init__(self):
         self._logger = None

@@ -83,13 +83,14 @@ class AdminBlueprint(flask.Blueprint):
         self.add_url_rule('/notifications/call/<string:status>', methods=['GET'], view_func=self.controller.list_call_notification_by_status)
 
 
-blueprints = [
-    AdminAccountBlueprint(),
-    AdminProposalBlueprint(),
-    AdminTournamentsBlueprint(),
-    AdminPromoCodeBlueprint(),
-    AdminCallBlueprint(),
-    AdminRoomBlueprint(),
-    AdminSlotBlueprint(),
-    AdminBlueprint()
-]
+def load_blueprints():
+    return [
+        AdminAccountBlueprint(),
+        AdminProposalBlueprint(),
+        AdminTournamentsBlueprint(),
+        AdminPromoCodeBlueprint(),
+        AdminCallBlueprint(),
+        AdminRoomBlueprint(),
+        AdminSlotBlueprint(),
+        AdminBlueprint()
+    ]
