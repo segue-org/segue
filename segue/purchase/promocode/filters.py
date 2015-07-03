@@ -1,3 +1,4 @@
+from segue.core import db
 from segue.filters import FilterStrategies
 from models import PromoCode
 from segue.account.models import Account

@@ -44,8 +44,8 @@ class SlotFilterStrategies(FilterStrategies):
     def by_speaker(self, value, as_user=None):
         return Account.name.ilike('%'+value+'%')
 
-    def join_for_title(self, queryset):
+    def join_for_title(self, queryset, needle=None):
         return queryset.join(Proposal)
 
-    def join_for_speaker(self, queryset):
+    def join_for_speaker(self, queryset, needle=None):
         return queryset.join(Proposal).join(Account)

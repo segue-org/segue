@@ -39,10 +39,10 @@ class FilterStrategies(object):
             result = method(result)
         return result
 
-    def all_joins(self, queryset):
+    def all_joins(self, queryset, needle=None):
         result = queryset
         for method_name in dir(self):
             if not method_name.startswith("join_for_"): continue
             method = getattr(self, method_name)
-            result = method(result)
+            result = method(result, needle)
         return result

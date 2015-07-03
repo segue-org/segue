@@ -19,6 +19,15 @@ class Badge(db.Model):
 
     person       = db.relationship('Purchase', backref=db.backref('badges', lazy='dynamic'))
 
+    @classmethod
+    def create_for_person(cls, person):
+        badge = Badge(person=person.purchase)
+        badge.name         = person.name
+        badge.city         = person.city
+        badge.category     = person.category
+        badge.organization = person.organization
+        return badge
+
     @property
     def xid(self):
         return self.person.id if self.person else None
@@ -49,7 +58,13 @@ class Person(object):
 
     @property
     def related_people(self):
-        return []
+        all_purchases = self.purchase.customer.purchases[:]
+        other_purchases = [ x for x in all_purchases if x.id != self.id ]
+        return map(Person, other_purchases)
+
+    @property
+    def related_count(self):
+        return len(self.purchase.customer.purchases) - 1
 
     @property
     def is_valid_ticket(self):

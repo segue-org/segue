@@ -11,8 +11,14 @@ class PersonController(object):
         self.badges = badges or BadgeService()
         self.current_user = current_user
 
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def list(self):
-        pass
+        needle = request.args.get('q')
+        result = self.people.lookup(needle, by_user=self.current_user)
+        return PersonResponse.create(result, related=False), 200
+
     def create(self):
         pass
 
@@ -21,7 +27,7 @@ class PersonController(object):
     @jsoned
     def get_one(self, person_id):
         result = self.people.get_one(person_id, by_user=self.current_user)
-        return PersonResponse.create(result), 200
+        return PersonResponse.create(result, related=True), 200
 
     def modify(self, person_id):
         pass

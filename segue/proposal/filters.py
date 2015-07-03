@@ -39,6 +39,6 @@ class ProposalFilterStrategies(FilterStrategies):
         else:
             return Slot.id == None
 
-    def join_for_slotted(self, queryset):
+    def join_for_slotted(self, queryset, needle=None):
         from segue.schedule.models import Slot
         return queryset.outerjoin(Slot)

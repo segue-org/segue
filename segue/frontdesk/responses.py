@@ -2,14 +2,15 @@ from segue.responses import BaseResponse
 
 class PersonResponse(BaseResponse):
     def __init__(self, person, links=False, embeds=True, related=True):
-        self.id       = person.id
-        self.name     = person.name
-        self.email    = person.email
-        self.city     = person.city
-        self.document = person.document
-        self.category = person.category
-        self.price    = person.price
-        self.status   = person.status
+        self.id            = person.id
+        self.name          = person.name
+        self.email         = person.email
+        self.city          = person.city
+        self.document      = person.document
+        self.category      = person.category
+        self.price         = person.price
+        self.status        = person.status
+        self.related_count = person.related_count
 
         if embeds:
             self.buyer    = BuyerResponse.create(person.buyer)
