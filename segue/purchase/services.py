@@ -75,7 +75,7 @@ class PurchaseService(object):
             return self.payments.create(purchase, payment_method, payment_data)
         raise ProductExpired()
 
-    def clone_purchase(self, purchase_id, by=None, commit=False):
+    def clone_purchase(self, purchase_id, by=None, commit=True):
         purchase = self.get_one(purchase_id, by=by)
         if not purchase: return None
 
@@ -87,6 +87,7 @@ class PurchaseService(object):
             raise NoSuchProduct()
 
         cloned_purchase = purchase.clone()
+        cloned_purchase.customer = purchase.customer
         cloned_purchase.product = replacement_product
         db.session.add(cloned_purchase)
         if commit: db.session.commit()

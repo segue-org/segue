@@ -85,38 +85,6 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         with self.assertRaises(ProductExpired):
             self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
 
-    def test_clone_a_purchase(self):
-        yesterday = datetime.now() - timedelta(days=1)
-        tomorrow  = datetime.now() + timedelta(days=1)
-        product1 = self.create_from_factory(ValidProductFactory, kind="ticket", category='normal',  sold_until=yesterday)
-        product2 = self.create_from_factory(ValidProductFactory, kind="ticket", category='normal',  sold_until=tomorrow)
-        product3 = self.create_from_factory(ValidProductFactory, kind="ticket", category='student', sold_until=tomorrow)
-
-        purchase1 = self.create_from_factory(ValidPurchaseFactory, product=product1)
-        purchase2 = self.create_from_factory(ValidPurchaseFactory, product=product2)
-        purchase3 = self.create_from_factory(ValidPurchaseFactory, product=product2, status='paid')
-
-        result = self.service.clone_purchase(purchase1.id, by=purchase1.customer)
-        self.assertEquals(result.product.sold_until, tomorrow)
-        self.assertEquals(result.buyer, purchase1.buyer)
-        self.assertEquals(result.customer, purchase1.customer)
-        self.assertEquals(result.product, product2)
-        self.assertIsNot(result.created, purchase1.created)
-
-        result = self.service.clone_purchase(888, by=purchase2.customer)
-        self.assertRaises(result, None)
-
-        with self.assertRaises(NotAuthorized):
-            self.service.clone_purchase(purchase1.id, by=purchase2.customer)
-
-        with self.assertRaises(NoSuchProduct):
-            self.service.clone_purchase(purchase2.id, by=purchase2.customer)
-
-        with self.assertRaises(PurchaseAlreadySatisfied):
-            self.service.clone_purchase(purchase3.id, by=purchase3.customer)
-
-
-
 class PaymentServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PaymentServiceTestCases, self).setUp()

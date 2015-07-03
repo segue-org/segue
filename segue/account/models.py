@@ -77,6 +77,10 @@ class Account(JsonSerializable, db.Model):
         if not self.purchases: return None
         valid_purchases = filter(lambda p:p.satisfied, self.purchases)
         if valid_purchases: return valid_purchases[-1]
+
+        payable_purchases = filter(lambda p:p.payable, self.purchases)
+        if payable_purchases: return payable_purchases[-1]
+
         return self.purchases[-1]
 
     @property
