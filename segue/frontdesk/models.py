@@ -39,5 +39,6 @@ class Person(object):
         self.status   = purchase.status
         self.buyer    = purchase.buyer
 
+    @property
     def related_people(self):
         return []

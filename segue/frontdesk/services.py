@@ -6,6 +6,7 @@ from segue.core import config
 from segue.purchase.services import PurchaseService
 
 from errors import TicketIsNotValid
+from models import Person
 
 class PrinterService(object):
     def __init__(self, name='default', queue_host=None, queue_password=None):
