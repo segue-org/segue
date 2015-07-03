@@ -29,6 +29,7 @@ def import_avulsos(in_file):
         ds.csv = f.read()
 
     counter = 0
+    counter_added = 0
     for item in ds.dict:
         # dados do comprador
         buyer_data = {
@@ -83,51 +84,54 @@ def import_avulsos(in_file):
             print "error in owner, could not create"
             break
 
-        purchase = purchase_service.create(buyer_data, product, owner)
+        if not owner.has_valid_purchases:
+            purchase = purchase_service.create(buyer_data, product, owner)
 
-        if item['caravan_id'] and item['Categoria'] == 'caravan':
-            purchase.kind = 'caravan-rider'
-            purchase.caravan = caravan
-        else:
-            purchase.kind = 'single'
+            if item['caravan_id'] and item['Categoria'] == 'caravan':
+                purchase.kind = 'caravan-rider'
+                purchase.caravan = caravan
+            else:
+                purchase.kind = 'single'
 
-        purchase.status = 'paid'
+            purchase.status = 'paid'
 
-        # dados do payment
-        payment_data = {
-            'type': 'boleto',
-            'purchase': purchase,
-            'status': 'paid',
-            'amount': product.price,
-            'our_number': item['Nosso Numero'],
-        }
+            # dados do payment
+            payment_data = {
+                'type': 'boleto',
+                'purchase': purchase,
+                'status': 'paid',
+                'amount': product.price,
+                'our_number': item['Nosso Numero'],
+            }
 
-        payment = BoletoPayment(**payment_data)
+            payment = BoletoPayment(**payment_data)
 
-        transition_data = {
-            'old_status': 'pending',
-            'new_status': 'paid',
-            'source': 'script',
-            'payment': payment,
-            'payment_date': format_date(item['Data do pagamento']),
-            'paid_amount' : product.price
-        }
-        transition = BoletoTransition(**transition_data)
+            transition_data = {
+                'old_status': 'pending',
+                'new_status': 'paid',
+                'source': 'import_avulsos',
+                'payment': payment,
+                'payment_date': format_date(item['Data do pagamento']),
+                'paid_amount' : product.price
+            }
+            transition = BoletoTransition(**transition_data)
 
-        db.session.add(purchase)
-        db.session.add(payment)
-        db.session.add(transition)
-        db.session.commit()
+            db.session.add(purchase)
+            db.session.add(payment)
+            db.session.add(transition)
+            db.session.commit()
 
-        if item['caravan_id'] and item['Categoria'] == 'caravan':
-            caravan_service.update_leader_exemption(caravan.id, caravan.owner)
+            if item['caravan_id'] and item['Categoria'] == 'caravan':
+                caravan_service.update_leader_exemption(caravan.id, caravan.owner)
 
-        mailer_service.notify_payment(purchase, payment)
+            #mailer_service.notify_payment(purchase, payment)
+            counter_added += 1
 
         counter += 1
 
     print "###########################################################"
     print "records processed: ", counter
+    print "records inserted:  ", counter_added
     print "####################### DONE! #############################"
 
 def format_date(date):
