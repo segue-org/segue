@@ -3,9 +3,6 @@ from models import PromoCode
 from segue.account.models import Account
 
 class PromoCodeFilterStrategies(FilterStrategies):
-    def by_creator_name(self, value, as_user=None):
-        return Account.name.ilike('%'+value+'%')
-
     def by_hash_code(self, value, as_user=None):
         return PromoCode.hash_code.ilike("%"+value+"%")
 
@@ -17,7 +14,3 @@ class PromoCodeFilterStrategies(FilterStrategies):
 
     def by_description(self, value, as_user=None):
         return PromoCode.description.ilike("%"+value+"%")
-
-    def join_for_creator_name(self, queryset):
-        return queryset.join(Account)
-
