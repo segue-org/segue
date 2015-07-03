@@ -9,8 +9,6 @@
   sudo: true
   accelerate: true
   roles:
-    - nodesource.node
-    - realtime
     - database
     - segue
     - server
