@@ -9,4 +9,4 @@ class CashTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'cash' }
 
     cashier_id  = db.Column(db.Integer, db.ForeignKey('account.id'))
-    ip_address  = db.Column(db.String)
+    ip_address  = db.Column(db.String, name='ca_ip_address')
