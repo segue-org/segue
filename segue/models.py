@@ -1,6 +1,6 @@
 from account.models  import Account, ResetPassword
 from proposal.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice
-from product.models  import Product, StudentProduct
+from product.models  import Product, StudentProduct, PromoCodeProduct, ForeignerProduct, ForeignerStudentProduct, CorporateProduct, GovernmentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
 from purchase.boleto.models    import BoletoPayment,    BoletoTransition
@@ -10,12 +10,12 @@ from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderP
 from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification
 from frontdesk.models import Badge
-from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase, CorporateProduct
+from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
 
 __all__ = [
     'Account', 'ResetPassword',
     'ProposalTag', 'Proposal', 'ProposalInvite', 'Track', 'ProponentProduct', 'NonSelectionNotice',
-    'Product', 'StudentProduct',
+    'Product', 'StudentProduct', 'PromoCodeProduct', 'ForeignerProduct', 'ForeignerStudentProduct', 'CorporateProduct', 'GovernmentProduct',
     'Buyer', 'Purchase', 'Payment',
     'PagSeguroPayment',
     'BoletoPayment',
@@ -26,5 +26,5 @@ __all__ = [
     'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification',
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
-    'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase', 'CorporateProduct'
+    'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase'
 ]

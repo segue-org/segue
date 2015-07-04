@@ -72,12 +72,5 @@ class ForeignerStudentProduct(ForeignerProduct):
 class CorporateProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }
 
-    def check_eligibility(self, buyer_data, account=None):
-        raise WrongBuyerForProduct()
-
-class Empenho(Product):
-    __mapper_args__ = { 'polymorphic_identity': 'empenho' }
-
-    def check_eligibility(self, buyer_data, account=None):
-        raise WrongBuyerForProduct()
-
+class GovernmentProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'government' }

@@ -13,6 +13,7 @@ import notificate
 import slotize
 import import_caravan
 import import_avulsos
+import import_corporate
 import purchaser
 import lister
 import jobs
@@ -21,7 +22,6 @@ import printer
 def _make_context():
     import segue.models
     return dict(app=app, db=segue.core.db, models=segue.models)
-
 
 app = segue.Application()
 
@@ -50,6 +50,7 @@ manager.command(report.adempiere_format)
 manager.command(slotize.slotize)
 manager.command(import_caravan.import_caravan)
 manager.command(import_avulsos.import_avulsos)
+manager.command(import_corporate.import_corporate)
 manager.command(purchaser.ensure_purchase)
 manager.command(lister.list_speakers)
 manager.command(jobs.bad_jobs)

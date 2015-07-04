@@ -1,4 +1,4 @@
-ACCOUNT_ROLES = [ "user","operator","admin" ]
+ACCOUNT_ROLES = [ "user","operator","admin","employee" ]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 
 signup = {

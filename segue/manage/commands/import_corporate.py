@@ -95,18 +95,19 @@ def process_line_business(item):
 
         # 16 -> number of employees slots in csv file
         for n in xrange(1, 17):
-            if corp_data['name_{}'.format(n)] == '':
-                del corp_data['name_{}'.format(n)]
-                del corp_data['badge_name_{}'.format(n)]
-                del corp_data['document_{}'.format(n)]
-                del corp_data['email_{}'.format(n)]
-            else:
-                employees.append({
+            if corp_data['name_{}'.format(n)] != '':
+                employee = {
                     'name':       corp_data['name_{}'.format(n)],
                     'badge_name': corp_data['badge_name_{}'.format(n)],
                     'document':   corp_data['document_{}'.format(n)],
-                    'email':      corp_data['email_{}'.format(n)]
-                })
+                    'email':      corp_data['email_{}'.format(n)],
+                }
+                print "adding employee: ", employee
+                employees.append(employee)
+            del corp_data['name_{}'.format(n)]
+            del corp_data['badge_name_{}'.format(n)]
+            del corp_data['document_{}'.format(n)]
+            del corp_data['email_{}'.format(n)]
 
         if '' in corp_data:
             del corp_data['']
@@ -115,15 +116,42 @@ def process_line_business(item):
         del corp_data['_nf_emitida']
         del corp_data['_details']
 
-        print "adding corporate: ", corp_data['name']
-        owner = get_or_add_account({
+        del corp_data['payment_date']
+        del corp_data['amount']
+        del corp_data['our_number']
+        del corp_data['description']
+        #del corp_data['_details']
+
+        corp_data = dict((k, v) for k, v in corp_data.iteritems() if v)
+
+        print "adding/getting corporate: ", corp_data['name']
+        owner = get_or_add_account_owner({
             'name': corp_data['incharge_name'],
             'email': corp_data['incharge_email'],
-            'document': '00000000000'
+            'document': '00000000000',
+            'city': corp_data['address_city'],
+            'phone': corp_data['incharge_phone_1']
         })
-        corporate = corporate_service.create(corp_data, owner)
+        print corp_data
+        if owner.corporate_owned:
+            corporate = owner.corporate_owned[0]
+        else:
+            corporate = corporate_service.create(corp_data, owner)
+
         for e in employees:
-            corporate.add_people(corporate.id, e, owner)
+            e['corporate_id'] = corporate.id
+            "adding/getting employee: ", e['email']
+            if account_service.is_email_registered(e['email']):
+                employee = Account.query.filter(Account.email == e['email']).first()
+                employee.role = 'employee'
+                employee.corporate_id = corporate.id
+            else:
+                employee = EmployeeAccount(**e)
+
+            db.session.add(employee)
+
+        # add purchase/payment
+        db.session.commit()
 
         print corp_data
         print "###################### employees: "
@@ -152,3 +180,21 @@ def process_line_gov(item):
     # description
 
     print item
+
+def get_or_add_account_owner(item):
+    h = Hasher(10)
+
+    account_data = {
+        'name': item['name'],
+        'email': item['email'],
+        'document': item['document'],
+        'password': h.generate(),
+        'country': 'BRASIL',
+        'city': item['city'],
+        'phone': item['phone']
+    }
+
+    if account_service.is_email_registered(account_data['email']):
+        return Account.query.filter(Account.email == account_data['email']).one()
+    else:
+        return account_service.create(account_data)

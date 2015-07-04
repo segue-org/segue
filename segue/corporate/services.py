@@ -52,8 +52,10 @@ class CorporateService(object):
         db.session.commit()
         return corporate
 
-    def add_people(self, corporate_id, people, by=None):
-        return self.employees.create(corporate_id, people, by=by)
+    def add_person(self, corporate_id, account, by=None):
+        account.corporate = self.get_one(corporate_id)
+        db.session.add(account)
+        return account
 
     def sum_employee_tickets(self, corporate_id, product_value, by):
         value = 0
