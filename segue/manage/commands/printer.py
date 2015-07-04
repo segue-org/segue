@@ -40,3 +40,23 @@ def print_categories(categories="", start=None, end=None, printer=None):
         print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
 
         badges.make_badge_for_person(printer, person)
+
+def print_person(xid):
+    init_command()
+
+    person = PeopleService().get_one(int(xid))
+    badges = BadgeService()
+    result = []
+
+    print "scanning {}{}{}, person {}{}{} - {}{}{}".format(F.RESET,
+        F.RED, person.id,       F.RESET,
+        F.RED, u(person.name),  F.RESET,
+        F.RED, person.category, F.RESET
+        )
+
+    if not person.is_valid_ticket:
+        print "... {}ticket is not valid{}, skipping".format(F.RED, F.RESET)
+        return
+
+    print "... printing"
+    badges.make_badge_for_person(printer, person)

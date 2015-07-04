@@ -52,6 +52,7 @@ def good_jobs(debug=False):
             job_ids = registry.get_job_ids()
             _print_dot(len(job_ids))
             for job_id in job_ids:
+                if debug: print job_id
                 if job_id in seen_ids:
                     if debug: print "already saw {}{}{}, skipping".format(F.RED, job_id, F.RESET)
                     continue
