@@ -25,6 +25,19 @@ class BadgeService(object):
         self.config = override_config or config
         self.printers = { name: PrinterService(name) for name in config.PRINTERS }
 
+    def has_failed_recently(self, person_id):
+        latest_attempt = Badge.query.filter(Badge.person_id == person_id).order_by(Badge.created.desc()).first()
+        if not latest_attempt: return False
+        return latest_attempt.result == 'failed'
+
+    def mark_failed_for_person(self, person_id):
+        latest_attempt = Badge.query.filter(Badge.person_id == person_id).order_by(Badge.created.desc()).first()
+        if not latest_attempt: return False
+        latest_attempt.result = 'failed'
+        db.session.add(latest_attempt)
+        db.session.commit()
+        return True
+
     def report_failure(self, job_id):
         badge = Badge.query.filter(Badge.job_id == job_id).first()
         if not badge: return False

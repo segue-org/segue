@@ -10,7 +10,16 @@ USAGE = """
 
 """
 
-def print_categories(categories="", start=None, end=None, printer=None):
+def mark_failed(ids=''):
+    init_command()
+
+    service = BadgeService()
+    for person_id in map(int, ids.split(",")):
+        print "marking last badge attempt for person {}{}{} as failed...".format(F.RED, person_id, F.RESET),
+        result = service.mark_failed_for_person(person_id)
+        print result
+
+def print_range(categories="", start=None, end=None, printer=None, only_failures=False):
     if not start:      print USAGE; return;
     if not end:        print USAGE; return;
     if not categories: print USAGE; return;
@@ -37,9 +46,17 @@ def print_categories(categories="", start=None, end=None, printer=None):
             print "... {}ticket is not valid{}, skipping".format(F.RED, F.RESET)
             continue
 
-        print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
 
-        badges.make_badge_for_person(printer, person)
+        if not only_failures:
+            print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
+            badges.make_badge_for_person(printer, person)
+        elif badges.has_failed_recently(person.id):
+            print "... {}did fail recently{}, reprinting".format(F.GREEN, F.RESET)
+            badges.make_badge_for_person(printer, person)
+        else:
+            print "... {}did not fail recently{}, skippping".format(F.RED, F.RESET)
+
+
 
 def print_person(xid):
     init_command()
