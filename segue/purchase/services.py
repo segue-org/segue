@@ -38,12 +38,15 @@ class PurchaseService(object):
         self.deadline = deadline or OnlinePaymentDeadline()
         self.promocode_service = promocode or PromoCodeService()
 
+    def by_range(self, start, end):
+        return Purchase.query.filter(Purchase.id.between(start, end)).order_by(Purchase.id)
+
     def migrate_type(self, purchase_id, new_type):
         purchase = self.get_one(purchase_id, strict=True, check_ownership=False)
         purchase.kind = new_type
         db.session.add(purchase)
         db.session.commit()
-        db.session.expunge_all()
+        db.session.expunge(purchase)
         db.session.close()
 
         return self.get_one(purchase_id, strict=True, check_ownership=False)

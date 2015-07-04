@@ -15,6 +15,7 @@ import import_caravan
 import import_avulsos
 import purchaser
 import lister
+import jobs
 import printer
 
 def _make_context():
@@ -51,5 +52,6 @@ manager.command(import_caravan.import_caravan)
 manager.command(import_avulsos.import_avulsos)
 manager.command(purchaser.ensure_purchase)
 manager.command(lister.list_speakers)
-manager.command(printer.bad_jobs)
-manager.command(printer.good_jobs)
+manager.command(jobs.bad_jobs)
+manager.command(jobs.good_jobs)
+manager.command(printer.print_categories)

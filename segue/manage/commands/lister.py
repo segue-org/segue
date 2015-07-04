@@ -5,7 +5,7 @@ from support import *
 
 from segue.account.services import AccountService
 
-def list_speakers(start=0, end=sys.maxint, commit=False):
+def list_speakers(start=0, end=sys.maxint):
     init_command()
 
     accounts = AccountService().by_range(int(start), int(end)).all()

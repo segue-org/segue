@@ -68,8 +68,12 @@ class PeopleService(object):
         self.purchases = purchases or PurchaseService()
         self.filters   = filters   or FrontDeskFilterStrategies()
 
-    def get_one(self, person_id, by_user=None):
-        purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
+    def by_range(self, start, end):
+        purchases = self.purchases.by_range(start, end)
+        return map(Person, purchases)
+
+    def get_one(self, person_id, by_user=None, check_ownership=True):
+        purchase = self.purchases.get_one(person_id, by=by_user, strict=True, check_ownership=check_ownership)
         return Person(purchase)
 
     def lookup(self, needle, by_user=None, limit=20):
