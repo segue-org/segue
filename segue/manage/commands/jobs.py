@@ -43,7 +43,7 @@ def good_jobs(debug=False):
 
     registries = [ FinishedJobRegistry(printer, connection=redis_conn) for printer in config.PRINTERS ]
 
-    seen_ids = set([])
+    ids_of_previous_round = set([])
 
     while True:
         _print_dot()
@@ -53,12 +53,12 @@ def good_jobs(debug=False):
             _print_dot(len(job_ids))
             for job_id in job_ids:
                 if debug: print job_id
-                if job_id in seen_ids:
+                if job_id in ids_of_previous_round:
                     if debug: print "already saw {}{}{}, skipping".format(F.RED, job_id, F.RESET)
                     continue
 
                 print "writing success status to job {}{}{}...".format(F.RED, job_id, F.RESET),
                 print service.report_success(job_id)
-                seen_ids.add(job_id)
+            ids_of_previous_round = set(job_ids)
             registry.cleanup(0)
             time.sleep(5)
