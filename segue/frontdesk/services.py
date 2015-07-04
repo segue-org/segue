@@ -85,10 +85,11 @@ class FrontDeskFilterStrategies(FilterStrategies):
 
     def by_customer_name(self, value, as_user=None):
         if isinstance(value, basestring) and value.isdigit(): return
+        value = value.replace(" ","%")
         return Account.name.ilike('%'+value+'%')
 
     def join_for_customer_name(self, queryset, needle=None):
         if isinstance(needle, basestring) and needle.isdigit():
             return queryset
         else:
-            return queryset.join(Account)
+            return queryset.join('customer')

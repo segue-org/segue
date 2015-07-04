@@ -9,8 +9,8 @@ from support import *
 
 from segue.frontdesk.services import BadgeService
 
-def _print_dot():
-    sys.stdout.write(".")
+def _print_dot(dot="."):
+    sys.stdout.write(str(dot))
     sys.stdout.flush()
 
 def _print_queue_size(label, size):
@@ -27,8 +27,7 @@ def bad_jobs(debug=False):
     while True:
         _print_dot()
         jobs = queue.jobs
-        if debug: _print_queue_size('failed', len(job))
-
+        _print_dot(len(jobs))
         for job in jobs:
             print "writing failure status to job {}{}{}...".format(F.RED, job.id, F.RESET),
             print service.report_failure(job.id)
@@ -51,7 +50,7 @@ def good_jobs(debug=False):
 
         for registry in registries:
             job_ids = registry.get_job_ids()
-            if debug: _print_queue_size(registry.name, len(job_ids))
+            _print_dot(len(job_ids))
             for job_id in job_ids:
                 if job_id in seen_ids:
                     if debug: print "already saw {}{}{}, skipping".format(F.RED, job_id, F.RESET)
