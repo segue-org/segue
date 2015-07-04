@@ -39,4 +39,4 @@ def print_categories(categories="", start=None, end=None, printer=None):
 
         print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
 
-        badges.make_badge_for_person(printer_name, person)
+        badges.make_badge_for_person(printer, person)
