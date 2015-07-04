@@ -85,6 +85,17 @@ class PurchaseServiceTestCases(SegueApiTestCase):
         with self.assertRaises(ProductExpired):
             self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
 
+    def test_can_migrate_purchase_from_one_kind_to_another(self):
+        purchase = self.create(ValidPurchaseFactory)
+        purchase_id = purchase.id
+
+        self.service.migrate_type(purchase_id, 'caravan-rider')
+
+        updated_purchase = self.service.get_one(purchase_id, check_ownership=False)
+
+        self.assertEquals(updated_purchase.__class__, CaravanRiderPurchase)
+
+
 class PaymentServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(PaymentServiceTestCases, self).setUp()
