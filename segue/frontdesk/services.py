@@ -25,6 +25,24 @@ class BadgeService(object):
         self.config = override_config or config
         self.printers = { name: PrinterService(name) for name in config.PRINTERS }
 
+    def report_failure(self, job_id):
+        badge = Badge.query.filter(Badge.job_id == job_id).first()
+        if not badge: return False
+        if badge.result == 'failed': return False
+        badge.result = 'failed'
+        db.session.add(badge)
+        db.session.commit()
+        return True
+
+    def report_success(self, job_id):
+        badge = Badge.query.filter(Badge.job_id == job_id).first()
+        if not badge: return False
+        if badge.result == 'success': return False
+        badge.result = 'success'
+        db.session.add(badge)
+        db.session.commit()
+        return True
+
     def make_badge_for_person(self, printer, person, copies=1, by_user=None):
         if not person.is_valid_ticket: raise TicketIsNotValid()
 

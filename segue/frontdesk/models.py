@@ -13,6 +13,7 @@ class Badge(db.Model):
     city         = db.Column(db.Text)
     category     = db.Column(db.Text)
     job_id       = db.Column(db.Text)
+    result       = db.Column(db.Text)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
