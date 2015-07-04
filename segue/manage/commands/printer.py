@@ -6,14 +6,15 @@ from support import *
 from segue.frontdesk.services import BadgeService, PeopleService
 
 USAGE = """
-    python manage.py print_categories --categories=comma_separated_categories --start=id, --end=id
+    python manage.py print_categories --categories=comma_separated_categories --start=id, --end=id --printer=PRINTER
 
 """
 
-def print_categories(categories="", start=None, end=None):
+def print_categories(categories="", start=None, end=None, printer=None):
     if not start:      print USAGE; return;
     if not end:        print USAGE; return;
     if not categories: print USAGE; return;
+    if not printer:    print USAGE; return;
     init_command()
 
     wanted_categories = categories.split(",")
@@ -38,4 +39,4 @@ def print_categories(categories="", start=None, end=None):
 
         print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
 
-        badges.make_badge_for_person('vagrant', person)
+        badges.make_badge_for_person(printer_name, person)
