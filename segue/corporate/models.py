@@ -39,7 +39,6 @@ class Corporate(JsonSerializable, db.Model):
 
 class GovCorporate(Corporate):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
-    employees    = db.relationship('CorporateAccount', primaryjoin='and_(Corporate.id==CorporateAccount.corporate_id)')
 
 class EmployeeAccount(Account):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
@@ -53,16 +52,3 @@ class CorporatePurchase(Purchase):
 
 class EmployeePurchase(CorporatePurchase):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
-
-class CorporateProduct(Product):
-    __mapper_args__ = { 'polymorphic_identity': 'corporate' }
-
-    def special_purchase_class(self):
-        return CorporatePurchase
-
-    def check_eligibility(self, buyer_data):
-        if not super(CorporateProduct, self).check_eligibility(buyer_data):
-            raise WrongBuyerForProduct()
-
-    def extra_purchase_fields_for(self, buyer_data):
-        return { 'corporate_id': buyer_data[u'corporate_id'] }

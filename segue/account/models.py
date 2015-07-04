@@ -45,11 +45,14 @@ class Account(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    proposals     = db.relationship("Proposal", backref="owner")
-    purchases     = db.relationship("Purchase", backref="customer")
-    caravan_owned = db.relationship("Caravan",  backref="owner")
+    proposals       = db.relationship("Proposal", backref="owner")
+    purchases       = db.relationship("Purchase", backref="customer")
+    caravan_owned   = db.relationship("Caravan",  backref="owner")
+    corporate_owned = db.relationship("Corporate", backref="owner", primaryjoin='Account.id==Corporate.owner_id')
 
     resets        = db.relationship("ResetPassword", backref="account")
+
+    __mapper_args__ = { 'polymorphic_on': role, 'polymorphic_identity': 'user' }
 
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
@@ -139,4 +142,3 @@ class City(db.Model):
     longitude = db.Column(db.Numeric)
 
     __tablename__ = 'cities'
-

@@ -1,3 +1,4 @@
+import schema
 from segue.factory import Factory
 from models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
 

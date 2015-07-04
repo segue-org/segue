@@ -8,7 +8,7 @@ from models import Corporate, EmployeeAccount
 from factories import CorporateFactory, EmployeeAccountFactory, CorporatePurchaseFactory
 from errors import AccountAlreadyHasCorporate
 
-from segue.account import schema as account_schema
+from ..account import schema as account_schema
 from segue.account.errors import NotAuthorized
 
 class CorporateService(object):
@@ -52,8 +52,8 @@ class CorporateService(object):
         db.session.commit()
         return corporate
 
-    def add_people(self, corporate_id, people, buyer_data, by=None):
-        return self.employees.create(corporate_id, people, buyer_data, by=by)
+    def add_people(self, corporate_id, people, by=None):
+        return self.employees.create(corporate_id, people, by=by)
 
     def sum_employee_tickets(self, corporate_id, product_value, by):
         value = 0
