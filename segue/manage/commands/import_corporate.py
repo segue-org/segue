@@ -190,7 +190,7 @@ def process_line_corporate(item, mode="business"):
             }
 
             product = find_corporate_product(item['*participants'], amount, mode)
-            if product:
+            if product and not account.has_valid_corporate_purchases:
                 corp_purchase = purchase_service.create(corp_buyer_data, product, account, corporate_id=corporate.id)
                 print "purchase created for user: ", account.email
 
@@ -242,7 +242,7 @@ def process_line_corporate(item, mode="business"):
 
                 corp_purchase.recalculate_status()
             else:
-                print "product not found"
+                print "product not found or account already have corporate purchase"
                 return
 
         db.session.commit()
