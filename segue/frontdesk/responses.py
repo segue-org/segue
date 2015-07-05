@@ -2,22 +2,23 @@ from segue.responses import BaseResponse
 
 class PersonResponse(BaseResponse):
     def __init__(self, person, links=True):
-        self.id               = person.id
-        self.name             = person.name
-        self.email            = person.email
-        self.city             = person.city
-        self.country          = person.country
-        self.document         = person.document
-        self.category         = person.category
-        self.price            = person.price
-        self.status           = person.status
-        self.related_count    = person.related_count
-        self.has_valid_ticket = person.is_valid_ticket
+        self.id                 = person.id
+        self.name               = person.name
+        self.email              = person.email
+        self.city               = person.city
+        self.country            = person.country
+        self.document           = person.document
+        self.category           = person.category
+        self.price              = person.price
+        self.status             = person.status
+        self.related_count      = person.related_count
+        self.has_valid_ticket   = person.is_valid_ticket
+        self.can_change_product = person.can_change_product
 
         if links:
             self.add_link('related',  person.related_count, 'fd.person.related',  person_id=person.id)
             self.add_link('buyer',    person.buyer,         'fd.person.buyer',    person_id=person.id)
-            self.add_link('eligible', None,                 'fd.person.eligible', person_id=person.id)
+            self.add_link('eligible', -1,                   'fd.person.eligible', person_id=person.id)
 
 class BuyerResponse(BaseResponse):
     def __init__(self, buyer):

@@ -17,7 +17,7 @@ class BaseResponse(SimpleJson):
             self.links = {}
         if collection_or_entity is None: return
         self.links[name] = { "href": url_for(route, **route_parms) }
-        if isinstance(collection_or_entity, int):
+        if isinstance(collection_or_entity, int) and collection_or_entity >= 0:
             self.links[name]['count'] = collection_or_entity
         elif isinstance(collection_or_entity, list):
             self.links[name]['count'] = len(collection_or_entity)

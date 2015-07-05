@@ -79,6 +79,10 @@ class Person(object):
         return self.status == 'stale'
 
     @property
+    def can_change_product(self):
+        return not (self.purchase.satisfied or self.purchase.has_started_payment)
+
+    @property
     def eligible_products(self):
         if self.is_valid_ticket: return []
         products = []

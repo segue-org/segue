@@ -76,6 +76,10 @@ class Purchase(JsonSerializable, db.Model):
         return self.product.price - self.paid_amount
 
     @property
+    def has_started_payment(self):
+        return self.outstanding_amount < self.product.price
+
+    @property
     def satisfied(self):
         return self.status == 'paid'
 
