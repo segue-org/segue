@@ -113,6 +113,7 @@ class Payment(JsonSerializable, db.Model):
     purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'))
     status      = db.Column(db.Text, default='pending')
     amount      = db.Column(db.Numeric)
+    description = db.Column(db.Text)
 
     transitions = db.relationship('Transition', backref='payment', lazy='dynamic')
 
@@ -147,4 +148,3 @@ class Transition(JsonSerializable, db.Model):
     @property
     def is_payment(self):
         return self.old_status != 'paid' and self.new_status == 'paid'
-
