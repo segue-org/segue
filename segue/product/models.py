@@ -30,6 +30,7 @@ class Product(JsonSerializable, db.Model):
     def check_eligibility(self, buyer_data, account=None):
         if self.sold_until < datetime.now():
             raise ProductExpired()
+        return True
 
     def extra_purchase_fields_for(self, buyer_data):
         return {}
@@ -49,6 +50,15 @@ class StudentProduct(Product):
 class PromoCodeProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
 
+    def check_eligibility(self, buyer_data, account=None):
+        hash_code = buyer_data.get('hash_code',None)
+        if not hash_code: return False
+
+        promocode = PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
+        if not promocode: return False
+
+        return promocode.product == self
+
 class ForeignerProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'foreigner' }
 
@@ -62,5 +72,12 @@ class ForeignerStudentProduct(ForeignerProduct):
 class CorporateProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }
 
+    def check_eligibility(self, buyer_data, account=None):
+        raise WrongBuyerForProduct()
+
 class Empenho(Product):
     __mapper_args__ = { 'polymorphic_identity': 'empenho' }
+
+    def check_eligibility(self, buyer_data, account=None):
+        raise WrongBuyerForProduct()
+

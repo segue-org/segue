@@ -110,7 +110,6 @@ class ProponentProduct(Product):
 
     def check_eligibility(self, buyer_data, account=None):
         was_not_accepted, earliest_proposal = NonSelectionNotice.qualify(account)
-
         if not was_not_accepted: return False
 
         timely_proponent  = earliest_proposal.created < self.original_deadline
@@ -124,6 +123,10 @@ class SpeakerProduct(Product):
     def special_purchase_class(self):
         from segue.purchase.models import ExemptPurchase
         return ExemptPurchase
+
+    def check_eligibility(self, buyer_data, account=None):
+        if not account: return False
+        return account.is_speaker
 
 class NonSelectionNotice(db.Model):
     id         = db.Column(db.Integer, primary_key=True)

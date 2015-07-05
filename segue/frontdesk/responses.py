@@ -33,3 +33,18 @@ class BuyerResponse(BaseResponse):
         self.address_city    = buyer.address_city
         self.address_country = buyer.address_country
 
+
+class ProductResponse(BaseResponse):
+    def __init__(self, product):
+        self.id                = product.id
+        self.kind              = product.kind
+        self.category          = product.category
+        self.public            = product.public
+        self.price             = product.price
+        self.sold_until        = product.sold_until
+        self.description       = product.description
+        self.is_promo          = product.is_promo
+        self.is_speaker        = product.is_speaker
+        self.gives_kit         = product.gives_kit
+        self.can_pay_cash      = product.can_pay_cash
+        self.original_deadline = product.original_deadline

@@ -3,7 +3,7 @@ from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned
 
 from services import BadgeService, PeopleService
-from responses import PersonResponse, BuyerResponse
+from responses import PersonResponse, BuyerResponse, ProductResponse
 
 class PersonController(object):
     def __init__(self, people=None, badges=None):
@@ -48,8 +48,7 @@ class PersonController(object):
     @jsoned
     def eligible(self, person_id):
         result = self.people.get_one(person_id, by_user=self.current_user) or abort(404)
-        return ProductResponse.create(result.eligible_products, links=False), 200
-
+        return ProductResponse.create(result.eligible_products), 200
 
     @jwt_only
     @frontdesk_only

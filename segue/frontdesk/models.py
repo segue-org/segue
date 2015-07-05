@@ -1,6 +1,8 @@
 from datetime import datetime
 from segue.core import db
 from sqlalchemy.sql import functions as func
+from segue.errors import SegueError
+from segue.product.models import Product
 
 class Badge(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
@@ -74,4 +76,23 @@ class Person(object):
 
     @property
     def eligible_products(self):
-        return []
+        if self.is_valid_ticket: return []
+        products = []
+
+        for product in Product.query.all():
+            try:
+                if product == self.purchase.product:
+                    products.append(product)
+                elif product.check_eligibility({}, self.purchase.customer):
+                    products.append(product)
+            except SegueError, e:
+                pass
+
+        cheapest = {}
+        for product in products:
+            if not cheapest.get(product.category, None):
+                cheapest[product.category] = product
+            elif cheapest[product.category].price > product.price:
+                cheapest[product.category] = product
+
+        return cheapest.values()
