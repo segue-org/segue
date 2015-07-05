@@ -3,6 +3,7 @@ from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
 from errors import ProductExpired
+from segue.corporate.models import CorporatePurchase
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -70,7 +71,13 @@ class ForeignerStudentProduct(ForeignerProduct):
     __mapper_args__ = { 'polymorphic_identity': 'foreigner-student' }
 
 class CorporateProduct(Product):
-    __mapper_args__ = { 'polymorphic_identity': 'corporate' }
+    __mapper_args__ = { 'polymorphic_identity': 'business' }
+
+    def special_purchase_class(self):
+        return CorporatePurchase
 
 class GovernmentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
+
+    def special_purchase_class(self):
+        return CorporatePurchase
