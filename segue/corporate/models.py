@@ -2,8 +2,7 @@ import datetime
 from sqlalchemy.sql import functions as func
 from ..core import db
 from ..json import JsonSerializable
-from segue.product.models import Product
-from segue.purchase.models import Purchase
+from segue.purchase.models import Purchase, Payment, Transition
 from segue.account.models import Account
 from segue.product.errors import WrongBuyerForProduct
 
@@ -52,3 +51,15 @@ class CorporatePurchase(Purchase):
 
 class EmployeePurchase(CorporatePurchase):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
+
+class DepositPayment(Payment):
+    __mapper_args__ = { 'polymorphic_identity': 'deposit' }
+
+class DepositTransition(Transition):
+    __mapper_args__ = { 'polymorphic_identity': 'deposit' }
+
+class GovPayment(Payment):
+    __mapper_args__ = { 'polymorphic_identity': 'government' }
+
+class GovTransition(Transition):
+    __mapper_args__ = { 'polymorphic_identity': 'government' }
