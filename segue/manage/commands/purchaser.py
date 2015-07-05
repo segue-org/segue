@@ -4,12 +4,45 @@ import collections
 from support import *
 from segue.core import db
 
+from segue.frontdesk.services import PeopleService
 from segue.purchase.services import PurchaseService
 from segue.product.services import ProductService
 from segue.account.services import AccountService
 
 from segue.product.models import Product
 from segue.purchase.models import Purchase
+
+def validate_current_purchase(start=0, end=sys.maxint, commit=False):
+    init_command()
+
+    print "querying..."
+    service = PeopleService()
+    people_ids = [ p.id for p in service.by_range(int(start), int(end)) ]
+
+    for person_id in people_ids:
+        person = service.get_one(person_id, check_ownership=False)
+        if not person.category.startswith('proponent'):
+            continue;
+
+        print "{} scanning {}{}-{}{}...".format(F.RESET, F.GREEN, person.id, u(person.name), F.RESET),
+        if person.is_valid_ticket:
+            print "... {}is paid already{}".format(F.GREEN, F.RESET)
+            continue
+
+        if person.is_stale:
+            print "... {}is stale{}".format(F.GREEN, F.RESET)
+            continue
+
+
+        if person.purchase.product in person.eligible_products:
+            print "... {}product is okay{}".format(F.GREEN, F.RESET)
+            continue
+
+        print "...product is {}, but eligibles are {}".format(person.purchase.product, person.eligible_products)
+
+        new_person = service.set_product(person.id, person.eligible_products[0].id)
+        print "...product has been set to {}".format(new_person.purchase.product)
+
 
 def ensure_purchase(start=0, end=sys.maxint, commit=False):
     init_command()

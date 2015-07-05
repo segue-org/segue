@@ -7,7 +7,7 @@ from segue.decorators import jwt_only, admin_only, jsoned
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
 
-from ..responses import AccountDetailResponse
+from ..responses import AccountDetailResponse, ProposalDetailResponse
 
 class AdminAccountController(object):
     def __init__(self, accounts=None, purchases=None):
@@ -45,6 +45,13 @@ class AdminAccountController(object):
     def get_one(self, account_id=None):
         result = self.accounts.get_one(account_id, check_owner=False) or abort(404)
         return AccountDetailResponse(result), 200
+
+    @jsoned
+    @jwt_only
+    @admin_only
+    def proposals_of_account(self, account_id=None):
+        account = self.accounts.get_one(account_id, by=self.current_user) or abort(404)
+        return ProposalDetailResponse.create(account.all_related_proposals), 200
 
     @jsoned
     @jwt_only

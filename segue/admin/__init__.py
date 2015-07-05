@@ -11,6 +11,7 @@ class AdminAccountBlueprint(flask.Blueprint):
         self.add_url_rule('',                                 methods=['POST'], view_func=self.controller.create)
         self.add_url_rule('/<int:account_id>',                methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:account_id>',                methods=['PUT'],  view_func=self.controller.modify)
+        self.add_url_rule('/<int:account_id>/proposals',      methods=['GET'],  view_func=self.controller.proposals_of_account)
         self.add_url_rule('/holder-of/<int:purchase_id>',     methods=['GET'],  view_func=self.controller.get_by_purchase)
 
 class AdminProposalBlueprint(flask.Blueprint):

@@ -8,6 +8,7 @@ from segue.errors import SegueValidationError
 
 from segue.models import Purchase, PromoCode, PromoCodePayment, Account
 from segue.purchase.services import PurchaseService
+from segue.product.services import ProductService
 
 from errors import TicketIsNotValid
 from models import Person, Badge
@@ -80,7 +81,8 @@ class BadgeService(object):
         db.session.commit()
 
 class PeopleService(object):
-    def __init__(self, purchases=None, filters=None):
+    def __init__(self, purchases=None, filters=None, products=None):
+        self.products  = products  or ProductService()
         self.purchases = purchases or PurchaseService()
         self.filters   = filters   or FrontDeskFilterStrategies()
 
@@ -88,9 +90,31 @@ class PeopleService(object):
         purchases = self.purchases.by_range(start, end)
         return map(Person, purchases)
 
-    def get_one(self, person_id, by_user=None, check_ownership=True):
+    def get_one(self, person_id, by_user=None, check_ownership=True, strict=True):
         purchase = self.purchases.get_one(person_id, by=by_user, strict=True, check_ownership=check_ownership)
-        return Person(purchase)
+        if purchase: return Person(purchase)
+        if strict: raise NoSuchPurchase()
+        return None
+
+    def lookup(self, needle, by_user=None, limit=20):
+        base    = self.filters.all_joins(Purchase.query)
+        filters = self.filters.needle(needle)
+        query   = base.filter(*filters).order_by(Purchase.status, Purchase.id).limit(limit)
+        return map(Person, query.all())
+
+    def set_product(self, person_id, new_product_id):
+        purchase = self.purchases.get_one(person_id, check_ownership=False, strict=True)
+        product  = self.products.get_product(new_product_id)
+
+        purchase.product = product
+        purchase.kind    = product.special_purchase_class() or purchase.kind
+
+        db.session.add(purchase)
+        db.session.commit()
+        db.session.expunge_all()
+
+        return self.get_one(person_id, strict=True, check_ownership=False)
+
 
     def patch(self, person_id, by_user=None, **data):
         purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
@@ -125,12 +149,6 @@ class PeopleService(object):
     def _patch_country(self, purchase, value):
         purchase.customer.country = value
         db.session.add(purchase.customer)
-
-    def lookup(self, needle, by_user=None, limit=20):
-        base    = self.filters.all_joins(Purchase.query)
-        filters = self.filters.needle(needle)
-        query   = base.filter(*filters).order_by(Purchase.status, Purchase.id).limit(limit)
-        return map(Person, query.all())
 
 class FrontDeskFilterStrategies(FilterStrategies):
     def by_customer_id(self, value, as_user=None):

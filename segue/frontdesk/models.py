@@ -75,6 +75,10 @@ class Person(object):
         return self.status == 'paid'
 
     @property
+    def is_stale(self):
+        return self.status == 'stale'
+
+    @property
     def eligible_products(self):
         if self.is_valid_ticket: return []
         products = []
@@ -83,8 +87,6 @@ class Person(object):
             try:
                 if not product.can_pay_cash:
                     continue
-                elif product == self.purchase.product:
-                    products.append(product)
                 elif product.check_eligibility({}, self.purchase.customer):
                     products.append(product)
             except SegueError, e:
@@ -97,4 +99,4 @@ class Person(object):
             elif cheapest[product.category].price > product.price:
                 cheapest[product.category] = product
 
-        return cheapest.values()
+        return sorted(cheapest.values(), key=lambda p: p.price)
