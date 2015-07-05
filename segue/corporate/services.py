@@ -34,7 +34,7 @@ class CorporateService(object):
             raise NotAuthorized()
 
     def create(self, data, owner):
-        if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCorporate()
+        # if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCorporate()
 
         corporate = CorporateFactory.from_json(data, schema.new_corporate)
         corporate.owner_id = owner.id
@@ -52,9 +52,10 @@ class CorporateService(object):
         db.session.commit()
         return corporate
 
-    def add_person(self, corporate_id, account, by=None):
-        account.corporate = self.get_one(corporate_id)
+    def add_person(self, corporate, account, by=None):
+        account.corporate = corporate
         db.session.add(account)
+        db.session.commit()
         return account
 
     def sum_employee_tickets(self, corporate_id, product_value, by):
@@ -73,20 +74,10 @@ class EmployeeAccountService(object):
     def list(self, corporate_id, by=None):
         return self.corporates.get_one(corporate_id, by).employees
 
-    def create(self, corporate_id, data, by=None):
-        corporate = self.corporates.get_one(corporate_id, by)
-
+    def create(self, corporate, data, by=None):
         data['document'] = str(data['document']).translate(None, './-')
 
-        account_data = {
-            'email': data['email'],
-            'name': data['name'],
-            'document': data['document'],
-            'password': self.hasher.generate(),
-            'corporate_id': corporate.id
-        }
-
-        account = EmployeeAccountFactory.from_json(account_data, self.account_schema.signup)
+        account = EmployeeAccountFactory.from_json(data, self.account_schema.signup)
 
         db.session.add(account)
         db.session.commit()
