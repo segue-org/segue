@@ -14,6 +14,6 @@ VALUES ('ticket', 'business', 'f', 'f', 270, '2015-06-11 23:59:59', 'ingresso FI
 INSERT INTO product (kind, category, can_pay_cash, "public", price, sold_until, description)
 VALUES ('ticket', 'business', 'f', 'f', 320, '2015-06-30 23:59:59', 'ingresso FISL16 - corporativo - lote 5');
 INSERT INTO product (kind, category, can_pay_cash, "public", price, sold_until, description)
-VALUES ('ticket', 'business', 'f', 'f', 350, '2015-07-11 23:59:59', 'ingresso FISL16 - corporativo - lote 6');
+VALUES ('ticket', 'business', 't', 'f', 350, '2015-07-11 23:59:59', 'ingresso FISL16 - corporativo - lote 6');
 
 COMMIT;
