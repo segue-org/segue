@@ -44,6 +44,7 @@ class Account(JsonSerializable, db.Model):
     resume       = db.Column(db.Text)
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    corporate_id = db.Column(db.Integer)
 
     proposals       = db.relationship("Proposal", backref="owner")
     purchases       = db.relationship("Purchase", backref="customer")
