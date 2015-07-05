@@ -60,7 +60,7 @@ class Proposal(JsonSerializable, db.Model):
 
     @property
     def coauthor_accounts(self):
-        return [ x.account for x in self.coauthors.all() ]
+        return [ x.account for x in self.coauthors.all() if x.account ]
 
     @property
     def tag_names(self):
