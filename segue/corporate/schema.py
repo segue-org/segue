@@ -10,7 +10,7 @@ new_corporate = {
         "document":         { "type": "string", "minLength": 11, "maxLength": 20, "pattern": CPF_CNPJ_PATTERN },
         "address_number":   { "type": "string", "minLength": 1, "maxLength": 80 },
         "address_street":   { "type": "string", "minLength": 5, "maxLength": 80 },
-        "address_extra":    { "type": "string", "minLength": 5, "maxLength": 80 },
+        "address_extra":    { "type": "string", "minLength": 0, "maxLength": 80 },
         "address_district": { "type": "string", "minLength": 3, "maxLength": 80 },
         "address_city":     { "type": "string", "minLength": 2, "maxLength": 80 },
         "address_state":    { "type": "string", "minLength": 2, "maxLength": 80 },
@@ -18,7 +18,7 @@ new_corporate = {
         "incharge_name":    { "type": "string", "minLength": 5, "maxLength": 80 },
         "incharge_email":   { "type": "string", "minLength": 5, "maxLength": 80 },
         "incharge_phone_1": { "type": "string", "minLength": 10, "maxLength": 80 },
-        "incharge_phone_2": { "type": "string", "minLength": 10, "maxLength": 80 },
+        "incharge_phone_2": { "type": "string", "minLength": 0, "maxLength": 80 },
     },
     "required": [
                   "name", "badge_name", "document",
