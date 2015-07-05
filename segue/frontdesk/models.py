@@ -51,6 +51,7 @@ class Person(object):
         self.document     = purchase.customer.document
         self.organization = purchase.customer.organization
         self.city         = purchase.customer.city
+        self.country      = purchase.customer.country
         self.category     = purchase.product.category
         self.price        = purchase.product.price
         self.status       = purchase.status
@@ -70,3 +71,7 @@ class Person(object):
     @property
     def is_valid_ticket(self):
         return self.status == 'paid'
+
+    @property
+    def eligible_products(self):
+        return []

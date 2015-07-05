@@ -1,11 +1,12 @@
 from segue.responses import BaseResponse
 
 class PersonResponse(BaseResponse):
-    def __init__(self, person, links=False, embeds=True, related=True):
+    def __init__(self, person, links=True):
         self.id               = person.id
         self.name             = person.name
         self.email            = person.email
         self.city             = person.city
+        self.country          = person.country
         self.document         = person.document
         self.category         = person.category
         self.price            = person.price
@@ -13,11 +14,10 @@ class PersonResponse(BaseResponse):
         self.related_count    = person.related_count
         self.has_valid_ticket = person.is_valid_ticket
 
-        if embeds:
-            self.buyer    = BuyerResponse.create(person.buyer)
-
-        if related:
-            self.related  = PersonResponse.create(person.related_people, embeds=False, related=False)
+        if links:
+            self.add_link('related',  person.related_count, 'fd.person.related',  person_id=person.id)
+            self.add_link('buyer',    person.buyer,         'fd.person.buyer',    person_id=person.id)
+            self.add_link('eligible', None,                 'fd.person.eligible', person_id=person.id)
 
 class BuyerResponse(BaseResponse):
     def __init__(self, buyer):

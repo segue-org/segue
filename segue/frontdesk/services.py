@@ -1,14 +1,17 @@
+import jsonschema
 from redis import Redis
 from rq import Queue
 
-from segue.core import db, config
+from segue.core import db, config, logger
 from segue.filters import FilterStrategies
+from segue.errors import SegueValidationError
 
+from segue.models import Purchase, PromoCode, PromoCodePayment, Account
 from segue.purchase.services import PurchaseService
 
 from errors import TicketIsNotValid
 from models import Person, Badge
-from segue.models import Purchase, PromoCode, PromoCodePayment, Account
+import schema
 
 class PrinterService(object):
     def __init__(self, name='default', queue_host=None, queue_password=None):
@@ -88,6 +91,40 @@ class PeopleService(object):
     def get_one(self, person_id, by_user=None, check_ownership=True):
         purchase = self.purchases.get_one(person_id, by=by_user, strict=True, check_ownership=check_ownership)
         return Person(purchase)
+
+    def patch(self, person_id, by_user=None, **data):
+        purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
+
+        validator = jsonschema.Draft4Validator(schema.patch, format_checker=jsonschema.FormatChecker())
+        errors = list(validator.iter_errors(data))
+        if errors:
+            logger.error('validation error for person patch: %s', errors)
+            raise SegueValidationError(errors)
+
+        for key, value in data.items():
+            method = getattr(self, "_patch_"+key, None)
+            if method: method(purchase, value)
+
+        db.session.add(purchase)
+        db.session.commit()
+
+        return Person(purchase)
+
+    def _patch_name(self, purchase, value):
+        purchase.customer.name = value
+        db.session.add(purchase.customer)
+
+    def _patch_city(self, purchase, value):
+        purchase.customer.city = value
+        db.session.add(purchase.customer)
+
+    def _patch_document(self, purchase, value):
+        purchase.customer.document = value
+        db.session.add(purchase.customer)
+
+    def _patch_country(self, purchase, value):
+        purchase.customer.country = value
+        db.session.add(purchase.customer)
 
     def lookup(self, needle, by_user=None, limit=20):
         base    = self.filters.all_joins(Purchase.query)
