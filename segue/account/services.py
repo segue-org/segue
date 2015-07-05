@@ -30,6 +30,9 @@ class AccountService(object):
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 
+    def get_by_email(self, email):
+        return Account.query.filter(Account.email == email).first()
+
     def try_to_change_email(self, account, new_email):
         if account.email == new_email:
             return account
@@ -47,6 +50,16 @@ class AccountService(object):
 
     def _get_account(self, id):
         return Account.query.get(id)
+
+    def migrate_role(self, account_id, new_role):
+        account = self.get_one(account_id, strict=True, check_owner=False)
+        account.role = new_role
+        db.session.add(account)
+        db.session.commit()
+        db.session.expunge(account)
+        db.session.close()
+
+        return self.get_one(account_id, strict=True, check_owner=False)
 
     def modify(self, account_id, data, by=None, allow_email_change=False):
         account = self._get_account(account_id)
