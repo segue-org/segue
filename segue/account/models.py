@@ -110,6 +110,10 @@ class Account(JsonSerializable, db.Model):
         return any([ p.satisfied for p in self.purchases ])
 
     @property
+    def has_valid_corporate_purchases(self):
+        return any([ p.satisfied for p in self.purchases if p.kind == 'corporate' ])
+
+    @property
     def payments(self):
         payments = []
         for purchase in self.purchases:
