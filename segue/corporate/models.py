@@ -32,18 +32,14 @@ class Corporate(JsonSerializable, db.Model):
     created          = db.Column(db.DateTime, default=func.now())
     last_updated     = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    employees    = db.relationship('EmployeeAccount', primaryjoin='and_(Corporate.id==EmployeeAccount.corporate_id)')
+    employees        = db.relationship('Account', backref='corporate')
 
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'business' }
 
+EmployeeAccount = Account
+
 class GovCorporate(Corporate):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
-
-class EmployeeAccount(Account):
-    __mapper_args__ = { 'polymorphic_identity': 'employee' }
-    # TODO: find some way to reference the object directly: 'ca.corporate = c' and not 'ca.corporate_id = c.id', as it is now.
-    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id', use_alter=True, name='corporate'), name='cr_corporate_id')
-    badge_name   = db.Column(db.Text)
 
 class CorporatePurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }
