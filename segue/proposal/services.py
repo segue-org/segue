@@ -77,7 +77,7 @@ class ProposalService(object):
         if enforce_deadline:
             self.deadline.enforce()
         if isinstance(owner, int):
-            owner = self.accounts.get_one(owner, check_owner=False, strict=True)
+            owner = self.accounts.get_one(owner, check_ownership=False, strict=True)
 
         proposal = ProposalFactory.from_json(data, schema.new_proposal)
         proposal.owner = owner
@@ -116,7 +116,7 @@ class ProposalService(object):
 
         new_owner_id = data.get('owner_id',None)
         if new_owner_id and new_owner_id != proposal.owner.id:
-            proposal.owner = self.accounts.get_one(data.get('owner_id',None), check_owner=False, strict=True)
+            proposal.owner = self.accounts.get_one(data.get('owner_id',None), check_ownership=False, strict=True)
 
         for name, value in ProposalFactory.clean_for_update(data).items():
             setattr(proposal, name, value)
@@ -237,12 +237,12 @@ class InviteService(object):
         wanted_set   = set(coauthor_ids)
 
         for acc_id in wanted_set - existing_set:
-            account = self.accounts.get_one(acc_id, strict=True, check_owner=False)
+            account = self.accounts.get_one(acc_id, strict=True, check_ownership=False)
             invite = InviteFactory.for_account(proposal, account)
             db.session.add(invite)
 
         for acc_id in existing_set - wanted_set:
-            account = self.accounts.get_one(acc_id, strict=True, check_owner=False)
+            account = self.accounts.get_one(acc_id, strict=True, check_ownership=False)
             invite = ProposalInvite.query.filter(ProposalInvite.proposal == proposal, ProposalInvite.recipient == account.email).first()
             db.session.delete(invite)
 

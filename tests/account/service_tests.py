@@ -30,7 +30,7 @@ class AccountServiceTestCases(SegueApiTestCase):
         account['password'] = 'password' # factory-boy can't keep SQLAlchemy from swallowing the value =/
 
         saved = self.service.create(account)
-        unchecked_retrieval = self.service.get_one(saved.id, check_owner=False)
+        unchecked_retrieval = self.service.get_one(saved.id, check_ownership=False)
 
         checked_retrieval = self.service.get_one(saved.id, by=unchecked_retrieval)
 

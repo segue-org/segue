@@ -43,7 +43,7 @@ class AdminAccountController(object):
     @jwt_only
     @admin_only
     def get_one(self, account_id=None):
-        result = self.accounts.get_one(account_id, check_owner=False) or abort(404)
+        result = self.accounts.get_one(account_id, check_ownership=False) or abort(404)
         return AccountDetailResponse(result), 200
 
     @jsoned

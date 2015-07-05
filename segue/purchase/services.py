@@ -42,14 +42,14 @@ class PurchaseService(object):
         return Purchase.query.filter(Purchase.id.between(start, end)).order_by(Purchase.id)
 
     def migrate_type(self, purchase_id, new_type):
-        purchase = self.get_one(purchase_id, strict=True, check_owner=False)
+        purchase = self.get_one(purchase_id, strict=True, check_ownership=False)
         purchase.kind = new_type
         db.session.add(purchase)
         db.session.commit()
         db.session.expunge(purchase)
         db.session.close()
 
-        return self.get_one(purchase_id, strict=True, check_owner=False)
+        return self.get_one(purchase_id, strict=True, check_ownership=False)
 
     def current_mode(self):
         return 'reservation' if self.deadline.is_past() else 'online'
@@ -73,11 +73,11 @@ class PurchaseService(object):
             self.db.session.commit()
         return purchase
 
-    def get_one(self, purchase_id, by=None, strict=False, check_owner=True):
+    def get_one(self, purchase_id, by=None, strict=False, check_ownership=True):
         purchase = Purchase.query.get(purchase_id)
         if strict and not purchase: raise NoSuchPurchase()
         if not purchase: return None
-        if not check_owner: return purchase
+        if not check_ownership: return purchase
         if not self.check_ownership(purchase, by): raise NotAuthorized()
 
         return purchase

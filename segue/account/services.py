@@ -42,9 +42,9 @@ class AccountService(object):
         account.email = new_email
         return account
 
-    def get_one(self, account_id, by=None, check_owner=True, strict=False):
+    def get_one(self, account_id, by=None, check_ownership=True, strict=False):
         account = self._get_account(account_id)
-        if check_owner and not self.check_ownership(account, by): raise NotAuthorized
+        if check_ownership and not self.check_ownership(account, by): raise NotAuthorized
         if strict and not account: raise NoSuchAccount()
         return account
 
@@ -52,14 +52,14 @@ class AccountService(object):
         return Account.query.get(id)
 
     def migrate_role(self, account_id, new_role):
-        account = self.get_one(account_id, strict=True, check_owner=False)
+        account = self.get_one(account_id, strict=True, check_ownership=False)
         account.role = new_role
         db.session.add(account)
         db.session.commit()
         db.session.expunge(account)
         db.session.close()
 
-        return self.get_one(account_id, strict=True, check_owner=False)
+        return self.get_one(account_id, strict=True, check_ownership=False)
 
     def modify(self, account_id, data, by=None, allow_email_change=False):
         account = self._get_account(account_id)
