@@ -53,8 +53,6 @@ class Account(JsonSerializable, db.Model):
 
     resets        = db.relationship("ResetPassword", backref="account")
 
-    __mapper_args__ = { 'polymorphic_on': role, 'polymorphic_identity': 'user' }
-
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.id == alleged.id: return True
