@@ -14,7 +14,7 @@ signup = {
         "country":      { "type": "string", "minLength": 5,  "maxLength": 30 },
         "city":         { "type": "string", "minLength": 3,  "maxLength": 30 },
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "organization": { "type": "string", "minLength": 3,  "maxLength": 30 },
+        "organization": { "type": "string", "minLength": 3,  "maxLength": 80 },
         "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
     },
     "required": ["email", "name", "password", "country", "city", "phone" ],
