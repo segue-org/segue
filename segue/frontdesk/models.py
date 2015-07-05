@@ -81,7 +81,9 @@ class Person(object):
 
         for product in Product.query.all():
             try:
-                if product == self.purchase.product:
+                if not product.can_pay_cash:
+                    continue
+                elif product == self.purchase.product:
                     products.append(product)
                 elif product.check_eligibility({}, self.purchase.customer):
                     products.append(product)
