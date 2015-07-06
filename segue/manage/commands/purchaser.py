@@ -148,7 +148,6 @@ class IsForeigner(Situation):
         return not account.is_brazilian
     def solve(self, account, known_situations):
         self.acted += 1
-        self.solved += 1
         return 'solved'
 
 class HasTicketsThatCouldBeStale(Situation):
