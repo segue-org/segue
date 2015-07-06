@@ -41,6 +41,12 @@ class PurchaseService(object):
     def by_range(self, start, end):
         return Purchase.query.filter(Purchase.id.between(start, end)).order_by(Purchase.id)
 
+    def get_by_hash(self, hash_code, strict=True):
+        purchase = Purchase.query.filter(Purchase.hash_code == hash_code).first()
+        if purchase: return purchase
+        if strict: raise NoSuchPurchase()
+        return None
+
     def migrate_type(self, purchase_id, new_type):
         purchase = self.get_one(purchase_id, strict=True, check_ownership=False)
         purchase.kind = new_type

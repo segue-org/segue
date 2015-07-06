@@ -45,6 +45,7 @@ class Purchase(JsonSerializable, db.Model):
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.now)
     kind           = db.Column(db.Text, server_default='single')
+    hash_code      = db.Column(db.String(64))
 
     payments       = db.relationship('Payment', backref='purchase', lazy='dynamic')
 

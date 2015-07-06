@@ -116,3 +116,11 @@ class MailerService(object):
         )
         message.to(notice.account.name, notice.account.email)
         return mailer.send(message.build())
+
+    def reception_mail(self, person):
+        message = self.message_factory.from_template('reception/'+person.status)
+        message.given(
+            person = person,
+        )
+        message.to(person.name, person.email)
+        return mailer.send(message.build())

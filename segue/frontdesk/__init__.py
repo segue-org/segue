@@ -3,6 +3,13 @@ import flask
 from controllers import *
 from responses import *
 
+class FrontdeskReceptionBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(FrontdeskReceptionBlueprint, self).__init__('fd.reception', __name__, url_prefix='/fd/reception')
+        self.controller = ReceptionController()
+
+        self.add_url_rule('/<string:hash_code>', methods=['GET'], view_func=self.controller.get_by_hash)
+
 class FrontdeskPersonBlueprint(flask.Blueprint):
     def __init__(self):
         super(FrontdeskPersonBlueprint, self).__init__('fd.person', __name__, url_prefix='/fd/people')
@@ -33,6 +40,7 @@ class FrontdeskBadgeBlueprint(flask.Blueprint):
 
 def load_blueprints():
     return [
+        FrontdeskReceptionBlueprint(),
         FrontdeskBadgeBlueprint(),
         FrontdeskPersonBlueprint()
     ]

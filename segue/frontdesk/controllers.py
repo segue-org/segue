@@ -1,9 +1,25 @@
-from flask import request, abort
+from segue.core import config
+
+from flask import request, abort, redirect
 from flask.ext.jwt import current_user
-from segue.decorators import jwt_only, frontdesk_only, jsoned
+from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html
 
 from services import BadgeService, PeopleService
-from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse
+from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse
+
+class ReceptionController(object):
+    def __init__(self, people=None):
+        self.people = people or PeopleService()
+
+    @jsoned
+    @accepts_html
+    def get_by_hash(self, hash_code=None, wants_html=False):
+        person = self.people.get_by_hash(hash_code) or flask.abort(404)
+        if wants_html:
+            path = '/#/reception/{}'.format(hash_code)
+            return redirect(config.FRONTEND_URL + path)
+        else:
+            return ReceptionResponse.create(person), 200
 
 class PersonController(object):
     def __init__(self, people=None, badges=None):

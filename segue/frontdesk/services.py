@@ -5,6 +5,8 @@ from rq import Queue
 from segue.core import db, config, logger
 from segue.filters import FilterStrategies
 from segue.errors import SegueValidationError
+from segue.hasher import Hasher
+from segue.mailer import MailerService
 
 from segue.models import Purchase, PromoCode, PromoCodePayment, Account
 from segue.account.services import AccountService
@@ -82,11 +84,29 @@ class BadgeService(object):
         db.session.commit()
 
 class PeopleService(object):
-    def __init__(self, purchases=None, filters=None, products=None, accounts=None):
+    def __init__(self, purchases=None, filters=None, products=None, accounts=None, hasher=None, mailer=None):
         self.products  = products  or ProductService()
         self.purchases = purchases or PurchaseService()
         self.accounts  = accounts  or AccountService()
         self.filters   = filters   or FrontDeskFilterStrategies()
+        self.hasher    = hasher    or Hasher()
+        self.mailer    = mailer    or MailerService()
+
+    def get_by_hash(self, hash_code):
+        purchase = self.purchases.get_by_hash(hash_code, strict=True)
+        return Person(purchase)
+
+    def send_reception_mail(self, person_id):
+        purchase = self.purchases.get_one(person_id, strict=True, check_ownership=False)
+
+        if not purchase.hash_code:
+            purchase.hash_code = self.hasher.generate()
+            db.session.add(purchase)
+            db.session.commit()
+
+        person = Person(purchase)
+        self.mailer.reception_mail(person)
+        return person
 
     def by_range(self, start, end):
         purchases = self.purchases.by_range(start, end)
