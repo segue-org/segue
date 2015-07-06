@@ -139,7 +139,7 @@ def format_date(date):
     return datetime.date(int(items[2]), int(items[1]), int(items[0]))
 
 def get_product(category, price):
-    return Product.query.filter(Product.category == category and Product.price == price).first()
+    return Product.query.filter(Product.category == category, Product.price == price).first()
 
 def generate_password():
     h = Hasher(8)
