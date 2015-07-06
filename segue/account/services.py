@@ -30,6 +30,7 @@ class AccountService(object):
     def create_for_email(self, email, commit=False):
         if self.is_email_registered(email): raise EmailAlreadyInUse(email)
         account = Account(email=email)
+        account.password = self.hasher.generate()
         db.session.add(account)
         if commit: db.session.commit()
         return account
