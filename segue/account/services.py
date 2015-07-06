@@ -83,8 +83,9 @@ class AccountService(object):
         return account
 
     def lookup(self, needle, by=None):
+        base    = self.filters.all_joins(Account.query, needle)
         filters = self.filters.needle(needle, by)
-        return Account.query.filter(or_(*filters)).all()
+        return base.filter(or_(*filters)).all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)
