@@ -13,7 +13,7 @@ from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
 from segue.product.services import ProductService
 
-from errors import TicketIsNotValid
+from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter
 from models import Person, Badge, Visitor
 import schema
 
@@ -78,6 +78,7 @@ class BadgeService(object):
 
     def make_badge(self, printer, visitor_or_person, copies=1, by_user=None):
         if not visitor_or_person.can_print_badge: raise CannotPrintBadge()
+        if printer not in self.printers: raise InvalidPrinter()
         badge = Badge.create(visitor_or_person)
         badge.printer = printer
         badge.issuer  = by_user
@@ -92,6 +93,7 @@ class VisitorService(object):
 
     def create(self, printer, by_user=None, **data):
         _validate('visitor', data)
+        if not printer: raise MustSpecifyPrinter()
         visitor = Visitor(**data)
         db.session.add(visitor)
         db.session.commit()

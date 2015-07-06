@@ -10,6 +10,7 @@ USAGE = """
                                       --start=id,
                                       --end=id
                                       --printer=PRINTER
+                                      --rehearse
                                       [--failures_only|--never_printed_only]
 
 """
@@ -23,7 +24,7 @@ def mark_failed(ids=''):
         result = service.mark_failed_for_person(person_id)
         print result
 
-def print_range(categories="", start=None, end=None, printer=None, failures_only=False, never_printed_only=False):
+def print_range(categories="", start=None, end=None, printer=None, failures_only=False, never_printed_only=False, rehearse=False):
     if not start:      print USAGE; return;
     if not end:        print USAGE; return;
     if not categories: print USAGE; return;
@@ -34,19 +35,23 @@ def print_range(categories="", start=None, end=None, printer=None, failures_only
     wanted_categories = categories.split(",")
     people = PeopleService()
     badges = BadgeService()
-    result = []
+
+    printed = 0
 
     for person in people.by_range(int(start), int(end)):
-        print "scanning {}{}{}, person {}{}{} - {}{}{}".format(F.RESET,
+        print "{}scanning id {}{}{}, name {}{}{}, category {}{}{}".format(F.RESET,
             F.RED, person.id,       F.RESET,
             F.RED, u(person.name),  F.RESET,
             F.RED, person.category, F.RESET
         )
 
-        if person.category not in wanted_categories:
+        if person.category in wanted_categories:
+            print "... {}has correct category{}".format(F.GREEN, F.RESET)
+        elif categories == "*":
+            print "... {}has correct category{}".format(F.GREEN, F.RESET)
+        else:
             print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
             continue
-        print "... {}has correct category{}".format(F.GREEN, F.RESET)
 
         if not person.is_valid_ticket:
             print "... {}ticket is not valid{}, skipping".format(F.RED, F.RESET)
@@ -62,8 +67,19 @@ def print_range(categories="", start=None, end=None, printer=None, failures_only
         elif failures_only and not has_failed_recently:
             print "... {}did not fail recently{}, skipping".format(F.RED, F.RESET)
             continue
-        else:
-            print "... {}matches printing criteria{}, printing".format(F.GREEN, F.RESET)
+        elif rehearse:
+            print "... {}matches printing criteria{}, so I would print it".format(F.GREEN, F.RESET)
+            printed += 1
+            continue
+
+        print "... {}matches printing criteria{}, printing".format(F.GREEN, F.RESET)
+        printed += 1
+        badge.make_badge(person.id)
+
+    if rehearse:
+        print "WOULD BE PRINTED", printed
+    else:
+        print "TOTAL PRINTED:", printed
 
 def print_person(xid):
     init_command()

@@ -33,7 +33,6 @@ class VisitorResponse(BaseResponse):
         self.id     = visitor.id
         self.name   = visitor.name
         self.email  = visitor.email
-        self.issuer = visitor.issuer.name
 
 class ReceptionResponse(PersonResponse):
     def __init__(self, person):

@@ -5,7 +5,7 @@ from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html
 
 from services import BadgeService, PeopleService, VisitorService
-from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse
+from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
 
 class VisitorController(object):
     def __init__(self, visitors=None):
@@ -17,7 +17,8 @@ class VisitorController(object):
     @jsoned
     def create(self):
         data = request.get_json()
-        visitor = self.visitors.create(by_user=self.current_user, **data)
+        printer = data.pop('printer',None)
+        visitor = self.visitors.create(printer, by_user=self.current_user, **data)
         return VisitorResponse.create(visitor), 200
 
 class ReceptionController(object):
