@@ -14,7 +14,7 @@ from segue.purchase.services import PurchaseService
 from segue.product.services import ProductService
 
 from errors import TicketIsNotValid
-from models import Person, Badge
+from models import Person, Badge, Visitor
 import schema
 
 def _validate(schema_name, data):
@@ -39,13 +39,19 @@ class BadgeService(object):
         self.config = override_config or config
         self.printers = { name: PrinterService(name) for name in config.PRINTERS }
 
+    def latest_attempt_for_person(self, person_id):
+        return Badge.query.filter(Badge.person_id == person_id).order_by(Badge.created.desc()).first()
+
+    def was_ever_printed(self, person_id):
+        return self.latest_attempt_for_person(person_id) != None
+
     def has_failed_recently(self, person_id):
-        latest_attempt = Badge.query.filter(Badge.person_id == person_id).order_by(Badge.created.desc()).first()
+        latest_attempt = self.latest_attempt_for_person(person_id)
         if not latest_attempt: return False
         return latest_attempt.result == 'failed'
 
     def mark_failed_for_person(self, person_id):
-        latest_attempt = Badge.query.filter(Badge.person_id == person_id).order_by(Badge.created.desc()).first()
+        lattest_attempt = self.latest_attempt_for_person(person_id)
         if not latest_attempt: return False
         latest_attempt.result = 'failed'
         db.session.add(latest_attempt)
@@ -119,7 +125,7 @@ class PeopleService(object):
         return person
 
     def by_range(self, start, end):
-        purchases = self.purchases.by_range(start, end)
+        purchases = self.purchases.by_range(start, end).all()
         return map(Person, purchases)
 
     def get_one(self, person_id, by_user=None, check_ownership=True, strict=True):

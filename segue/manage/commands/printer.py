@@ -6,7 +6,11 @@ from support import *
 from segue.frontdesk.services import BadgeService, PeopleService
 
 USAGE = """
-    python manage.py print_categories --categories=comma_separated_categories --start=id, --end=id --printer=PRINTER
+    python manage.py print_categories --categories=comma_separated_categories
+                                      --start=id,
+                                      --end=id
+                                      --printer=PRINTER
+                                      [--failures_only|--never_printed_only]
 
 """
 
@@ -19,11 +23,12 @@ def mark_failed(ids=''):
         result = service.mark_failed_for_person(person_id)
         print result
 
-def print_range(categories="", start=None, end=None, printer=None, only_failures=False):
+def print_range(categories="", start=None, end=None, printer=None, failures_only=False, never_printed_only=False):
     if not start:      print USAGE; return;
     if not end:        print USAGE; return;
     if not categories: print USAGE; return;
     if not printer:    print USAGE; return;
+    if failures_only and never_printed_only: print USAGE; return;
     init_command()
 
     wanted_categories = categories.split(",")
@@ -41,22 +46,24 @@ def print_range(categories="", start=None, end=None, printer=None, only_failures
         if person.category not in wanted_categories:
             print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
             continue
+        print "... {}has correct category{}".format(F.GREEN, F.RESET)
 
         if not person.is_valid_ticket:
             print "... {}ticket is not valid{}, skipping".format(F.RED, F.RESET)
             continue
+        print "... {}has valid ticket{}".format(F.GREEN, F.RESET)
 
+        was_printed_before  = badges.was_ever_printed(person.id)
+        has_failed_recently = badges.has_failed_recently(person.id)
 
-        if not only_failures:
-            print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
-            badges.make_badge(printer, person)
-        elif badges.has_failed_recently(person.id):
-            print "... {}did fail recently{}, reprinting".format(F.GREEN, F.RESET)
-            badges.make_badge(printer, person)
+        if never_printed_only and was_printed_before:
+            print "... {}was printed before{}, skipping".format(F.RED, F.RESET)
+            continue
+        elif failures_only and not has_failed_recently:
+            print "... {}did not fail recently{}, skipping".format(F.RED, F.RESET)
+            continue
         else:
-            print "... {}did not fail recently{}, skippping".format(F.RED, F.RESET)
-
-
+            print "... {}matches printing criteria{}, printing".format(F.GREEN, F.RESET)
 
 def print_person(xid):
     init_command()

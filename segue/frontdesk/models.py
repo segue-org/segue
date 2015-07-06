@@ -22,29 +22,8 @@ PREFIXES = {
  'speaker':           'P',
  'student':           'S',
  'support':           'SU',
- 'visitor':           'V'
+ 'visitor':           'VVV'
 }
-
-class Visitor(db.Model):
-    id    = db.Column(db.Integer, primary_key=True)
-    name  = db.Column(db.Text)
-    email = db.Column(db.Text)
-
-    created      = db.Column(db.DateTime, default=func.now())
-    last_updated = db.Column(db.DateTime, onupdate=datetime.now)
-
-    def badge_data(self):
-        return dict(
-            name         = visitor.name,
-            city         = None,
-            category     = "visitor",
-            organization = None
-        )
-
-    @property
-    def can_print_badge(self):
-        return True
-
 
 class Badge(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
@@ -101,6 +80,29 @@ class Badge(db.Model):
             category     = self.category,
             copies       = self.copies
         )
+
+class Visitor(db.Model):
+    id    = db.Column(db.Integer, primary_key=True)
+    name  = db.Column(db.Text)
+    email = db.Column(db.Text)
+
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+
+    @property
+    def badge_data(self):
+        return dict(
+            name         = self.name,
+            city         = None,
+            category     = "visitor",
+            organization = None
+        )
+
+    @property
+    def can_print_badge(self):
+        return True
+
+
 
 class Person(object):
     def __init__(self, purchase, links=False):

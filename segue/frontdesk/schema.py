@@ -9,6 +9,16 @@ create = {
     "required": [ 'email'  ]
 }
 
+visitor = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "email":  { "type": "string", "minLength": 5, "maxLength": 80, "format": "email" },
+        "name":   { "type": "string", "minLength": 5, "maxLength": 80 },
+    },
+    "required": [ 'email', 'name' ]
+}
+
 patch = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -30,5 +40,6 @@ patch = {
 
 whitelist=dict(
     patch=patch,
-    create=create
+    create=create,
+    visitor=visitor
 )
