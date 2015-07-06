@@ -13,20 +13,34 @@ class PersonResponse(BaseResponse):
         self.status             = person.status
         self.badge_name         = person.badge_name
         self.badge_corp         = person.badge_corp
+        self.is_brazilian       = person.is_brazilian
 
-        self.related_count      = person.related_count
-        self.has_valid_ticket   = person.is_valid_ticket
-        self.can_change_product = person.can_change_product
-        self.outstanding_amount = person.outstanding_amount
+        self.related_count         = person.related_count
+        self.has_valid_ticket      = person.is_valid_ticket
+        self.can_change_product    = person.can_change_product
+        self.outstanding_amount    = person.outstanding_amount
+        self.can_change_badge_corp = person.can_change_badge_corp
+
 
         if embeds:
-            self.payments = PaymentResponse.create(person.purchase.valid_payments.all())
-            self.product  = ProductResponse.create(person.purchase.product)
+            self.payments   = PaymentResponse.create(person.purchase.valid_payments.all())
+            self.product    = ProductResponse.create(person.purchase.product)
+            self.last_badge = BadgeResponse.create(person.last_badge)
 
         if links:
             self.add_link('related',  person.related_count,     'fd.person.related',  person_id=person.id)
             self.add_link('buyer',    person.buyer,             'fd.person.buyer',    person_id=person.id)
             self.add_link('eligible', -1,                       'fd.person.eligible', person_id=person.id)
+
+class BadgeResponse(BaseResponse):
+    def __init__(self, badge):
+        self.id      = badge.id
+        self.prefix  = badge.prefix
+        self.name    = badge.name
+        self.corp    = badge.organization
+        self.printer = badge.printer
+        self.was_ok  = badge.was_ok
+        self.given   = badge.given
 
 class VisitorResponse(BaseResponse):
     def __init__(self, visitor):

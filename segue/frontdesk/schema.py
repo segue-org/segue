@@ -35,7 +35,7 @@ patch = {
         "organization": { "type": "string", "minLength": 3,  "maxLength": 30 },
         "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
     },
-    "required": [   ]
+    "required": [ ]
 }
 
 whitelist=dict(

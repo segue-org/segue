@@ -5,7 +5,7 @@ from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html
 
 from services import BadgeService, PeopleService, VisitorService
-from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
+from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
 
 class VisitorController(object):
     def __init__(self, visitors=None):
@@ -108,8 +108,12 @@ class PersonController(object):
     @frontdesk_only
     @jsoned
     def create_badge(self, person_id):
+        printer = request.get_json().get('printer',None)
+        if not printer: abort(400)
+
         person = self.people.get_one(person_id, by_user=self.current_user)
-        result = self.badges.make_badge("vagrant", person, by_user=self.current_user)
+        result = self.badges.make_badge(printer, person, by_user=self.current_user)
+
         return {},200
 
 class BadgeController(object):
@@ -117,14 +121,9 @@ class BadgeController(object):
         self.badges       = badges or BadgeService()
         self.current_user = current_user
 
-    def get_one(self, badge_id):
-        pass
-
-    def move(self, badge_id):
-        pass
-
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def give(self, badge_id):
-        pass
-
-    def trash(self, badge_id):
-        pass
+        badge = self.badges.give_badge(badge_id) or abort(404)
+        return BadgeResponse.create(badge), 200

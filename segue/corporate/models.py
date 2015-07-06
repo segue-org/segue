@@ -51,6 +51,11 @@ class CorporatePurchase(Purchase):
         if not self.corporate: return ''
         return self.corporate.badge_name
 
+    @property
+    def can_change_badge_corp(self):
+        return False
+
+
 class EmployeePurchase(CorporatePurchase):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
 

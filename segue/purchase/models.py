@@ -63,6 +63,10 @@ class Purchase(JsonSerializable, db.Model):
         return self.customer.organization
 
     @property
+    def can_change_badge_corp(self):
+        return True
+
+    @property
     def valid_payments(self):
         return self.payments.filter(Payment.status.in_(Payment.VALID_PAYMENT_STATUSES))
 

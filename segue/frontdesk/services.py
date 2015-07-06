@@ -1,4 +1,5 @@
 import jsonschema
+from datetime import datetime
 from redis import Redis
 from rq import Queue
 
@@ -86,6 +87,14 @@ class BadgeService(object):
         badge.job_id  = self.printers[printer].print_badge(badge).id
         db.session.add(badge)
         db.session.commit()
+
+    def give_badge(self, badge_id):
+        badge = Badge.query.filter(Badge.id == badge_id).first()
+        if not badge: return None
+        badge.given = datetime.now()
+        db.session.add(badge)
+        db.session.commit()
+        return badge
 
 class VisitorService(object):
     def __init__(self, badges=None):
@@ -196,6 +205,15 @@ class PeopleService(object):
 
     def _patch_country(self, purchase, value):
         purchase.customer.country = value
+        db.session.add(purchase.customer)
+
+    def _patch_badge_name(self, purchase, value):
+        purchase.customer.badge_name = value
+        db.session.add(purchase.customer)
+
+    def _patch_badge_corp(self, purchase, value):
+        if not purchase.can_change_badge_corp: return
+        purchase.customer.organization = value
         db.session.add(purchase.customer)
 
 class FrontDeskFilterStrategies(FilterStrategies):

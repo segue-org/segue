@@ -3,6 +3,7 @@ from segue.core import db
 from sqlalchemy.sql import functions as func
 from segue.errors import SegueError
 from segue.product.models import Product
+from segue.corporate.models import CorporatePurchase
 
 PREFIXES = {
  'business':          'N',
@@ -39,6 +40,7 @@ class Badge(db.Model):
     job_id       = db.Column(db.Text)
     result       = db.Column(db.Text)
     prefix       = db.Column(db.Text)
+    given        = db.Column(db.DateTime)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
@@ -69,6 +71,10 @@ class Badge(db.Model):
         if self.person:    return self.person.id
         elif self.visitor: return self.visitor.id
         return 0
+
+    @property
+    def was_ok(self):
+        return self.result != 'failed'
 
     def print_data(self):
         return dict(
@@ -101,7 +107,6 @@ class Visitor(db.Model):
     @property
     def can_print_badge(self):
         return True
-
 
 
 class Person(object):
@@ -137,12 +142,24 @@ class Person(object):
         return len(self.purchase.customer.purchases) - 1
 
     @property
+    def is_brazilian(self):
+        return self.purchase.customer.is_brazilian
+
+    @property
     def is_valid_ticket(self):
         return self.status == 'paid'
 
     @property
     def can_print_badge(self):
         return self.is_valid_ticket
+
+    @property
+    def can_change_badge_corp(self):
+        return self.purchase.can_change_badge_corp
+
+    @property
+    def last_badge(self):
+        return self.purchase.badges.order_by(Badge.created.desc()).first()
 
     @property
     def badge_data(self):
@@ -159,7 +176,7 @@ class Person(object):
 
     @property
     def can_change_product(self):
-        return not (self.purchase.satisfied or self.purchase.has_started_payment)
+        return not (self.purchase.stale or self.purchase.satisfied or self.purchase.has_started_payment)
 
     @property
     def eligible_products(self):

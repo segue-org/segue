@@ -131,7 +131,7 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def is_brazilian(self):
-        return re.match(r"bra.*", self.country, re.IGNORECASE)
+        return re.match(r"bra.*", self.country, re.IGNORECASE) != None
 
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
