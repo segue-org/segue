@@ -49,8 +49,24 @@ class Product(JsonSerializable, db.Model):
                 Product.kind       == self.kind,
                 Product.sold_until >  datetime.now())
 
-class StudentProduct(Product):
-    __mapper_args__ = { 'polymorphic_identity': 'student' }
+class LockedProduct(Product):
+    def check_eligibility(self):
+        return False
+
+class PressProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'press' }
+
+class SupportProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'support' }
+
+class ServiceProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'service' }
+
+class ExhibitorProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'exhibitor' }
+
+class OrganizationProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'organization' }
 
 class PromoCodeProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
@@ -63,6 +79,9 @@ class PromoCodeProduct(Product):
         if not promocode: return False
 
         return promocode.product == self
+
+class StudentProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'student' }
 
 class ForeignerProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'foreigner' }
