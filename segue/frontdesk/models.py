@@ -25,7 +25,7 @@ class Badge(db.Model):
     @classmethod
     def create_for_person(cls, person):
         badge = Badge(person=person.purchase)
-        badge.name         = person.name
+        badge.name         = person.badge_name
         badge.city         = person.city
         badge.category     = person.category
         badge.organization = person.organization
@@ -52,6 +52,8 @@ class Person(object):
         self.email        = purchase.customer.email
         self.document     = purchase.customer.document
         self.organization = purchase.customer.organization
+        self.badge_name   = purchase.badge_name
+        self.badge_corp   = purchase.badge_corp
         self.city         = purchase.customer.city
         self.country      = purchase.customer.country
         self.category     = purchase.product.category
@@ -90,6 +92,7 @@ class Person(object):
     @property
     def eligible_products(self):
         if self.is_valid_ticket: return []
+        if not self.can_change_product: return []
         products = []
 
         for product in Product.query.all():

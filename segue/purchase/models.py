@@ -52,6 +52,16 @@ class Purchase(JsonSerializable, db.Model):
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'single' }
 
     @property
+    def badge_name(self):
+        if not self.customer: return ''
+        return self.customer.badge_name
+
+    @property
+    def badge_corp(self):
+        if not self.account: return ''
+        return self.customer.organization
+
+    @property
     def valid_payments(self):
         return self.payments.filter(Payment.status.in_(Payment.VALID_PAYMENT_STATUSES))
 

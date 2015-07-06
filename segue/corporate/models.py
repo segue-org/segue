@@ -32,7 +32,8 @@ class Corporate(JsonSerializable, db.Model):
     created          = db.Column(db.DateTime, default=func.now())
     last_updated     = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
-    employees        = db.relationship('Account', backref='corporate')
+    employees        = db.relationship('Account',           backref=db.backref('corporate', uselist=False))
+    purchases        = db.relationship('CorporatePurchase', backref=db.backref('corporate', uselist=False))
 
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'business' }
 
@@ -45,17 +46,34 @@ class CorporatePurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }
     corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'), name='cr_corporate_id')
 
+    @property
+    def badge_corp(self):
+        return self.corporate.badge_name
+
 class EmployeePurchase(CorporatePurchase):
     __mapper_args__ = { 'polymorphic_identity': 'employee' }
 
 class DepositPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'deposit' }
 
+    @property
+    def extra_fields(self):
+        return dict(description=self.description)
+
 class DepositTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'deposit' }
 
 class GovPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
+
+    @property
+    def extra_fields(self):
+        result = dict(description=self.description)
+        if not hasattr(self.purchase, 'corporate'):
+            result['corporate'] = corporate.name
+        return result
+
+
 
 class GovTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'government' }

@@ -11,6 +11,8 @@ class PersonResponse(BaseResponse):
         self.category           = person.category
         self.price              = person.price
         self.status             = person.status
+        self.badge_name         = person.badge_name
+        self.badge_corp         = person.badge_corp
 
         self.related_count      = person.related_count
         self.has_valid_ticket   = person.is_valid_ticket
@@ -31,13 +33,8 @@ class PaymentResponse(BaseResponse):
         self.id     = payment.id
         self.type   = payment.type
         self.amount = payment.amount
+        self.status = payment.status
         setattr(self, payment.type, payment.extra_fields)
-
-class PromoCodeResponse(BaseResponse):
-    def __init__(self, promocode):
-        self.id        = promocode.id
-        self.hash_code = promocode.hash_code
-        self.discount  = promocode.discount
 
 class BuyerResponse(BaseResponse):
     def __init__(self, buyer):

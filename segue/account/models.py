@@ -52,7 +52,7 @@ class Account(JsonSerializable, db.Model):
     caravan_owned   = db.relationship("Caravan",  backref="owner")
     corporate_owned = db.relationship("Corporate", backref="owner", primaryjoin='Account.id==Corporate.owner_id')
 
-    resets        = db.relationship("ResetPassword", backref="account")
+    resets = db.relationship("ResetPassword", backref="account")
 
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
@@ -62,6 +62,15 @@ class Account(JsonSerializable, db.Model):
     @property
     def is_speaker(self):
         return any([ x.is_talk for x in self.all_related_proposals ])
+
+    @property
+    def is_corporate(self):
+        return self.corporate != None and self.corporate.kind == 'business';
+
+    @property
+    def is_government(self):
+        return self.corporate != None and self.corporate.kind == 'government';
+
 
     @property
     def all_related_proposals(self):

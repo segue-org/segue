@@ -79,8 +79,17 @@ class CorporateProduct(Product):
     def special_purchase_class(self):
         return CorporatePurchase
 
+    def check_eligibility(self, buyer_data, account=None):
+        if not account: return False
+        return account.is_corporate
+
 class GovernmentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
 
     def special_purchase_class(self):
         return CorporatePurchase
+
+    def check_eligibility(self, buyer_data, account=None):
+        if not account: return False
+        return account.is_government
+
