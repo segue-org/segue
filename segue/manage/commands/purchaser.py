@@ -12,12 +12,15 @@ from segue.account.services import AccountService
 from segue.product.models import Product
 from segue.purchase.models import Purchase
 
-def validate_current_purchase(start=0, end=sys.maxint, commit=False):
+def validate_current_purchase(start=0, end=sys.maxint, fix_it=False):
     init_command()
 
     print "querying..."
     service = PeopleService()
     people_ids = [ p.id for p in service.by_range(int(start), int(end)) ]
+
+    okay = 0
+    wrong = 0
 
     for person_id in people_ids:
         person = service.get_one(person_id, check_ownership=False)
@@ -33,16 +36,19 @@ def validate_current_purchase(start=0, end=sys.maxint, commit=False):
             print "... {}is stale{}".format(F.GREEN, F.RESET)
             continue
 
-
         if person.purchase.product in person.eligible_products:
             print "... {}product is okay{}".format(F.GREEN, F.RESET)
+            okay += 1
             continue
 
         print "...product is {}, but eligibles are {}".format(person.purchase.product, person.eligible_products)
+        wrong += 1
 
-        new_person = service.set_product(person.id, person.eligible_products[0].id)
-        print "...product has been set to {}".format(new_person.purchase.product)
+        if fix_it:
+            new_person = service.set_product(person.id, person.eligible_products[0].id)
+            print "...product has been set to {}".format(new_person.purchase.product)
 
+    print "results: okay={}, wrong={}".format(okay, wrong)
 
 def ensure_purchase(start=0, end=sys.maxint, commit=False):
     init_command()
