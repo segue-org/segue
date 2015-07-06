@@ -109,7 +109,7 @@ class PersonController(object):
     @jsoned
     def create_badge(self, person_id):
         person = self.people.get_one(person_id, by_user=self.current_user)
-        result = self.badges.make_badge_for_person("vagrant", person, by_user=self.current_user)
+        result = self.badges.make_badge("vagrant", person, by_user=self.current_user)
         return {},200
 
 class BadgeController(object):
