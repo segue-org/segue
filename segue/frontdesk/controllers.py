@@ -34,8 +34,15 @@ class PersonController(object):
         result = self.people.patch(person_id, by_user=self.current_user, **data)
         return PersonResponse.create(result, links=True), 200
 
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def create(self):
-        pass
+        email = request.get_json().get('email',None)
+        if not email: abort(400)
+        result = self.people.create(email, by_user=self.current_user)
+        return PersonResponse.create(result, links=True), 200
+
     def apply_promo(self, person_id):
         pass
     def make_payment(self, person_id):

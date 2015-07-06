@@ -1,5 +1,14 @@
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 
+create = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
+    },
+    "required": [ 'email'  ]
+}
+
 patch = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -20,5 +29,6 @@ patch = {
 }
 
 whitelist=dict(
-    patch=patch
+    patch=patch,
+    create=create
 )

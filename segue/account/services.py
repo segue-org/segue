@@ -27,6 +27,13 @@ class AccountService(object):
     def by_range(self, start, end):
         return Account.query.filter(Account.id.between(start, end)).order_by(Account.id)
 
+    def create_for_email(self, email, commit=False):
+        if self.is_email_registered(email): raise EmailAlreadyInUse(email)
+        account = Account(email=email)
+        db.session.add(account)
+        if commit: db.session.commit()
+        return account
+
     def is_email_registered(self, email):
         return Account.query.filter(Account.email == email).count() > 0
 

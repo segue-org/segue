@@ -7,6 +7,7 @@ from segue.filters import FilterStrategies
 from segue.errors import SegueValidationError
 
 from segue.models import Purchase, PromoCode, PromoCodePayment, Account
+from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
 from segue.product.services import ProductService
 
@@ -81,9 +82,10 @@ class BadgeService(object):
         db.session.commit()
 
 class PeopleService(object):
-    def __init__(self, purchases=None, filters=None, products=None):
+    def __init__(self, purchases=None, filters=None, products=None, accounts=None):
         self.products  = products  or ProductService()
         self.purchases = purchases or PurchaseService()
+        self.accounts  = accounts  or AccountService()
         self.filters   = filters   or FrontDeskFilterStrategies()
 
     def by_range(self, start, end):
@@ -115,15 +117,29 @@ class PeopleService(object):
 
         return self.get_one(person_id, strict=True, check_ownership=False)
 
-
-    def patch(self, person_id, by_user=None, **data):
-        purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
-
-        validator = jsonschema.Draft4Validator(schema.patch, format_checker=jsonschema.FormatChecker())
+    def _validate(self, schema_name, data):
+        validator = jsonschema.Draft4Validator(schema.whitelist.get(schema_name), format_checker=jsonschema.FormatChecker())
         errors = list(validator.iter_errors(data))
         if errors:
             logger.error('validation error for person patch: %s', errors)
             raise SegueValidationError(errors)
+
+    def create(self, email, by_user=None):
+        self._validate('create', dict(email=email))
+
+        default_product = self.products.cheapest_for('normal')
+        account = self.accounts.create_for_email(email, commit=False)
+        purchase = Purchase(customer=account, product=default_product)
+
+        db.session.add(purchase)
+        db.session.commit()
+
+        return Person(purchase)
+
+    def patch(self, person_id, by_user=None, **data):
+        purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
+
+        self._validate('patch', data)
 
         for key, value in data.items():
             method = getattr(self, "_patch_"+key, None)
