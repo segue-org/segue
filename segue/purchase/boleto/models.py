@@ -19,6 +19,10 @@ class BoletoPayment(Payment):
     document_hash = db.Column(db.String(32), name='bo_document_hash')
 
     @property
+    def extra_fields(self):
+        return dict(our_number=self.our_number, due_date=self.due_date, document_hash=self.document_hash)
+
+    @property
     def legal_due_date(self):
         tolerance_days = 0
         if self.due_date.weekday() == Weekdays.SATURDAY: tolerance_days = 2

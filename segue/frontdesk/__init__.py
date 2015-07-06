@@ -11,9 +11,11 @@ class FrontdeskPersonBlueprint(flask.Blueprint):
         self.add_url_rule('',                          methods=['POST'],  view_func=self.controller.create)
         self.add_url_rule('/<int:person_id>',          methods=['GET'],   view_func=self.controller.get_one)
         self.add_url_rule('/<int:person_id>',          methods=['PATCH'], view_func=self.controller.patch)
+
         self.add_url_rule('/<int:person_id>/buyer',    methods=['GET'],   view_func=self.controller.buyer)
         self.add_url_rule('/<int:person_id>/related',  methods=['GET'],   view_func=self.controller.related)
         self.add_url_rule('/<int:person_id>/eligible', methods=['GET'],   view_func=self.controller.eligible)
+
         self.add_url_rule('/<int:person_id>/product',  methods=['POST'],  view_func=self.controller.set_product)
         self.add_url_rule('/<int:person_id>/promo',    methods=['POST'],  view_func=self.controller.apply_promo)
         self.add_url_rule('/<int:person_id>/pay',      methods=['POST'],  view_func=self.controller.make_payment)

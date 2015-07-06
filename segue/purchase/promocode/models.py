@@ -26,6 +26,11 @@ class PromoCodePayment(Payment):
     promocode_id     = db.Column(db.Integer, db.ForeignKey('promocode.id'), name='pc_promocode_id')
 
     @property
+    def extra_fields(self):
+        if not self.promocode: return {}
+        return dict(hash_code=self.promocode.hash_code, discount=self.promocode.discount)
+
+    @property
     def paid_amount(self):
         valid = self.promocode != None
         total_value = self.purchase.product.price

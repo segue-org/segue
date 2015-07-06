@@ -67,6 +67,11 @@ class Person(object):
         return map(Person, other_purchases)
 
     @property
+    def outstanding_amount(self):
+        if self.is_valid_ticket: return None
+        return self.purchase.outstanding_amount
+
+    @property
     def related_count(self):
         return len(self.purchase.customer.purchases) - 1
 

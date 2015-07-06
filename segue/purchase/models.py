@@ -125,6 +125,10 @@ class Payment(JsonSerializable, db.Model):
     __mapper_args__ = { 'polymorphic_on': type, 'polymorphic_identity': 'payment' }
 
     @property
+    def extra_fields(self):
+        return {}
+
+    @property
     def paid_amount(self):
         valid = self.status in Payment.VALID_PAYMENT_STATUSES
         return self.amount if valid else 0

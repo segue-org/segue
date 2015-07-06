@@ -10,3 +10,7 @@ class CashTransition(Transition):
 
     cashier_id  = db.Column(db.Integer, db.ForeignKey('account.id'))
     ip_address  = db.Column(db.String, name='ca_ip_address')
+
+    @property
+    def extra_fields(self):
+        return dict(cashier=self.cashier.name, ip_address=self.ip_address)

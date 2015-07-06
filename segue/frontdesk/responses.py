@@ -1,7 +1,7 @@
 from segue.responses import BaseResponse
 
 class PersonResponse(BaseResponse):
-    def __init__(self, person, links=True):
+    def __init__(self, person, embeds=False, links=True):
         self.id                 = person.id
         self.name               = person.name
         self.email              = person.email
@@ -11,14 +11,33 @@ class PersonResponse(BaseResponse):
         self.category           = person.category
         self.price              = person.price
         self.status             = person.status
+
         self.related_count      = person.related_count
         self.has_valid_ticket   = person.is_valid_ticket
         self.can_change_product = person.can_change_product
+        self.outstanding_amount = person.outstanding_amount
+
+        if embeds:
+            self.payments = PaymentResponse.create(person.purchase.valid_payments.all())
+            self.product  = ProductResponse.create(person.purchase.product)
 
         if links:
-            self.add_link('related',  person.related_count, 'fd.person.related',  person_id=person.id)
-            self.add_link('buyer',    person.buyer,         'fd.person.buyer',    person_id=person.id)
-            self.add_link('eligible', -1,                   'fd.person.eligible', person_id=person.id)
+            self.add_link('related',  person.related_count,     'fd.person.related',  person_id=person.id)
+            self.add_link('buyer',    person.buyer,             'fd.person.buyer',    person_id=person.id)
+            self.add_link('eligible', -1,                       'fd.person.eligible', person_id=person.id)
+
+class PaymentResponse(BaseResponse):
+    def __init__(self, payment):
+        self.id     = payment.id
+        self.type   = payment.type
+        self.amount = payment.amount
+        setattr(self, payment.type, payment.extra_fields)
+
+class PromoCodeResponse(BaseResponse):
+    def __init__(self, promocode):
+        self.id        = promocode.id
+        self.hash_code = promocode.hash_code
+        self.discount  = promocode.discount
 
 class BuyerResponse(BaseResponse):
     def __init__(self, buyer):
