@@ -74,7 +74,7 @@ def print_range(categories="", start=None, end=None, printer=None, failures_only
 
         print "... {}matches printing criteria{}, printing".format(F.GREEN, F.RESET)
         printed += 1
-        badges.make_badge(person.id)
+        badges.make_badge(printer, person.id)
 
     if rehearse:
         print "WOULD BE PRINTED", printed
