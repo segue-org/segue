@@ -4,6 +4,7 @@ from ..core import db
 
 from errors import ProductExpired
 from segue.corporate.models import CorporatePurchase
+from segue.purchase.promocode.models import PromoCode
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
