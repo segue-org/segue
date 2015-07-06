@@ -38,9 +38,17 @@ class FrontdeskBadgeBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:badge_id>/give',  methods=['POST'], view_func=self.controller.give)
         self.add_url_rule('/<int:badge_id>/trash', methods=['POST'], view_func=self.controller.trash)
 
+class VisitorBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(VisitorBlueprint, self).__init__('fd.visitor', __name__, url_prefix='/fd/visitors')
+        self.controller = VisitorController()
+        self.add_url_rule('', methods=['POST'], view_func=self.controller.create)
+
+
 def load_blueprints():
     return [
         FrontdeskReceptionBlueprint(),
         FrontdeskBadgeBlueprint(),
-        FrontdeskPersonBlueprint()
+        FrontdeskPersonBlueprint(),
+        VisitorBlueprint()
     ]

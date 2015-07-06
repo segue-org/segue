@@ -4,8 +4,21 @@ from flask import request, abort, redirect
 from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html
 
-from services import BadgeService, PeopleService
+from services import BadgeService, PeopleService, VisitorService
 from responses import PersonResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse
+
+class VisitorController(object):
+    def __init__(self, visitors=None):
+        self.visitors     = visitors or VisitorService()
+        self.current_user = current_user
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def create(self):
+        data = request.get_json()
+        visitor = self.visitors.create(by_user=self.current_user, **data)
+        return VisitorResponse.create(visitor), 200
 
 class ReceptionController(object):
     def __init__(self, people=None):

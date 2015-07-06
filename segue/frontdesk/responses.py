@@ -28,6 +28,13 @@ class PersonResponse(BaseResponse):
             self.add_link('buyer',    person.buyer,             'fd.person.buyer',    person_id=person.id)
             self.add_link('eligible', -1,                       'fd.person.eligible', person_id=person.id)
 
+class VisitorResponse(BaseResponse):
+    def __init__(self, visitor):
+        self.id     = visitor.id
+        self.name   = visitor.name
+        self.email  = visitor.email
+        self.issuer = visitor.issuer.name
+
 class ReceptionResponse(PersonResponse):
     def __init__(self, person):
         super(ReceptionResponse, self).__init__(person, embeds=True, links=False)

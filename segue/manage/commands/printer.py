@@ -49,10 +49,10 @@ def print_range(categories="", start=None, end=None, printer=None, only_failures
 
         if not only_failures:
             print "... {}correct category{}, printing".format(F.GREEN, F.RESET)
-            badges.make_badge_for_person(printer, person)
+            badges.make_badge(printer, person)
         elif badges.has_failed_recently(person.id):
             print "... {}did fail recently{}, reprinting".format(F.GREEN, F.RESET)
-            badges.make_badge_for_person(printer, person)
+            badges.make_badge(printer, person)
         else:
             print "... {}did not fail recently{}, skippping".format(F.RED, F.RESET)
 
@@ -76,4 +76,4 @@ def print_person(xid):
         return
 
     print "... printing"
-    badges.make_badge_for_person(printer, person)
+    badges.make_badge(printer, person)

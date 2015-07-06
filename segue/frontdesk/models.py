@@ -4,9 +4,52 @@ from sqlalchemy.sql import functions as func
 from segue.errors import SegueError
 from segue.product.models import Product
 
+PREFIXES = {
+ 'business':          'N',
+ 'caravan':           'N',
+ 'caravan-leader':    'N',
+ 'exhibitor':         'X',
+ 'foreigner':         'N',
+ 'foreigner-student': 'S',
+ 'government':        'E',
+ 'normal':            'N',
+ 'organization':      'O',
+ 'press':             'I',
+ 'promocode':         'N',
+ 'proponent':         'N',
+ 'proponent-student': 'S',
+ 'service':           'SE',
+ 'speaker':           'P',
+ 'student':           'S',
+ 'support':           'SU',
+ 'visitor':           'V'
+}
+
+class Visitor(db.Model):
+    id    = db.Column(db.Integer, primary_key=True)
+    name  = db.Column(db.Text)
+    email = db.Column(db.Text)
+
+    created      = db.Column(db.DateTime, default=func.now())
+    last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+
+    def badge_data(self):
+        return dict(
+            name         = visitor.name,
+            city         = None,
+            category     = "visitor",
+            organization = None
+        )
+
+    @property
+    def can_print_badge(self):
+        return True
+
+
 class Badge(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     person_id    = db.Column(db.Integer, db.ForeignKey('purchase.id'))
+    visitor_id   = db.Column(db.Integer, db.ForeignKey('visitor.id'))
     issuer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
     copies       = db.Column(db.Integer, default=1)
     printer      = db.Column(db.Text)
@@ -16,27 +59,41 @@ class Badge(db.Model):
     category     = db.Column(db.Text)
     job_id       = db.Column(db.Text)
     result       = db.Column(db.Text)
+    prefix       = db.Column(db.Text)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
-    person       = db.relationship('Purchase', backref=db.backref('badges', lazy='dynamic'))
+    person  = db.relationship('Purchase', backref=db.backref('badges', lazy='dynamic'))
+    visitor = db.relationship('Visitor',  backref=db.backref('badges', lazy='dynamic'))
 
     @classmethod
-    def create_for_person(cls, person):
-        badge = Badge(person=person.purchase)
-        badge.name         = person.badge_name
-        badge.city         = person.city
-        badge.category     = person.category
-        badge.organization = person.organization
-        return badge
+    def create(cls, target):
+        badge = Badge()
+
+        if isinstance(target, Visitor):
+            badge.visitor = target
+            badge.prefix  = PREFIXES.get('visitor',None)
+        else:
+            badge.person = target.purchase
+            badge.prefix = PREFIXES.get(target.category,None)
+
+        # we could've used a splat, but we want to control the arguments more finely
+        data = target.badge_data
+        for key in ['name','organization','city','category']:
+            setattr(badge, key, data.get(key, None))
+
+        return badge;
 
     @property
     def xid(self):
-        return self.person.id if self.person else None
+        if self.person:    return self.person.id
+        elif self.visitor: return self.visitor.id
+        return 0
 
     def print_data(self):
         return dict(
+            prefix       = self.prefix,
             xid          = self.xid,
             name         = self.name,
             city         = self.city,
@@ -80,6 +137,19 @@ class Person(object):
     @property
     def is_valid_ticket(self):
         return self.status == 'paid'
+
+    @property
+    def can_print_badge(self):
+        return self.is_valid_ticket
+
+    @property
+    def badge_data(self):
+        return dict(
+            city         = self.city,
+            category     = self.category,
+            name         = self.badge_name,
+            organization = self.badge_corp
+        )
 
     @property
     def is_stale(self):

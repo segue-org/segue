@@ -55,7 +55,7 @@ class Purchase(JsonSerializable, db.Model):
     @property
     def badge_name(self):
         if not self.customer: return ''
-        return self.customer.badge_name
+        return self.customer.badge_name or self.customer.name
 
     @property
     def badge_corp(self):

@@ -17,6 +17,13 @@ from errors import TicketIsNotValid
 from models import Person, Badge
 import schema
 
+def _validate(schema_name, data):
+    validator = jsonschema.Draft4Validator(schema.whitelist.get(schema_name), format_checker=jsonschema.FormatChecker())
+    errors = list(validator.iter_errors(data))
+    if errors:
+        logger.error('validation error for person patch: %s', errors)
+        raise SegueValidationError(errors)
+
 class PrinterService(object):
     def __init__(self, name='default', queue_host=None, queue_password=None):
         host     = queue_host     or config.QUEUE_HOST
@@ -63,10 +70,9 @@ class BadgeService(object):
         db.session.commit()
         return True
 
-    def make_badge_for_person(self, printer, person, copies=1, by_user=None):
-        if not person.is_valid_ticket: raise TicketIsNotValid()
-
-        badge = Badge.create_for_person(person)
+    def make_badge(self, printer, visitor_or_person, copies=1, by_user=None):
+        if not visitor_or_person.can_print_badge: raise CannotPrintBadge()
+        badge = Badge.create(visitor_or_person)
         badge.printer = printer
         badge.issuer  = by_user
         badge.copies  = copies
@@ -74,14 +80,18 @@ class BadgeService(object):
         db.session.add(badge)
         db.session.commit()
 
-    def make_badge(self, printer, by_user=None, copies=1, **data):
-        badge = Badge(**data)
-        badge.printer = printer
-        badge.issuer  = by_user
-        badge.copies  = copies
-        badge.job_id  = self.printers[printer].print_badge(badge).id
-        db.session.add(badge)
+class VisitorService(object):
+    def __init__(self, badges=None):
+        self.badges = badges or BadgeService()
+
+    def create(self, printer, by_user=None, **data):
+        _validate('visitor', data)
+        visitor = Visitor(**data)
+        db.session.add(visitor)
         db.session.commit()
+        self.badges.make_badge(printer, visitor, by_user=by_user)
+        return visitor
+
 
 class PeopleService(object):
     def __init__(self, purchases=None, filters=None, products=None, accounts=None, hasher=None, mailer=None):
@@ -137,15 +147,9 @@ class PeopleService(object):
 
         return self.get_one(person_id, strict=True, check_ownership=False)
 
-    def _validate(self, schema_name, data):
-        validator = jsonschema.Draft4Validator(schema.whitelist.get(schema_name), format_checker=jsonschema.FormatChecker())
-        errors = list(validator.iter_errors(data))
-        if errors:
-            logger.error('validation error for person patch: %s', errors)
-            raise SegueValidationError(errors)
 
     def create(self, email, by_user=None):
-        self._validate('create', dict(email=email))
+        _validate('create', dict(email=email))
 
         default_product = self.products.cheapest_for('normal')
         account = self.accounts.create_for_email(email, commit=False)
@@ -159,7 +163,7 @@ class PeopleService(object):
     def patch(self, person_id, by_user=None, **data):
         purchase = self.purchases.get_one(person_id, by=by_user, strict=True)
 
-        self._validate('patch', data)
+        _validate('patch', data)
 
         for key, value in data.items():
             method = getattr(self, "_patch_"+key, None)
