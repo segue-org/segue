@@ -48,6 +48,7 @@ class CorporatePurchase(Purchase):
 
     @property
     def badge_corp(self):
+        if not self.corporate: return ''
         return self.corporate.badge_name
 
 class EmployeePurchase(CorporatePurchase):
@@ -69,8 +70,8 @@ class GovPayment(Payment):
     @property
     def extra_fields(self):
         result = dict(description=self.description)
-        if not hasattr(self.purchase, 'corporate'):
-            result['corporate'] = corporate.name
+        if hasattr(self.purchase, 'corporate'):
+            result['payer_name'] = self.purchase.corporate.name
         return result
 
 
