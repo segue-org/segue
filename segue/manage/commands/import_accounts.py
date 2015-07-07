@@ -38,7 +38,7 @@ def import_accounts(in_file, product_id):
 
             if not account.has_valid_purchases:
                 purchase_data = {
-                    'product_id': product,
+                    'product': product,
                     'customer': account,
                     'status': 'paid',
                     'kind': 'exempt'
@@ -49,9 +49,10 @@ def import_accounts(in_file, product_id):
             else:
                 purchase = account.identifier_purchase
 
-            db.session.commit()
-            print "account id = {}".format(account.id)
-            print "purchase id = {}".format(purchase.id)
+            try:
+                db.session.commit()
+            except Exception, e:
+                print e.__dict__
 
 def generate_password():
     h = Hasher(8)
