@@ -118,8 +118,8 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
 
             self.assertEquals(response.status_code, 200)
             self.assertEquals(len(items), 2)
-            self.assertEquals(items[0]['document'], "1234")
-            self.assertEquals(items[1]['document'], "4567")
+            self.assertEquals(items[0]['document'], "1234567")
+            self.assertEquals(items[1]['document'], "4567890")
             self.assertEquals(items[0]['$type'], 'AccountDetailResponse')
             self.assertEquals(items[1]['$type'], 'AccountDetailResponse')
 
