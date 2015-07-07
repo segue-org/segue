@@ -12,6 +12,8 @@ class CashTransition(Transition):
     ip_address = db.Column(db.String, name='ca_ip_address')
     mode       = db.Column(db.Text, name='ca_mode')
 
+    cashier = db.relationship('Account')
+
     @property
     def extra_fields(self):
         return dict(cashier=self.cashier.name, ip_address=self.ip_address)

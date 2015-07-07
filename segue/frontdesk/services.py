@@ -9,7 +9,7 @@ from segue.errors import SegueValidationError
 from segue.hasher import Hasher
 from segue.mailer import MailerService
 
-from segue.models import Purchase, PromoCode, PromoCodePayment, Account
+from segue.models import Purchase
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService, PaymentService
 from segue.purchase.cash import CashPaymentService
@@ -18,6 +18,7 @@ from segue.product.services import ProductService
 
 from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter, InvalidPaymentOperation
 from models import Person, Badge, Visitor
+from filters import FrontDeskFilterStrategies
 import schema
 
 def _validate(schema_name, data):
@@ -237,29 +238,3 @@ class PeopleService(object):
         if not purchase.can_change_badge_corp: return
         purchase.customer.organization = value
         db.session.add(purchase.customer)
-
-class FrontDeskFilterStrategies(FilterStrategies):
-    def by_customer_id(self, value, as_user=None):
-        if isinstance(value, basestring) and not value.isdigit(): return
-        return Purchase.id == value
-
-    def by_customer_name(self, value, as_user=None):
-        if isinstance(value, basestring) and value.isdigit(): return
-        value = value.replace(" ","%")
-        return Account.name.ilike('%'+value+'%')
-
-    def by_customer_email(self, value, as_user=None):
-        if isinstance(value, basestring) and "@" in value:
-            return Account.email.ilike('%'+value+'%')
-
-    def join_for_customer_name(self, queryset, needle=None):
-        if isinstance(needle, basestring) and needle.isdigit():
-            return queryset
-        else:
-            return queryset.join('customer')
-
-    def join_for_customer_email(self, queryset, needle=None):
-        if isinstance(needle, basestring) and "@" in needle:
-            return queryset.join('customer')
-        else:
-            return queryset
