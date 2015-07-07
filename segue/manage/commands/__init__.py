@@ -14,6 +14,7 @@ import slotize
 import import_caravan
 import import_avulsos
 import import_corporate
+import import_accounts
 import purchaser
 import lister
 import jobs
@@ -52,6 +53,7 @@ manager.command(slotize.slotize)
 manager.command(import_caravan.import_caravan)
 manager.command(import_avulsos.import_avulsos)
 manager.command(import_corporate.import_corporate)
+manager.command(import_accounts.import_accounts)
 manager.command(purchaser.ensure_purchase)
 manager.command(purchaser.validate_current_purchase)
 manager.command(lister.list_speakers)
