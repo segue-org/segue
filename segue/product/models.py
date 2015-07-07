@@ -68,6 +68,9 @@ class ExhibitorProduct(LockedProduct):
 class OrganizationProduct(LockedProduct):
     __mapper_args__ = { 'polymorphic_identity': 'organization' }
 
+class SponsorProduct(LockedProduct):
+    __mapper_args__ = { 'polymorphic_identity': 'sponsor' }
+
 class PromoCodeProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
 
