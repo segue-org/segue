@@ -25,10 +25,10 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
         yield mock_user
 
     def setUpData(self):
-        account0 = self.create_from_factory(ValidAccountFactory, id=111, document="1234", name="Ferdinando Ferreira")
-        account1 = self.create_from_factory(ValidAccountFactory, id=222, document="4567", name="Astrogildo Nogueira")
-        account2 = self.create_from_factory(ValidAccountFactory, id=333, document="7890", name="Pedro Alvarenga")
-        account3 = self.create_from_factory(ValidAccountFactory, id=444, document="3451", name="Hermano Neves")
+        account0 = self.create_from_factory(ValidAccountFactory, id=111, document="1234567", name="Ferdinando Ferreira")
+        account1 = self.create_from_factory(ValidAccountFactory, id=222, document="4567890", name="Astrogildo Nogueira")
+        account2 = self.create_from_factory(ValidAccountFactory, id=333, document="7890123", name="Pedro Alvarenga")
+        account3 = self.create_from_factory(ValidAccountFactory, id=444, document="3451234", name="Hermano Neves")
 
         track1 = self.create_from_factory(ValidTrackFactory)
         track2 = self.create_from_factory(ValidTrackFactory)
@@ -127,7 +127,7 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
         ctx = self.setUpData()
 
         with self.admin_user():
-            response = self.jget('/admin/accounts', query_string={"q":"7890"})
+            response = self.jget('/admin/accounts', query_string={"q":"789012"})
             items = json.loads(response.data)['items']
 
             self.assertEquals(response.status_code, 200)
