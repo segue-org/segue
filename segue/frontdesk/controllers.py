@@ -21,6 +21,16 @@ class VisitorController(object):
         visitor = self.visitors.create(printer, by_user=self.current_user, **data)
         return VisitorResponse.create(visitor), 200
 
+class PrinterController(object):
+    def __init__(self, visitors=None):
+        self.current_user = current_user
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def list(self):
+        return config.PRINTERS
+
 class ReceptionController(object):
     def __init__(self, people=None):
         self.people = people or PeopleService()
