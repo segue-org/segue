@@ -138,7 +138,7 @@ class AdminControllerFunctionalTestCases(SegueApiTestCase):
         ctx = self.setUpData()
 
         with self.admin_user():
-            response1 = self.jget('/admin/accounts', query_string={"q":"7890"})
+            response1 = self.jget('/admin/accounts', query_string={"q":"789012"})
             items = json.loads(response1.data)['items']
             response2 = self.jget('/admin/accounts/333')
             item = json.loads(response2.data)['resource']
