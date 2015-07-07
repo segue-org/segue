@@ -3,8 +3,11 @@ import os.path
 import glob
 import codecs
 
+from segue.errors import SegueError
 from segue.core import mailer, config
 from flask_mail import Message
+
+class EmailIsNotValid(SegueError): pass
 
 class TemplatedMessage(object):
     def __init__(self, template):
@@ -118,6 +121,7 @@ class MailerService(object):
         return mailer.send(message.build())
 
     def reception_mail(self, person):
+        if not person.email: raise EmailIsNotValid()
         message = self.message_factory.from_template('reception/{}-{}'.format(person.status, person.reception_desk))
         message.given(
             person = person,

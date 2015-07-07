@@ -27,13 +27,13 @@ PREFIXES = {
 }
 
 CATEGORY_RECEPTION_DESK = {
- 'business':          'govcorp',
+ 'business':          'pre',
  'caravan':           'pre',
  'caravan-leader':    'pre',
  'exhibitor':         'expopress',
  'foreigner':         'pre',
  'foreigner-student': 'pre',
- 'government':        'govcorp',
+ 'government':        'pre',
  'normal':            'pre',
  'organization':      'pre',
  'press':             'expopress',
