@@ -87,8 +87,15 @@ class PersonController(object):
         pass
     def make_payment(self, person_id):
         pass
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def set_product(self, person_id):
-        pass
+        new_product_id = request.get_json().get('product_id',None)
+        if not new_product_id: abort(400)
+        result = self.people.set_product(person_id, new_product_id, by_user=self.current_user)
+        return PersonResponse.create(result, embeds=True, links=True), 200
 
     @jwt_only
     @frontdesk_only

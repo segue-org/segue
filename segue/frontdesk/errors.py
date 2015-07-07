@@ -20,3 +20,8 @@ class InvalidPrinter(SegueError):
     code = 400
     def to_json(self):
         return { 'message': 'invalid printer' }
+
+class CannotChangeProduct(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'this person cannot change products' }

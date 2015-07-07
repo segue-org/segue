@@ -12,6 +12,7 @@ from segue.mailer import MailerService
 from segue.models import Purchase, PromoCode, PromoCodePayment, Account
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService
+from segue.product.errors import WrongBuyerForProduct
 from segue.product.services import ProductService
 
 from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter
@@ -151,9 +152,14 @@ class PeopleService(object):
         query   = base.filter(*filters).order_by(Purchase.status, Purchase.id).limit(limit)
         return map(Person, query.all())
 
-    def set_product(self, person_id, new_product_id):
-        purchase = self.purchases.get_one(person_id, check_ownership=False, strict=True)
+    def set_product(self, person_id, new_product_id, by_user=None):
+        person   = self.get_one(person_id, by_user=by_user, strict=True)
+        purchase = person.purchase
         product  = self.products.get_product(new_product_id)
+        if not person.can_change_product:
+            raise CannotPrintBadge()
+        if not product.check_eligibility({}, purchase.customer):
+            raise WrongBuyerForProduct()
 
         purchase.product = product
         purchase.kind    = product.special_purchase_class() or purchase.kind
