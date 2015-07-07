@@ -143,7 +143,7 @@ class ValidInviteFactory(SegueFactory):
 class ValidProductFactory(SegueFactory):
     class Meta:
         model = Product
-    kind        = FuzzyChoice(["ticket","swag"])
+    kind        = "public"
     category    = "normal"
     sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2015,12,1,0,0,0))
     public      = True
