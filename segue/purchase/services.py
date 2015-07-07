@@ -94,7 +94,8 @@ class PurchaseService(object):
     def create_payment(self, purchase_id, payment_method, payment_data, by=None):
         purchase = self.get_one(purchase_id, by=by)
         if purchase.can_start_payment:
-            return self.payments.create(purchase, payment_method, payment_data)
+            instructions, payment = self.payments.create(purchase, payment_method, payment_data)
+            return instructions
         raise ProductExpired()
 
     def clone_purchase(self, purchase_id, by=None, commit=True):
@@ -161,7 +162,7 @@ class PaymentService(object):
         instructions = processor.process(payment)
         db.session.add(payment)
         db.session.commit()
-        return instructions
+        return instructions, payment
 
     def get_one(self, purchase_id, payment_id):
         result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)

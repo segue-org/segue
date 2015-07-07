@@ -32,8 +32,6 @@ def frontdesk_only(fn):
         return fn(instance, *args, **kw)
     return wrapped
 
-
-
 def jwt_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):

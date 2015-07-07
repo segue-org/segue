@@ -8,8 +8,9 @@ class CashPayment(Payment):
 class CashTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'cash' }
 
-    cashier_id  = db.Column(db.Integer, db.ForeignKey('account.id'))
-    ip_address  = db.Column(db.String, name='ca_ip_address')
+    cashier_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    ip_address = db.Column(db.String, name='ca_ip_address')
+    mode       = db.Column(db.Text, name='ca_mode')
 
     @property
     def extra_fields(self):

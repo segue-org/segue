@@ -3,7 +3,7 @@ import os.path
 from segue.errors import NotAuthorized
 from segue.core import config, db
 
-from factories import CashPaymentFactory
+from factories import CashPaymentFactory, CashTransitionFactory
 
 class CashPaymentService(object):
     def __init__(self, factory=None):
@@ -20,5 +20,4 @@ class CashPaymentService(object):
         return dict(redirectUserTo=url)
 
     def notify(self, purchase, payment, payload, source='notification'):
-        # TODO: actually moves payment status
-        pass
+        return CashTransitionFactory.create(payment, payload, source)

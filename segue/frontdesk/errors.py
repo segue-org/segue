@@ -25,3 +25,10 @@ class CannotChangeProduct(SegueError):
     code = 400
     def to_json(self):
         return { 'message': 'this person cannot change products' }
+
+class InvalidPaymentOperation(SegueError):
+    code = 400
+    def __init__(self, bad_field):
+        self.bad_field = bad_field
+    def to_json(self):
+        return { 'message': '{} must be specified'.format(self.bad_field) }

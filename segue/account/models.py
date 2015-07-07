@@ -60,6 +60,10 @@ class Account(JsonSerializable, db.Model):
         return alleged.role in ('admin','frontdesk','cashier')
 
     @property
+    def can_receive_money(self):
+        return self.role in ['admin','cashier']
+
+    @property
     def is_speaker(self):
         return any([ x.is_talk for x in self.all_related_proposals ])
 

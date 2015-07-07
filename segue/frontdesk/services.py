@@ -11,11 +11,12 @@ from segue.mailer import MailerService
 
 from segue.models import Purchase, PromoCode, PromoCodePayment, Account
 from segue.account.services import AccountService
-from segue.purchase.services import PurchaseService
+from segue.purchase.services import PurchaseService, PaymentService
+from segue.purchase.cash import CashPaymentService
 from segue.product.errors import WrongBuyerForProduct
 from segue.product.services import ProductService
 
-from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter
+from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter, InvalidPaymentOperation
 from models import Person, Badge, Visitor
 import schema
 
@@ -112,16 +113,31 @@ class VisitorService(object):
 
 
 class PeopleService(object):
-    def __init__(self, purchases=None, filters=None, products=None, accounts=None, hasher=None, mailer=None):
+    def __init__(self, purchases=None, filters=None, products=None, accounts=None, hasher=None, mailer=None, payments=None):
         self.products  = products  or ProductService()
         self.purchases = purchases or PurchaseService()
         self.accounts  = accounts  or AccountService()
         self.filters   = filters   or FrontDeskFilterStrategies()
         self.hasher    = hasher    or Hasher()
         self.mailer    = mailer    or MailerService()
+        self.payments  = payments  or PaymentService()
 
     def get_by_hash(self, hash_code):
         purchase = self.purchases.get_by_hash(hash_code, strict=True)
+        return Person(purchase)
+
+    def pay(self, person_id, by_user, ip_address=None, mode=None):
+        if not mode:       raise InvalidPaymentOperation('ip_address')
+        if not ip_address: raise InvalidPaymentOperation('mode')
+
+        # retrieves purchase, creates a new cash payment (ignores instructions (_))
+        purchase   = self.purchases.get_one(person_id, strict=True, check_ownership=False)
+        _, payment = self.payments.create(purchase, 'cash', None)
+
+        # prepares payload for processor and notifies transition
+        payload = dict(cashier=by_user, ip_address=ip_address, mode=mode)
+        purchase, transition = self.payments.notify(purchase.id, payment.id, payload, source='frontdesk')
+
         return Person(purchase)
 
     def send_reception_mail(self, person_id):

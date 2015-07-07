@@ -2,7 +2,7 @@ from segue.core import config
 
 from flask import request, abort, redirect
 from flask.ext.jwt import current_user
-from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html
+from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html, cashier_only
 
 from services import BadgeService, PeopleService, VisitorService
 from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
@@ -85,8 +85,14 @@ class PersonController(object):
 
     def apply_promo(self, person_id):
         pass
+
+    @jwt_only
+    @cashier_only
+    @jsoned
     def make_payment(self, person_id):
-        pass
+        data = request.get_json()
+        result = self.people.pay(person_id, by_user=self.current_user, ip_address=request.remote_addr, **data)
+        return PersonResponse.create(result, links=True), 200
 
     @jwt_only
     @frontdesk_only
