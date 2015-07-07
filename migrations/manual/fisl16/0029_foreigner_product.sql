@@ -16,8 +16,9 @@ VALUES
     ('foreigner-student', 160, 'ingresso FISL16 - estrangeiro estudante - lote 5', '2015-06-30 23:59:59'),
     ('foreigner-student', 175, 'ingresso FISL16 - estrangeiro estudante - lote 6', '2015-07-11 23:59:29');
 
-UPDATE product SET kind       = 'ticket'              WHERE category LIKE 'foreigner%';
-UPDATE product SET "public"   = 'f'                   WHERE category LIKE 'foreigner%';
-UPDATE product SET sold_until = '2015-07-11 23:59:59' WHERE category LIKE 'foreigner%';
+UPDATE product SET kind         = 'ticket'              WHERE category LIKE 'foreigner%';
+UPDATE product SET "public"     = 'f'                   WHERE category LIKE 'foreigner%';
+UPDATE product SET sold_until   = '2015-07-11 23:59:59' WHERE category LIKE 'foreigner%';
+UPDATE product SET can_pay_cash = 't'                   WHERE category LIKE 'foreigner%';
 
 COMMIT;
