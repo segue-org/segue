@@ -1,0 +1,40 @@
+---
+
+template: paid-press
+language: pt
+subject: "FISL16 - está chegando a hora!"
+
+body: |
+
+    Olá, {person.name}!
+
+    Sua inscrição no evento está confirmada, e o fisl
+    começa nesta quarta-feira, dia 8! Para acelerar
+    seu atendimento, proceda da seguinte forma:
+
+      - dirija-se ao balcão de IMPRENSA/EXPOSITORES/SERVIÇOS
+      - informe o número de inscrição abaixo
+      - o crachá sera entregue pelo atendente
+      - *estudante: favor apresentar documento
+        que comprove sua matrícula para o
+        semestre corrente.*
+
+               ******************
+               ACESSO AUTORIZADO
+
+                  {person.id}
+
+          {person.purchase.product.description}
+               *******************
+
+    Para sua maior conveniência, imprima o seu
+    cartão de inscrição, que pode ser visualizado
+    na URL abaixo:
+
+    {backend_url}/api/fd/reception/{person.purchase.hash_code}
+
+    Cordialmente
+
+    --
+    Organização
+    Associação Software Livre.Org

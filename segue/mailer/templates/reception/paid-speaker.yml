@@ -1,0 +1,38 @@
+---
+
+template: paid-speaker
+language: pt
+subject: "FISL16 - está chegando a hora!"
+
+body: |
+
+    Olá {person.name}
+
+    Sua inscrição no evento está confirmada, e o fisl
+    começa nesta quarta-feira, dia 8! Para acelerar
+    seu atendimento na recepção do evento, por favor
+    proceda da seguinte forma:
+
+      - dirija-se ao balcão de PALESTRANTES
+      - informe o número de inscrição abaixo
+      - o crachá sera entregue pelo atendente
+
+               ******************
+              INSCRIÇÃO CONFIRMADA
+
+                  {person.id}
+
+          {person.purchase.product.description}
+               *******************
+
+    Para sua maior conveniência, imprima o seu
+    cartão de inscrição, que pode ser visualizado
+    na URL abaixo:
+
+    {backend_url}/api/fd/reception/{person.purchase.hash_code}
+
+    Cordialmente
+
+    --
+    Organização
+    Associação Software Livre.Org

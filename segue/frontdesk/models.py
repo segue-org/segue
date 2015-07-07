@@ -26,6 +26,26 @@ PREFIXES = {
  'visitor':           'VVV'
 }
 
+CATEGORY_RECEPTION_DESK = {
+ 'business':          'govcorp',
+ 'caravan':           'pre',
+ 'caravan-leader':    'pre',
+ 'exhibitor':         'expopress',
+ 'foreigner':         'pre',
+ 'foreigner-student': 'pre',
+ 'government':        'govcorp',
+ 'normal':            'pre',
+ 'organization':      'pre',
+ 'press':             'expopress',
+ 'promocode':         'pre',
+ 'proponent':         'pre',
+ 'proponent-student': 'pre',
+ 'service':           'expopress',
+ 'speaker':           'speaker',
+ 'student':           'pre',
+ 'support':           'expopress',
+}
+
 class Badge(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     person_id    = db.Column(db.Integer, db.ForeignKey('purchase.id'))
@@ -127,10 +147,20 @@ class Person(object):
         self.purchase     = purchase
 
     @property
+    def reception_desk(self):
+        if not self.is_valid_ticket: return 'new'
+        return CATEGORY_RECEPTION_DESK.get(self.category, 'pre')
+
+
+    @property
     def related_people(self):
         all_purchases = self.purchase.customer.purchases[:]
         other_purchases = [ x for x in all_purchases if x.id != self.id ]
         return map(Person, other_purchases)
+
+    @property
+    def kind(self):
+        return self.purchase.product.kind
 
     @property
     def outstanding_amount(self):

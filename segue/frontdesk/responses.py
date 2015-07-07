@@ -11,16 +11,17 @@ class PersonResponse(BaseResponse):
         self.category           = person.category
         self.price              = person.price
         self.status             = person.status
+        self.kind               = person.kind
         self.badge_name         = person.badge_name
         self.badge_corp         = person.badge_corp
         self.is_brazilian       = person.is_brazilian
+        self.reception_desk     = person.reception_desk
 
         self.related_count         = person.related_count
         self.has_valid_ticket      = person.is_valid_ticket
         self.can_change_product    = person.can_change_product
         self.outstanding_amount    = person.outstanding_amount
         self.can_change_badge_corp = person.can_change_badge_corp
-
 
         if embeds:
             self.payments   = PaymentResponse.create(person.purchase.valid_payments.all())

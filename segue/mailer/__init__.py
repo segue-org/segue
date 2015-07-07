@@ -118,7 +118,7 @@ class MailerService(object):
         return mailer.send(message.build())
 
     def reception_mail(self, person):
-        message = self.message_factory.from_template('reception/'+person.status)
+        message = self.message_factory.from_template('reception/{}-{}'.format(person.status, person.reception_desk))
         message.given(
             person = person,
         )

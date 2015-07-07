@@ -30,12 +30,15 @@ def reception_mail(status, categories="", start=None, end=None):
             F.RED, person.category, F.RESET
         )
 
-        if person.category not in wanted_categories:
-            print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
-            continue
-
         if person.status != status:
-            print "... {}ticket does not have the correct status, skipping".format(F.RED, F.RESET)
+            print "... {}ticket does not have the correct status{}, skipping".format(F.RED, F.RESET)
             continue
 
-        people.send_reception_mail(person.id)
+        elif person.category in wanted_categories or categories == "*":
+            print "... {}category is correct{}, sending".format(F.GREEN, F.RESET)
+            people.send_reception_mail(person.id)
+
+        else:
+            print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
+
+
