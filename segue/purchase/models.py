@@ -79,8 +79,12 @@ class Purchase(JsonSerializable, db.Model):
         return self.status == 'stale'
 
     @property
+    def reimbursed(self):
+        return self.status == 'reimbursed'
+
+    @property
     def could_be_stale(self):
-        return not self.stale and not self.satisfied and datetime.now() > self.product.sold_until
+        return not self.reimbursed and not self.stale and not self.satisfied and datetime.now() > self.product.sold_until
 
     @property
     def paid_amount(self):
