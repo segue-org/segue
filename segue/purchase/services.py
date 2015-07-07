@@ -13,7 +13,7 @@ from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
-from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied
+from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
@@ -196,6 +196,7 @@ class PaymentService(object):
             if not payment: raise NoSuchPayment(purchase_id, payment_id)
             processor = self.processor_for(payment.type)
             purchase = payment.purchase
+            if purchase.stale: raise PurchaseIsStale()
             logger.debug('selected processor for notification: %s', payment.type)
 
             transition = processor.notify(purchase, payment, payload, source)

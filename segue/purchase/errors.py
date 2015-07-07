@@ -20,6 +20,11 @@ class NoSuchPurchase(SegueError):
     def to_json(self):
         return { 'message': 'no such purchase' }
 
+class PurchaseIsStale(SegueError):
+    code = 404
+    def to_json(self):
+        return { 'message': 'this purchase is stale and cannot be paid' }
+
 class InvalidPaymentNotification(SegueError):
     code = 400
     def to_json(self):

@@ -17,9 +17,9 @@ class CashTransitionFactory(TransitionFactory):
 
     @classmethod
     def create(cls, payment, payload, source):
-        mode       = payment.get('mode', None)
-        cashier    = payment.get('mode', None)
-        ip_address = payment.get('ip_address', None)
+        mode       = payload.get('mode', None)
+        cashier    = payload.get('cashier', None)
+        ip_address = payload.get('ip_address', None)
 
         if not mode or not cashier or not ip_address: raise InvalidPaymentNotification()
         if not cashier.can_receive_money: raise InvalidPaymentNotification()
