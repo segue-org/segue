@@ -113,7 +113,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
         mockito.when(self.dummy).create(purchase, data).thenReturn(payment)
         mockito.when(self.dummy).process(payment).thenReturn(instructions)
 
-        result = self.service.create(purchase, 'dummy', data)
+        result,_ = self.service.create(purchase, 'dummy', data)
 
         self.assertEquals(result, instructions)
 
