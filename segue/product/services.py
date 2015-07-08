@@ -56,7 +56,13 @@ class ProductService(object):
         extra_fields = product.extra_purchase_fields_for(buyer_data)
         return self.purchases.create(buyer_data, product, account, **extra_fields)
 
-    def cheapest_for(self, category):
-        candidates = Product.query.filter(Product.category == category, self._in_time()).order_by(Product.price)
-        if not candidates: return NoSuchProduct()
-        return candidates.first()
+    def cheapest_for(self, category, account=None):
+        candidates = Product.query.filter(Product.category == category).order_by(Product.price)
+        if not candidates: raise NoSuchProduct()
+
+        if not account: return candidates.first()
+
+        eligible = filter(lambda p: p.check_eligibility({}, account), candidates)
+        if not eligible: raise NoSuchProduct()
+
+        return eligible[0]

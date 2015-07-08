@@ -7,6 +7,7 @@ from segue.core import db
 from segue.frontdesk.services import PeopleService
 from segue.purchase.services import PurchaseService
 from segue.product.services import ProductService
+from segue.product.errors import NoSuchProduct
 from segue.account.services import AccountService
 
 from segue.product.models import Product
@@ -98,6 +99,7 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
     print "\n*************"
     print "accounts scanned: ", len(accounts)
     print "speaker purchases now:", Purchase.query.join(Product).filter(Product.category == 'speaker').count()
+    print "foreigner purchases now:", Purchase.query.join(Product).filter(Product.category.like('foreigner%')).count()
     print "stale purchases now:", Purchase.query.filter(Purchase.status == 'stale').count()
     print not_solved
     for situation in situations:
@@ -115,6 +117,7 @@ class Situation(object):
         self.purchase_svc = PurchaseService()
         self.product_svc = ProductService()
         self.count = 0
+        self.problems = 0
         self.solved = 0
         self.acted = 0
     def applies(self, account, known_situations):
@@ -124,7 +127,9 @@ class Situation(object):
     def solve(self, account, known_situations):
         return "was-ok"
     def __repr__(self):
-        return "{}: {} cases / {} acted / {} solved".format(self.__class__.__name__, self.count, self.acted, self.solved)
+        return "{}: {} cases / {} acted / {} solved / {} problems".format(
+                    self.__class__.__name__, self.count, self.acted, self.solved, self.problems
+                )
 
 class HasPaidTicket(Situation):
     def applies(self, account, known_situations):
@@ -147,9 +152,16 @@ class IsForeigner(Situation):
     def applies(self, account, known_situations):
         return not account.is_brazilian
     def solve(self, account, known_situations):
-        self.solved += 1
-        self.acted += 1
-        return 'solved'
+        try:
+            product = self.product_svc.cheapest_for(account.guessed_category, account)
+        except NoSuchProduct, e:
+            self.problems += 1
+            return 'continue'
+        else:
+            self.purchase_svc.give_fresh_purchase(None, product, account, commit=False)
+            self.solved += 1
+            self.acted += 1
+            return 'solved'
 
 class HasTicketsThatCouldBeStale(Situation):
     def applies(self, account, known_situations):
@@ -168,10 +180,14 @@ class HasZeroPayableTickets(Situation):
     def applies(self, account, known_situations):
         return all([ x.stale for x in account.purchases])
     def solve(self, account, known_situations):
-        buyer   = account.last_buyer
-        product = self.product_svc.cheapest_for(account.guessed_category)
-        print account, account.last_buyer, account.guessed_category, product
-        self.purchase_svc.give_fresh_purchase(buyer, product, account, commit=False)
-        self.acted += 1
-        self.solved += 1
-        return 'solved'
+        try:
+            buyer   = account.last_buyer
+            product = self.product_svc.cheapest_for(account.guessed_category, account)
+        except NoSuchProduct, e:
+            self.problems += 1
+            return 'continue'
+        else:
+            self.purchase_svc.give_fresh_purchase(buyer, product, account, commit=False)
+            self.acted += 1
+            self.solved += 1
+            return 'solved'

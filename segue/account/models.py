@@ -102,6 +102,7 @@ class Account(JsonSerializable, db.Model):
     def guessed_category(self):
         purchase = self.identifier_purchase
         if purchase: return purchase.product.category
+        if not self.is_brazilian: return 'foreigner'
         if self.is_proponent: return 'proponent'
         return 'normal'
 
