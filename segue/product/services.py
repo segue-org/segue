@@ -62,7 +62,11 @@ class ProductService(object):
 
         if not account: return candidates.first()
 
-        eligible = filter(lambda p: p.check_eligibility({}, account), candidates)
-        if not eligible: raise NoSuchProduct()
-
+        eligible = []
+        for product in candidates:
+            try:
+                allowed = product.check_eligibility({}, account)
+                if allowed: eligible.append(product)
+            except:
+                pass
         return eligible[0]

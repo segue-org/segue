@@ -85,7 +85,9 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def is_proponent(self):
-        return all([ not x.is_talk for x in self.all_related_proposals ])
+        proposals = self.all_related_proposals
+        if not proposals: return False
+        return all([ not x.is_talk for x in proposals ])
 
     @property
     def identifier_purchase(self):

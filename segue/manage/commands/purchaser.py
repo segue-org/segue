@@ -60,6 +60,7 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
     situations = [
         HasTicketsThatCouldBeStale(),
         HasPaidTicket(),
+        BadProponent(),
         IsSpeakerWithNoTicket(),
         HasPayableTicket(),
         IsForeigner(),
@@ -78,7 +79,7 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
 
             if situation.applies(account, known_situations):
                 situation.inc()
-                known_situations.append(situation)
+                known_situations.append(situation.__class__.__name__)
                 print "{}YES{}".format(F.RED, F.RESET),
 
                 solution_status = situation.solve(account, known_situations)
@@ -137,6 +138,8 @@ class HasPaidTicket(Situation):
 
 class HasPayableTicket(Situation):
     def applies(self, account, known_situations):
+        if 'BadProponent' in known_situations:
+            return False
         return any([ x.payable for x in account.purchases ])
 
 class IsSpeakerWithNoTicket(Situation):
@@ -147,6 +150,13 @@ class IsSpeakerWithNoTicket(Situation):
         self.acted += 1
         self.solved += 1
         return 'solved'
+
+class BadProponent(Situation):
+    def applies(self, account, known_situations):
+        purchase = account.identifier_purchase
+        if not purchase: return False
+        if not purchase.product.category.startswith('proponent'): return False
+        return not account.is_proponent
 
 class IsForeigner(Situation):
     def applies(self, account, known_situations):
@@ -178,12 +188,16 @@ class HasTicketsThatCouldBeStale(Situation):
 
 class HasZeroPayableTickets(Situation):
     def applies(self, account, known_situations):
+        if 'BadProponent' in known_situations:
+            return True
         return all([ x.stale for x in account.purchases])
     def solve(self, account, known_situations):
         try:
             buyer   = account.last_buyer
             product = self.product_svc.cheapest_for(account.guessed_category, account)
-        except NoSuchProduct, e:
+        except Exception, e:
+            print account.__dict__, account.guessed_category
+            print e.__dict__
             self.problems += 1
             return 'continue'
         else:
