@@ -194,88 +194,90 @@ def process_line_corporate(item, mode="business"):
             'address_country': 'BRASIL',
         }
 
-        if amount and item['*participants']:
-            product = find_corporate_product(item['*participants'], amount, mode)
-            if product and not account.has_valid_corporate_purchases:
-                corp_purchase = purchase_service.create(corp_buyer_data, product, account, corporate_id=corporate.id)
-                print "purchase created for user: ", account.email
+        product = find_corporate_product(item['*participants'], amount, mode)
+        if product and not account.has_valid_corporate_purchases:
+            corp_purchase = purchase_service.create(corp_buyer_data, product, account, corporate_id=corporate.id)
+            print "purchase created for user: ", account.email
 
-                # create payment for each employee
-                if corp_purchase:
-                    corp_payment_data = {
-                        'purchase': corp_purchase,
-                        'status': status_purchase,
-                        'amount': product.price,
-                        'description': format_description(item['description'], _details),
-                    }
+            # create payment for each employee
+            if corp_purchase:
+                corp_payment_data = {
+                    'purchase': corp_purchase,
+                    'status': status_purchase,
+                    'amount': product.price,
+                    'description': format_description(item['description'], _details),
+                }
 
-                    corp_transition_data = {
-                        'old_status': status_purchase,
-                        'new_status': status_purchase,
-                        'source': 'import_corporate_' + mode,
-                    }
+                corp_transition_data = {
+                    'old_status': status_purchase,
+                    'new_status': status_purchase,
+                    'source': 'import_corporate_' + mode,
+                }
 
-                    if mode == "business":
-                        if item['our_number']:
-                            corp_payment_data.update({
-                                'our_number': item['our_number']
+                if mode == "business":
+                    if item['our_number']:
+                        corp_payment_data.update({
+                            'our_number': item['our_number']
+                        })
+
+                        if item[paid_flag] == "SIM":
+                            try:
+                                payment_date = datetime.datetime.strptime(item['payment_date'], "%Y-%m-%d")
+                            except ValueError:
+                                payment_date = None
+                            corp_transition_data.update({
+                                'payment_date': payment_date
                             })
 
-                            if item[paid_flag] == "SIM":
-                                try:
-                                    payment_date = datetime.datetime.strptime(item['payment_date'], "%Y-%m-%d")
-                                except ValueError:
-                                    payment_date = None
-                                corp_transition_data.update({
-                                    'payment_date': payment_date
-                                })
+                        objPayment = BoletoPayment
+                        objTransition = BoletoTransition
+                    elif item['description'] == 'deposit':
+                        objPayment = DepositPayment
+                        objTransition = DepositTransition
+                    elif item['description'] == 'pagseguro':
+                        objPayment = PagSeguroPayment
+                        objTransition = PagSeguroTransition
+                elif mode == "government":
+                    # corp_payment_data.update({
+                    #     'payment_date': datetime.datetime.strptime(item['_data_envio'], "%Y-%m-%d %H:%M:%S")
+                    # })
+                    objPayment = GovPayment
+                    objTransition = GovTransition
 
-                            objPayment = BoletoPayment
-                            objTransition = BoletoTransition
-                        elif item['description'] == 'deposit':
-                            objPayment = DepositPayment
-                            objTransition = DepositTransition
-                        elif item['description'] == 'pagseguro':
-                            objPayment = PagSeguroPayment
-                            objTransition = PagSeguroTransition
-                    elif mode == "government":
-                        # corp_payment_data.update({
-                        #     'payment_date': datetime.datetime.strptime(item['_data_envio'], "%Y-%m-%d %H:%M:%S")
-                        # })
-                        objPayment = GovPayment
-                        objTransition = GovTransition
+                corp_payment = objPayment(**corp_payment_data)
+                corp_transition_data.update({
+                    'payment': corp_payment
+                })
+                corp_transition = objTransition(**corp_transition_data)
+                print "created corporate payment - type/id: ", corp_payment.__class__.__name__, corp_payment
+                print "created corporate transition - type/id: ", corp_transition.__class__.__name__, corp_transition
 
-                    corp_payment = objPayment(**corp_payment_data)
-                    corp_transition_data.update({
-                        'payment': corp_payment
-                    })
-                    corp_transition = objTransition(**corp_transition_data)
-                    print "created corporate payment - type/id: ", corp_payment.__class__.__name__, corp_payment
-                    print "created corporate transition - type/id: ", corp_transition.__class__.__name__, corp_transition
+            corp_purchase.recalculate_status()
+        else:
+            print "product not found or account already have corporate purchase"
+            return
 
-                corp_purchase.recalculate_status()
-            else:
-                print "product not found or account already have corporate purchase"
-                return
+        db.session.commit()
 
-            db.session.commit()
-
-            print corp_data
-            print "###################### employees: "
-            print employees
+        print corp_data
+        print "###################### employees: "
+        print employees
 
         counter_added +=1
 
 def find_corporate_product(participants, amount, mode):
-    if mode == "business":
-        print "amount, participants: ", amount, participants
-        product_value = float(amount) / float(participants)
-        print "value: ", product_value
-        product = CorporateProduct.query.filter(CorporateProduct.price == product_value).first()
-        return product if product else None
-    elif mode == "government":
-        # government is a unique product
-        return Product.query.filter(Product.category == 'government').first()
+    if participants and amount and mode:
+        if mode == "business":
+            print "amount, participants: ", amount, participants
+            product_value = float(amount) / float(participants)
+            print "value: ", product_value
+            product = CorporateProduct.query.filter(CorporateProduct.price == product_value).first()
+            return product if product else None
+        elif mode == "government":
+            # government is a unique product
+            return Product.query.filter(Product.category == 'government').first()
+    else:
+        return None
 
 def format_description(description, details):
     ret = description
