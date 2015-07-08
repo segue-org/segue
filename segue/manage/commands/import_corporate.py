@@ -266,7 +266,7 @@ def process_line_corporate(item, mode="business"):
         counter_added +=1
 
 def find_corporate_product(participants, amount, mode):
-    if participants and amount and mode:
+    if participants:
         if mode == "business":
             print "amount, participants: ", amount, participants
             product_value = float(amount) / float(participants)
