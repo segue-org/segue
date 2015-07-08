@@ -72,7 +72,7 @@ class PersonController(object):
     def patch(self, person_id):
         data = request.get_json()
         result = self.people.patch(person_id, by_user=self.current_user, **data)
-        return PersonResponse.create(result, links=True), 200
+        return {}, 200
 
     @jwt_only
     @frontdesk_only
@@ -81,7 +81,7 @@ class PersonController(object):
         email = request.get_json().get('email',None)
         if not email: abort(400)
         result = self.people.create(email, by_user=self.current_user)
-        return PersonResponse.create(result, links=True), 200
+        return PersonResponse.create(result, embeds=False, links=False), 200
 
     @jwt_only
     @frontdesk_only
@@ -90,7 +90,7 @@ class PersonController(object):
         promo_hash = request.get_json().get('hash_code',None)
         if not promo_hash: abort(400)
         result = self.people.apply_promo(person_id, promo_hash, by_user=self.current_user)
-        return PersonResponse.create(result, links=True), 200
+        return {}, 200
 
     @jwt_only
     @cashier_only
@@ -98,7 +98,7 @@ class PersonController(object):
     def make_payment(self, person_id):
         data = request.get_json()
         result = self.people.pay(person_id, by_user=self.current_user, ip_address=request.remote_addr, **data)
-        return PersonResponse.create(result, links=True), 200
+        return {}, 200
 
     @jwt_only
     @frontdesk_only
@@ -107,7 +107,7 @@ class PersonController(object):
         new_product_id = request.get_json().get('product_id',None)
         if not new_product_id: abort(400)
         result = self.people.set_product(person_id, new_product_id, by_user=self.current_user)
-        return PersonResponse.create(result, embeds=True, links=True), 200
+        return {}, 200
 
     @jwt_only
     @frontdesk_only

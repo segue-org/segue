@@ -5,6 +5,17 @@ from ..models import Payment, Transition
 class CashPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'cash' }
 
+    @property
+    def extra_fields(self):
+        payment_transition = filter(lambda x: x.is_payment, self.transitions)
+        if not payment_transition: return dict()
+
+        return dict(
+                cashier    = payment_transition[0].cashier.name,
+                ip_address = payment_transition[0].ip_address,
+                mode       = payment_transition[0].mode
+        )
+
 class CashTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'cash' }
 
@@ -14,6 +25,3 @@ class CashTransition(Transition):
 
     cashier = db.relationship('Account')
 
-    @property
-    def extra_fields(self):
-        return dict(cashier=self.cashier.name, ip_address=self.ip_address)
