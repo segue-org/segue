@@ -38,6 +38,7 @@ class PurchaseController(object):
     @jsoned
     def pay(self, purchase_id=None, method=None):
         payload = request.get_json()
+        if method != 'cash': return {}, 400
         result = self.service.create_payment(purchase_id, method, payload, by=self.current_user)
         return result, 200
 
