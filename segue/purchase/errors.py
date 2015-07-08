@@ -31,6 +31,7 @@ class InvalidPaymentNotification(SegueError):
         return { 'message': 'the notification data from payment provider is not correct for this payment method' }
 
 class InvalidHashCode(SegueError):
+    code = 400
     def to_json(self):
         return { 'message': 'invalid hash code: {}'.format(self.args) }
 

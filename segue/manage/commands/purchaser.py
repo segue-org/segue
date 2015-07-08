@@ -147,6 +147,7 @@ class IsForeigner(Situation):
     def applies(self, account, known_situations):
         return not account.is_brazilian
     def solve(self, account, known_situations):
+        self.solved += 1
         self.acted += 1
         return 'solved'
 

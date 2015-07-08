@@ -7,6 +7,7 @@ from filters import PromoCodeFilterStrategies
 from factories import PromoCodePaymentFactory, PromoCodeTransitionFactory
 from models import PromoCode
 from segue.purchase.cash import CashPaymentService
+from ..errors import InvalidHashCode
 
 class PromoCodeService(object):
     def __init__(self, hasher=None, products=None, filters=None):
@@ -58,19 +59,21 @@ class PromoCodePaymentService(object):
         self.cash_service = cash_service or CashPaymentService()
         self.promocodes = promocodes or PromoCodeService()
 
-    def create(self, purchase, data=dict()):
+    def create(self, purchase, data=dict(), commit=True, force_product=False):
         hash_code = data.get('hash_code',None)
-        if not hash_code: return InvalidHashCode()
+        if not hash_code: raise InvalidHashCode(hash_code)
 
         promocode = self.promocodes.check(hash_code)
-        if not promocode: return InvalidHashCode()
+        if not promocode: raise InvalidHashCode(hash_code)
+
+        if force_product: purchase.product = promocode.product
 
         payment = self.factory.create(purchase, promocode)
         purchase.recalculate_status()
 
         db.session.add(purchase)
         db.session.add(payment)
-        db.session.commit()
+        if commit: db.session.commit()
         return payment
 
     def process(self, payment):

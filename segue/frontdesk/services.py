@@ -12,11 +12,13 @@ from segue.mailer import MailerService
 from segue.models import Purchase
 from segue.account.services import AccountService
 from segue.purchase.services import PurchaseService, PaymentService
+from segue.purchase.errors import PurchaseAlreadySatisfied
 from segue.purchase.cash import CashPaymentService
+from segue.purchase.promocode import PromoCodePaymentService
 from segue.product.errors import WrongBuyerForProduct
 from segue.product.services import ProductService
 
-from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter, InvalidPaymentOperation
+from errors import TicketIsNotValid, MustSpecifyPrinter, CannotPrintBadge, InvalidPrinter, InvalidPaymentOperation, CannotChangeProduct
 from models import Person, Badge, Visitor
 from filters import FrontDeskFilterStrategies
 import schema
@@ -114,14 +116,16 @@ class VisitorService(object):
 
 
 class PeopleService(object):
-    def __init__(self, purchases=None, filters=None, products=None, accounts=None, hasher=None, mailer=None, payments=None):
-        self.products  = products  or ProductService()
-        self.purchases = purchases or PurchaseService()
-        self.accounts  = accounts  or AccountService()
-        self.filters   = filters   or FrontDeskFilterStrategies()
-        self.hasher    = hasher    or Hasher()
-        self.mailer    = mailer    or MailerService()
-        self.payments  = payments  or PaymentService()
+    def __init__(self, purchases=None, filters=None, products=None, promocodes=None,
+                       accounts=None, hasher=None, mailer=None, cash=None):
+        self.products   = products   or ProductService()
+        self.purchases  = purchases  or PurchaseService()
+        self.accounts   = accounts   or AccountService()
+        self.filters    = filters    or FrontDeskFilterStrategies()
+        self.hasher     = hasher     or Hasher()
+        self.mailer     = mailer     or MailerService()
+        self.cash       = cash       or PaymentService()
+        self.promocodes = promocodes or PromoCodePaymentService()
 
     def get_by_hash(self, hash_code):
         purchase = self.purchases.get_by_hash(hash_code, strict=True)
@@ -133,11 +137,11 @@ class PeopleService(object):
 
         # retrieves purchase, creates a new cash payment (ignores instructions (_))
         purchase   = self.purchases.get_one(person_id, strict=True, check_ownership=False)
-        _, payment = self.payments.create(purchase, 'cash', None)
+        _, payment = self.cash.create(purchase, 'cash', None)
 
         # prepares payload for processor and notifies transition
         payload = dict(cashier=by_user, ip_address=ip_address, mode=mode)
-        purchase, transition = self.payments.notify(purchase.id, payment.id, payload, source='frontdesk')
+        purchase, transition = self.cash.notify(purchase.id, payment.id, payload, source='frontdesk')
 
         return Person(purchase)
 
@@ -169,12 +173,23 @@ class PeopleService(object):
         query   = base.filter(*filters).order_by(Purchase.status, Purchase.id).limit(limit)
         return map(Person, query.all())
 
+    def apply_promo(self, person_id, promo_hash, by_user=None):
+        person  = self.get_one(person_id, by_user=by_user, strict=True)
+        if person.is_valid_ticket: raise PurchaseAlreadySatisfied()
+        if not person.can_change_product: raise CannotChangeProduct()
+
+        self.promocodes.create(person.purchase, dict(hash_code=promo_hash), commit=False, force_product=True)
+        db.session.commit()
+        db.session.expunge_all()
+
+        return self.get_one(person_id, strict=True, check_ownership=False)
+
     def set_product(self, person_id, new_product_id, by_user=None):
         person   = self.get_one(person_id, by_user=by_user, strict=True)
         purchase = person.purchase
         product  = self.products.get_product(new_product_id)
         if not person.can_change_product:
-            raise CannotPrintBadge()
+            raise CannotChangeProduct()
         if not product.check_eligibility({}, purchase.customer):
             raise WrongBuyerForProduct()
 

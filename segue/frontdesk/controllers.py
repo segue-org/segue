@@ -83,8 +83,14 @@ class PersonController(object):
         result = self.people.create(email, by_user=self.current_user)
         return PersonResponse.create(result, links=True), 200
 
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def apply_promo(self, person_id):
-        pass
+        promo_hash = request.get_json().get('hash_code',None)
+        if not promo_hash: abort(400)
+        result = self.people.apply_promo(person_id, promo_hash, by_user=self.current_user)
+        return PersonResponse.create(result, links=True), 200
 
     @jwt_only
     @cashier_only
