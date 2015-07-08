@@ -13,4 +13,4 @@ def init_command():
     return sys.stdout
 
 def u(value):
-    return value.encode("utf-8")
+    return (value or '').encode("utf-8")
