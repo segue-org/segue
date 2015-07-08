@@ -108,9 +108,10 @@ class Badge(db.Model):
         )
 
 class Visitor(db.Model):
-    id    = db.Column(db.Integer, primary_key=True)
-    name  = db.Column(db.Text)
-    email = db.Column(db.Text)
+    id       = db.Column(db.Integer, primary_key=True)
+    name     = db.Column(db.Text)
+    email    = db.Column(db.Text)
+    document = db.Column(db.Text)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
