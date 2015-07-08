@@ -35,7 +35,7 @@ def import_accounts(in_file, product_id, commit=False):
             document = line['cpf']
             password = hasher.generate()
 
-            print "scanning {}{}{}...".format(F.RED, email, F.RESET)
+            print "scanning {}{}{}...".format(F.RED, u(email), F.RESET)
 
             if accounts.is_email_registered(line['email']):
                 print "... {}had account already!{}".format(F.RED, F.RESET)
