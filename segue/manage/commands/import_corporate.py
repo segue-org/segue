@@ -107,88 +107,94 @@ def process_line_corporate(item, mode="business"):
     counter += 1
     _details = None
     if item[paid_flag] == "SIM":
-        # 16 -> number of employees slots in csv file
-        for n in xrange(1, 17):
-            if corp_data['name_{}'.format(n)] != '':
-                employees.append({
-                    'name':         corp_data['name_{}'.format(n)],
-                    'badge_name':   corp_data['badge_name_{}'.format(n)],
-                    'document':     corp_data['document_{}'.format(n)],
-                    'email':        corp_data['email_{}'.format(n)],
-                    'organization': corp_data['name'],
-                })
+        status_purchase = 'paid'
+    else:
+        status_purchase = 'pending'
+    # 16 -> number of employees slots in csv file
+    for n in xrange(1, 17):
+        if corp_data['name_{}'.format(n)] != '':
+            employees.append({
+                'name':         corp_data['name_{}'.format(n)],
+                'badge_name':   corp_data['badge_name_{}'.format(n)],
+                'document':     corp_data['document_{}'.format(n)],
+                'email':        corp_data['email_{}'.format(n)],
+                'organization': corp_data['name'],
+            })
 
-            del corp_data['name_{}'.format(n)]
-            del corp_data['badge_name_{}'.format(n)]
-            del corp_data['document_{}'.format(n)]
-            del corp_data['email_{}'.format(n)]
+        del corp_data['name_{}'.format(n)]
+        del corp_data['badge_name_{}'.format(n)]
+        del corp_data['document_{}'.format(n)]
+        del corp_data['email_{}'.format(n)]
 
-        if '' in corp_data:
-            del corp_data['']
+    if '' in corp_data:
+        del corp_data['']
 
-        if mode == "business":
-            _details = item['_details']
+    if mode == "business":
+        _details = item['_details']
 
-        print "adding corporate: ", corp_data['name']
-        print "verifying owner of corporate: ", corp_data['incharge_email']
+    print "adding corporate: ", corp_data['name']
+    print "verifying owner of corporate: ", corp_data['incharge_email']
 
-        if account_service.is_email_registered(corp_data['incharge_email']):
-            owner = account_service.get_by_email(corp_data['incharge_email'])
-        else:
-            new_owner_data = {
-                'email': corp_data['incharge_email'],
-                'name': corp_data['incharge_name'],
-                'password': generate_password(),
-                'country': 'BRASIL',
-                'city': corp_data['address_city'],
-                'phone': corp_data['incharge_phone_1'],
-            }
-            owner = account_service.create(new_owner_data)
+    if account_service.is_email_registered(corp_data['incharge_email']):
+        owner = account_service.get_by_email(corp_data['incharge_email'])
+    else:
+        new_owner_data = {
+            'email': corp_data['incharge_email'],
+            'name': corp_data['incharge_name'],
+            'password': generate_password(),
+            'country': 'BRASIL',
+            'city': corp_data['address_city'],
+            'phone': corp_data['incharge_phone_1'],
+        }
+        owner = account_service.create(new_owner_data)
 
-        # exclude purchase data from corp_data dict for insertion
-        corp_data = clean_dict(corp_data, remove_from_dict[mode])
+    # exclude purchase data from corp_data dict for insertion
+    corp_data = clean_dict(corp_data, remove_from_dict[mode])
 
-        # create corporate
+    # create corporate
+    corporate = corporate_service.get_by_document(corp_data['document'])
+    if not corporate:
         corporate = corporate_service.create(corp_data, owner)
 
-        owner.corporate_id = corporate.id
-        db.session.add(owner)
+    owner.corporate_id = corporate.id
+    db.session.add(owner)
 
-        for e in employees:
-            print "trying to add person to corporate: ", e
-            if account_service.is_email_registered(e['email']):
-                account = account_service.get_by_email(e['email'])
-                account.organization = e['name']
-                account.badge_name = e['badge_name']
-                account.corporate_id = corporate.id
-                db.session.add(account)
-                print "person found: ", e
-            else:
-                e['password'] = generate_password()
-                e['country']  = 'BRASIL'
-                e['city']     = corp_data['address_city']
-                e['phone']    = corp_data['incharge_phone_1']
-                print "person not found, trying to add: ", corporate, e, owner
-                account = employee_service.create(corporate, e, owner)
-                print "person not found, added: ", e, account
-                account.corporate_id = corporate.id
-                db.session.add(account)
+    for e in employees:
+        print "trying to add person to corporate: ", e
+        if account_service.is_email_registered(e['email']):
+            account = account_service.get_by_email(e['email'])
+            account.organization = e['name']
+            account.badge_name = e['badge_name']
+            account.corporate_id = corporate.id
+            db.session.add(account)
+            print "person found: ", e
+        else:
+            e['password'] = generate_password()
+            e['country']  = 'BRASIL'
+            e['city']     = corp_data['address_city']
+            e['phone']    = corp_data['incharge_phone_1']
+            print "person not found, trying to add: ", corporate, e, owner
+            account = employee_service.create(corporate, e, owner)
+            print "person not found, added: ", e, account
+            account.corporate_id = corporate.id
+            db.session.add(account)
 
-            # add purchases and payments
-            # def create(self, buyer_data, product, account, commit=True, **extra):
-            corp_buyer_data = {
-                'kind': 'company',
-                'name': item['name'],
-                'document': item['document'],
-                'contact': item['incharge_email'],
-                'address_street': item['address_street'],
-                'address_number': item['address_number'],
-                'address_extra': item['address_extra'],
-                'address_zipcode': item['address_zipcode'],
-                'address_city': item['address_city'],
-                'address_country': 'BRASIL',
-            }
+        # add purchases and payments
+        # def create(self, buyer_data, product, account, commit=True, **extra):
+        corp_buyer_data = {
+            'kind': 'company',
+            'name': item['name'],
+            'document': item['document'],
+            'contact': item['incharge_email'],
+            'address_street': item['address_street'],
+            'address_number': item['address_number'],
+            'address_extra': item['address_extra'],
+            'address_zipcode': item['address_zipcode'],
+            'address_city': item['address_city'],
+            'address_country': 'BRASIL',
+        }
 
+        if amount and item['*participants']:
             product = find_corporate_product(item['*participants'], amount, mode)
             if product and not account.has_valid_corporate_purchases:
                 corp_purchase = purchase_service.create(corp_buyer_data, product, account, corporate_id=corporate.id)
@@ -198,14 +204,14 @@ def process_line_corporate(item, mode="business"):
                 if corp_purchase:
                     corp_payment_data = {
                         'purchase': corp_purchase,
-                        'status': 'paid',
+                        'status': status_purchase,
                         'amount': product.price,
                         'description': format_description(item['description'], _details),
                     }
 
                     corp_transition_data = {
-                        'old_status': 'pending',
-                        'new_status': 'paid',
+                        'old_status': status_purchase,
+                        'new_status': status_purchase,
                         'source': 'import_corporate_' + mode,
                     }
 
@@ -214,9 +220,16 @@ def process_line_corporate(item, mode="business"):
                             corp_payment_data.update({
                                 'our_number': item['our_number']
                             })
-                            corp_transition_data.update({
-                                'payment_date': datetime.datetime.strptime(item['payment_date'], "%Y-%m-%d")
-                            })
+
+                            if item[paid_flag] == "SIM":
+                                try:
+                                    payment_date = datetime.datetime.strptime(item['payment_date'], "%Y-%m-%d")
+                                except ValueError:
+                                    payment_date = None
+                                corp_transition_data.update({
+                                    'payment_date': payment_date
+                                })
+
                             objPayment = BoletoPayment
                             objTransition = BoletoTransition
                         elif item['description'] == 'deposit':
@@ -245,11 +258,11 @@ def process_line_corporate(item, mode="business"):
                 print "product not found or account already have corporate purchase"
                 return
 
-        db.session.commit()
+            db.session.commit()
 
-        print corp_data
-        print "###################### employees: "
-        print employees
+            print corp_data
+            print "###################### employees: "
+            print employees
 
         counter_added +=1
 

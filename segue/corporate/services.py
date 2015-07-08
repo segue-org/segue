@@ -26,6 +26,10 @@ class CorporateService(object):
         if isinstance(corporate, int): corporate = self.get_one(corporate)
         return corporate and alleged and corporate.owner_id == alleged.id
 
+    def get_by_document(self, document, by=None):
+        result = Corporate.query.filter(Corporate.document == document).first()
+        return result
+
     def get_by_owner(self, owner_id, by=None):
         result = Corporate.query.filter(Corporate.owner_id == owner_id).first()
         if self._check_ownership(result, by):
