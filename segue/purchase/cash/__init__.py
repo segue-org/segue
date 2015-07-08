@@ -3,6 +3,7 @@ import os.path
 from segue.errors import NotAuthorized
 from segue.core import config, db
 
+from models import CashPayment, CashTransition
 from factories import CashPaymentFactory, CashTransitionFactory
 
 class CashPaymentService(object):
@@ -21,3 +22,6 @@ class CashPaymentService(object):
 
     def notify(self, purchase, payment, payload, source='notification'):
         return CashTransitionFactory.create(payment, payload, source)
+
+    def for_cashier(self, cashier):
+        return CashPayment.query.join(CashTransition).filter(CashTransition.cashier == cashier).all()

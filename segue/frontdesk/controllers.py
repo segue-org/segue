@@ -4,7 +4,7 @@ from flask import request, abort, redirect
 from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html, cashier_only
 
-from services import BadgeService, PeopleService, VisitorService
+from services import BadgeService, PeopleService, VisitorService, ReportService
 from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
 
 class VisitorController(object):
@@ -156,3 +156,15 @@ class BadgeController(object):
     def give(self, badge_id):
         badge = self.badges.give_badge(badge_id) or abort(404)
         return BadgeResponse.create(badge), 200
+
+class ReportController(object):
+    def __init__(self, reports=None):
+        self.reports = reports or ReportService()
+        self.current_user = current_user
+
+    @jwt_only
+    @cashier_only
+    @jsoned
+    def get_report(self):
+        result = self.reports.for_cashier(self.current_user)
+        return PaymentResponse.create(result, transitions=True, person=True), 200

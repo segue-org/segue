@@ -115,6 +115,13 @@ class VisitorService(object):
         return visitor
 
 
+class ReportService(object):
+    def __init__(self, payments=None):
+        self.payments = payments or CashPaymentService()
+
+    def for_cashier(self, cashier):
+        return self.payments.for_cashier(cashier)
+
 class PeopleService(object):
     def __init__(self, purchases=None, filters=None, products=None, promocodes=None,
                        accounts=None, hasher=None, mailer=None, cash=None):

@@ -54,13 +54,37 @@ class ReceptionResponse(PersonResponse):
         super(ReceptionResponse, self).__init__(person, embeds=True, links=False)
         self.buyer = BuyerResponse.create(person.buyer)
 
+class PurchaseResponse(BaseResponse):
+    def __init__(self, person, embeds=False, links=True):
+        self.id          = person.id
+        self.name        = person.customer.name
+        self.category    = person.product.category
+        self.price       = person.product.price
+        self.description = person.product.description
+
 class PaymentResponse(BaseResponse):
-    def __init__(self, payment):
+    def __init__(self, payment, transitions=False, person=False):
         self.id     = payment.id
         self.type   = payment.type
         self.amount = payment.amount
         self.status = payment.status
-        setattr(self, payment.type, payment.extra_fields)
+
+        if person:
+            self.person = PurchaseResponse.create(payment.purchase)
+
+        if transitions:
+            self.transitions = PaymentTransitionResponse.create(payment.transitions.all())
+        else:
+            setattr(self, payment.type, payment.extra_fields)
+
+class PaymentTransitionResponse(BaseResponse):
+    def __init__(self, transition):
+        self.id         = transition.id
+        self.created    = transition.created
+        self.old_status = transition.old_status
+        self.new_status = transition.new_status
+        for key, value in transition.extra_fields.items():
+            setattr(self, key, value)
 
 class BuyerResponse(BaseResponse):
     def __init__(self, buyer):
