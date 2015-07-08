@@ -74,6 +74,7 @@ class PaymentResponse(BaseResponse):
 
         if transitions:
             self.transitions = PaymentTransitionResponse.create(payment.transitions.all())
+            self.created = self.transitions[0].created if self.transitions else None
         else:
             setattr(self, payment.type, payment.extra_fields)
 
