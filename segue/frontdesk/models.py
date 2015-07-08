@@ -122,7 +122,7 @@ class Visitor(db.Model):
             name         = self.name,
             city         = None,
             category     = "visitor",
-            organization = None
+            organization = "visitante"
         )
 
     @property
