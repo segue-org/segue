@@ -60,8 +60,8 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
     situations = [
         HasTicketsThatCouldBeStale(),
         HasPaidTicket(),
-        BadProponent(),
         IsSpeakerWithNoTicket(),
+        BadProponent(),
         HasPayableTicket(),
         IsForeigner(),
         HasZeroPayableTickets(),
