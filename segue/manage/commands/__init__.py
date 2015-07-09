@@ -20,6 +20,7 @@ import lister
 import jobs
 import printer
 import reception
+import link_tv
 
 def _make_context():
     import segue.models
@@ -64,3 +65,4 @@ manager.command(printer.print_range)
 manager.command(printer.print_person)
 manager.command(printer.mark_failed)
 manager.command(reception.reception_mail)
+manager.command(link_tv.link_tv)

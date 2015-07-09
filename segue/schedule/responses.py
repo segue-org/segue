@@ -12,13 +12,15 @@ class RoomResponse(BaseResponse):
 
 class SlotResponse(BaseResponse):
     def __init__(self, slot, embeds=False, links=True):
-        self.id        = slot.id
-        self.begins    = slot.begins
-        self.hour      = slot.begins.hour
-        self.duration  = slot.duration
-        self.room      = slot.room.id
-        self.room_name = slot.room.name
-        self.status    = slot.status
+        self.id         = slot.id
+        self.begins     = slot.begins
+        self.hour       = slot.begins.hour
+        self.duration   = slot.duration
+        self.room       = slot.room.id
+        self.room_name  = slot.room.name
+        self.status     = slot.status
+        self.recordings = [ r.url for r in slot.recordings ]
+
         if embeds:
             self.talk = TalkShortResponse.create(slot.talk)
 

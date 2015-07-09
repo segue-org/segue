@@ -8,7 +8,7 @@ from purchase.promocode.models import PromoCode, PromoCodePayment, PromoCodeTran
 from account.models import City, Country
 from caravan.models import Caravan, CaravanInvite, CaravanProduct, CaravanRiderPurchase, CaravanLeaderPurchase, CaravanLeaderProduct
 from judge.models import Judge, Match, Tournament
-from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification
+from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification, Recording
 from frontdesk.models import Badge
 from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
 
@@ -23,7 +23,7 @@ __all__ = [
     'City', 'Country',
     'Caravan', 'CaravanInvite', 'CaravanProduct', 'CaravanRiderPurchase', 'CaravanLeaderPurchase', 'CaravanLeaderProduct',
     'Judge', 'Match', 'Tournament',
-    'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification',
+    'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification', 'Recording',
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
     'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase'

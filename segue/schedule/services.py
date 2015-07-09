@@ -20,10 +20,24 @@ class RoomService(object):
         filters = kw
         return Room.query.filter(**filters).order_by(Room.position).all()
 
+    def get_by_name(self, name):
+        return Room.query.filter(Room.name.ilike(name)).first()
+
 class SlotService(object):
     def __init__(self, proposals=None):
         self.proposals = proposals or ProposalService()
         self.filters = SlotFilterStrategies()
+
+    def by_approximate_timestamp(self, room_id, when, max_delta=26):
+        slightly_earlier = when - timedelta(minutes=max_delta)
+        slightly_later   = when + timedelta(minutes=max_delta)
+
+        of_this_room     = Room.id == room_id
+        within_timeframe = Slot.begins.between(slightly_earlier, slightly_later)
+
+        query = Slot.query.join(Room).filter(of_this_room, within_timeframe)
+
+        return [ (x, when - x.begins) for x in query ]
 
     def unstretch_slot(self, slot_id):
         slot = self.get_one(slot_id, strict=True)

@@ -14,6 +14,11 @@ class Room(db.Model):
 
     slots       = db.relationship("Slot", backref="room")
 
+class Recording(db.Model):
+    id      = db.Column(db.Integer, primary_key=True)
+    slot_id = db.Column(db.Integer, db.ForeignKey('slot.id'))
+    url     = db.Column(db.Text)
+
 class Slot(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     room_id     = db.Column(db.Integer, db.ForeignKey('room.id'))
@@ -25,9 +30,13 @@ class Slot(db.Model):
     annotation  = db.Column(db.Text)
 
     notifications = db.relationship("SlotNotification", backref="slot", lazy="dynamic")
+    recordings    = db.relationship("Recording",        backref="slot", lazy="dynamic")
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
+
+    def __repr__(self):
+        return "<[{}]{}:{}+{}:{}>".format(self.id, self.room.name, self.begins, self.duration, self.talk != None)
 
     @property
     def next_contiguous_slot(self):
