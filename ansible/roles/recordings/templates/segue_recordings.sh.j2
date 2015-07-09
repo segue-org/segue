@@ -2,4 +2,5 @@
 
 cd {{ app_path }}
 source {{ app_virtualenv }}/bin/activate
-python manage.py link_tv 2>&1 /var/log/segue/recordings.log
+date >> /var/log/segue/recordings.log
+python manage.py link_tv --rooms={{ recordings_rooms }} --early_max=10 --late_max=50 &>> /var/log/segue/recordings.log
