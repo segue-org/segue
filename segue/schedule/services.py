@@ -28,12 +28,14 @@ class SlotService(object):
         self.proposals = proposals or ProposalService()
         self.filters = SlotFilterStrategies()
 
-    def by_approximate_timestamp(self, room_id, when, max_delta=26):
-        slightly_earlier = when - timedelta(minutes=max_delta)
-        slightly_later   = when + timedelta(minutes=max_delta)
+    def by_approximate_timestamp(self, room_id, when, early_max=5, late_max=25):
+        a_bit_before = when - timedelta(minutes=late_max)
+        a_bit_after  = when + timedelta(minutes=early_max)
+
+        print "\t\t", a_bit_before, a_bit_after
 
         of_this_room     = Room.id == room_id
-        within_timeframe = Slot.begins.between(slightly_earlier, slightly_later)
+        within_timeframe = Slot.begins.between(a_bit_before, a_bit_after)
 
         query = Slot.query.join(Room).filter(of_this_room, within_timeframe)
 

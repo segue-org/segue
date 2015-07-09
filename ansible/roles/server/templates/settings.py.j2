@@ -11,6 +11,10 @@ QUEUE_HOST= 'localhost'
 QUEUE_PASSWORD = '{{ redis_password }}'
 PRINTERS = '{{ printers }}'.split(',')
 
+RECORDINGS_BASE_URL = '{{ recordings_base_url }}'
+RECORDINGS_LINK_PATTERN = r'{{ recordings_link_pattern }}'
+RECORDINGS_FILE_PATTERN = r'{{ recordings_file_pattern }}'
+
 SQLALCHEMY_POOL_SIZE = None
 SQLALCHEMY_POOL_TIMEOUT = None
 SQLALCHEMY_POOL_RECYCLE = None
