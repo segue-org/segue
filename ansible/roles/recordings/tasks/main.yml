@@ -1,0 +1,31 @@
+---
+
+- file: path=/var/log/segue/
+        owner=www-data
+        mode=0777
+        state=directory
+
+- file: path=/var/log/segue/recordings.log
+        owner=www-data
+        mode=0777
+        state=touch
+
+- name: adds a cronjob to update recordings
+  tags:
+    - recordings
+    - config
+  cron: name='segue update recordings'
+        cron_file=segue_recordings
+        minute="*/10"
+        hour=*
+        user=root
+        job="/usr/local/sbin/segue_recordings.sh"
+
+- name: creates a script for recording from template
+  tags:
+    - recordings
+    - config
+  template: src=segue_recordings.sh.j2
+            mode=0755
+            owner=root
+            dest=/usr/local/sbin/segue_recordings.sh

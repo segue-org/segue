@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd {{ app_path }}
+source {{ app_virtualenv }}/bin/activate
+python manage.py link_tv 2>&1 /var/log/segue/recordings.log
