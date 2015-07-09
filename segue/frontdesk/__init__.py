@@ -51,7 +51,8 @@ class ReportBlueprint(flask.Blueprint):
     def __init__(self):
         super(ReportBlueprint, self).__init__('fd.report', __name__, url_prefix='/fd/reports')
         self.controller = ReportController()
-        self.add_url_rule('', methods=['GET'], view_func=self.controller.get_report)
+        self.add_url_rule('',               methods=['GET'], view_func=self.controller.get_report)
+        self.add_url_rule('/<string:date>', methods=['GET'], view_func=self.controller.get_report)
 
 
 def load_blueprints():

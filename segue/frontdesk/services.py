@@ -119,8 +119,8 @@ class ReportService(object):
     def __init__(self, payments=None):
         self.payments = payments or CashPaymentService()
 
-    def for_cashier(self, cashier):
-        return self.payments.for_cashier(cashier)
+    def for_cashier(self, cashier, date):
+        return self.payments.for_cashier(cashier, date)
 
 class PeopleService(object):
     def __init__(self, purchases=None, filters=None, products=None, promocodes=None,

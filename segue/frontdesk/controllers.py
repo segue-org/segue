@@ -1,3 +1,4 @@
+from datetime import datetime
 from segue.core import config
 
 from flask import request, abort, redirect
@@ -157,6 +158,8 @@ class BadgeController(object):
         badge = self.badges.give_badge(badge_id) or abort(404)
         return BadgeResponse.create(badge), 200
 
+
+DATE_FORMAT = "%Y-%m-%d"
 class ReportController(object):
     def __init__(self, reports=None):
         self.reports = reports or ReportService()
@@ -165,6 +168,7 @@ class ReportController(object):
     @jwt_only
     @cashier_only
     @jsoned
-    def get_report(self):
-        result = self.reports.for_cashier(self.current_user)
+    def get_report(self, date=None):
+        date = datetime.strptime(date,DATE_FORMAT) if date else datetime.now()
+        result = self.reports.for_cashier(self.current_user, date=date)
         return PaymentResponse.create(result, transitions=True, person=True), 200
