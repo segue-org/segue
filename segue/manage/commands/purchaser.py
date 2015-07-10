@@ -51,13 +51,13 @@ def validate_current_purchase(start=0, end=sys.maxint, fix_it=False):
 
     print "results: okay={}, wrong={}".format(okay, wrong)
 
-def ensure_purchase(start=0, end=sys.maxint, commit=False):
+def ensure_purchase(start=0, end=sys.maxint, commit=False, for_cases_of='*'):
     init_command()
 
     print "querying..."
     accounts = AccountService().by_range(int(start), int(end)).all()
 
-    situations = [
+    all_situations = [
         HasTicketsThatCouldBeStale(),
         HasPaidTicket(),
         IsSpeakerWithNoTicket(),
@@ -66,6 +66,12 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
         IsForeigner(),
         HasZeroPayableTickets(),
     ]
+
+    situations = []
+    for situation in all_situations:
+        if for_cases_of == '*' or situation.name in for_cases_of:
+            print "will look for cases of {}".format(situation.name)
+            situations.append(situation)
 
     not_solved = collections.defaultdict(list)
 
@@ -114,6 +120,9 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False):
     print "OK"
 
 class Situation(object):
+    @property
+    def name(self):
+        return self.__class__.__name__
     def __init__(self):
         self.purchase_svc = PurchaseService()
         self.product_svc = ProductService()
