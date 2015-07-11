@@ -10,6 +10,7 @@ from segue.product.services import ProductService
 from segue.product.errors import NoSuchProduct
 from segue.account.services import AccountService
 
+from segue.proposal.models import SpeakerProduct
 from segue.product.models import Product
 from segue.purchase.models import Purchase
 
@@ -61,6 +62,7 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False, for_cases_of='*'):
         HasTicketsThatCouldBeStale(),
         HasPaidTicket(),
         IsSpeakerWithNoTicket(),
+        SpeakerWithDoubleTicket(),
         BadProponent(),
         HasPayableTicket(),
         IsForeigner(),
@@ -100,8 +102,8 @@ def ensure_purchase(start=0, end=sys.maxint, commit=False, for_cases_of='*'):
                     print "/",
                     continue
                 else:
-                    print "{}NOT SOLVED!{}".format(F.REF, F.RESET),
-                    not_solved[situation.__class__.__name__].push(account)
+                    print "{}NOT SOLVED!{}".format(F.RED, F.RESET),
+                    not_solved[situation.name].append(account)
 
     print "\n*************"
     print "accounts scanned: ", len(accounts)
@@ -153,12 +155,29 @@ class HasPayableTicket(Situation):
 
 class IsSpeakerWithNoTicket(Situation):
     def applies(self, account, known_situations):
-        return account.is_speaker
+        if not account.is_speaker: return False
+        speaker_purchases = filter(lambda p: p.category == 'speaker', account.purchases)
+        return len(speaker_purchases) == 0
+
     def solve(self, account, known_situations):
         self.purchase_svc.give_speaker_ticket(account, commit=False)
         self.acted += 1
         self.solved += 1
         return 'solved'
+
+class SpeakerWithDoubleTicket(Situation):
+    def applies(self, account, known_situations):
+        if not account.is_speaker: return False
+        speaker_purchases = filter(lambda p: p.category == 'speaker', account.purchases)
+        return len(speaker_purchases) > 1
+    def solve(self, account, known_situations):
+        speaker_purchases = filter(lambda p: p.category == 'speaker', account.purchases)
+        speaker_purchases.sort(key=lambda p: p.id)
+        db.session.delete(speaker_purchases[-1])
+        self.acted += 1
+        self.solved += 1
+        return 'solved'
+
 
 class BadProponent(Situation):
     def applies(self, account, known_situations):

@@ -52,6 +52,13 @@ class Purchase(JsonSerializable, db.Model):
     __tablename__ = 'purchase'
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'single' }
 
+    def __repr__(self):
+        return "<[{}][{}]:{}-{}>".format(self.id, self.category, self.customer.email, self.status)
+
+    @property
+    def category(self):
+        return self.product.category
+
     @property
     def badge_name(self):
         if not self.customer: return ''

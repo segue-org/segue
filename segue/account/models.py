@@ -59,6 +59,9 @@ class Account(JsonSerializable, db.Model):
         if self.id == alleged.id: return True
         return alleged.role in ('admin','frontdesk','cashier')
 
+    def __repr__(self):
+        return "<[{}]-{}-({})>".format(self.id, self.email, self.role)
+
     @property
     def can_receive_money(self):
         return self.role in ['admin','cashier']
