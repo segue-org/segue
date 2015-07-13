@@ -60,11 +60,14 @@ class PurchaseController(object):
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
+        self.current_user = current_user
 
     @jsoned
     @jwt_only
     def guide(self, purchase_id=None, payment_id=None):
         payment = self.service.get_one(purchase_id, payment_id) or flask.abort(404)
+        if payment.purchase.customer != self.current_user:
+            flask.abort(401)
         return GuideResponse(payment), 200
 
     @jsoned
