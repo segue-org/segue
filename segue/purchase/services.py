@@ -165,7 +165,7 @@ class PaymentService(object):
         return instructions, payment
 
     def get_one(self, purchase_id, payment_id):
-        result = Payment.query.filter(Purchase.id == purchase_id, Payment.id == payment_id)
+        result = Payment.query.join(Purchase).filter(Purchase.id == purchase_id, Payment.id == payment_id)
         return result.first()
 
     def conclude(self, purchase_id, payment_id, payload):
