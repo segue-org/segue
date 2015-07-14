@@ -37,9 +37,13 @@
   tags: config
 
 - template: src=apache.conf.j2
-            dest=/etc/apache2/conf-enabled/segue.conf
+            dest=/etc/apache2/conf-available/segue.conf
   tags: config
   notify: restart apache
+
+- name: Enable segue configurations
+  command: a2enconf override
+  notify: reload apache
 
 - template: src=settings.py.j2 dest={{ app_path }}/segue/settings.py
             owner=www-data
