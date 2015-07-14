@@ -9,8 +9,13 @@ class CashPayment(Payment):
     def extra_fields(self):
         payment_transition = filter(lambda x: x.is_payment, self.transitions)
         if not payment_transition: return dict()
-
         return payment_transition[0].extra_fields
+
+    @property
+    def mode(self):
+        payment_transition = filter(lambda x: x.is_payment, self.transitions)
+        if not payment_transition: return dict()
+        return payment_transition[0].mode
 
 class CashTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'cash' }

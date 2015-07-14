@@ -160,6 +160,10 @@ class Person(object):
         return map(Person, other_purchases)
 
     @property
+    def product(self):
+        return self.purchase.product
+
+    @property
     def kind(self):
         return self.purchase.product.kind
 

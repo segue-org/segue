@@ -47,3 +47,5 @@ testfixtures==4.1.2
 wsgiref==0.1.2
 xmltodict==0.9.2
 locustio==0.7.3
+inflection==0.3.1
+odswriter==0.2.0
