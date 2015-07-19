@@ -22,6 +22,7 @@ import printer
 import reception
 import link_tv
 import cashiers
+import storage
 
 def _make_context():
     import segue.models
@@ -68,3 +69,4 @@ manager.command(printer.mark_failed)
 manager.command(reception.reception_mail)
 manager.command(link_tv.link_tv)
 manager.command(cashiers.cashiers)
+manager.command(storage.folderize)
