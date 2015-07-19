@@ -24,6 +24,7 @@ realtime_port: 9001
 
 redis_bind: 0.0.0.0
 
+recordings_frequency: 30
 recordings_base_url: 'http://hemingway.softwarelivre.org/fisl16/high/'
 recordings_link_pattern: 'href="(.*.ogv)"'
 recordings_file_pattern: '^sala(.*?)-.*-?(\d{12}).ogv'

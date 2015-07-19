@@ -42,8 +42,8 @@
   notify: restart apache
 
 - name: Enable segue configurations
-  command: a2enconf override
-  notify: reload apache
+  command: a2enconf segue
+  notify: restart apache
 
 - template: src=settings.py.j2 dest={{ app_path }}/segue/settings.py
             owner=www-data

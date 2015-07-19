@@ -16,7 +16,7 @@
     - config
   cron: name='segue update recordings'
         cron_file=segue_recordings
-        minute="*/10"
+        minute=*/{{ recordings_frequency }}
         hour=*
         user=root
         job="/usr/local/sbin/segue_recordings.sh"
