@@ -7,8 +7,10 @@ handler.wsgi
 settings.py
 segue/settings.py
 ansible/secret/*.yml
+ansible/secret/files
 *backup.sql
 *.bbt
 migrations/manual/fisl16/s*.sql
 src
 states.cache
+.DS_*
