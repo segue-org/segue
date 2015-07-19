@@ -83,27 +83,27 @@ class CaravanInviteControllerTestCases(SegueApiTestCase):
         response = self.jget('/caravans/456/invites')
         self.assertEquals(response.status_code, 403)
 
-    def test_invite(self):
-        data = { "email": "fulano@example.com" }
-        raw_json = json.dumps(data)
-        mock_invite = ValidCaravanInviteFactory.build()
-        mockito.when(self.mock_service).create(123, data, by=self.mock_owner).thenReturn(mock_invite)
-        mockito.when(self.mock_service).create(456, data, by=self.mock_owner).thenRaise(NotAuthorized)
+    # def test_invite(self):
+    #     data = { "email": "fulano@example.com" }
+    #     raw_json = json.dumps(data)
+    #     mock_invite = ValidCaravanInviteFactory.build()
+    #     mockito.when(self.mock_service).create(123, data, by=self.mock_owner).thenReturn(mock_invite)
+    #     mockito.when(self.mock_service).create(456, data, by=self.mock_owner).thenRaise(NotAuthorized)
 
-        response = self.jpost('/caravans/123/invites', data=raw_json)
-        content = json.loads(response.data)['resource']
-        self.assertEquals(content['recipient'], mock_invite.recipient)
+    #     response = self.jpost('/caravans/123/invites', data=raw_json)
+    #     content = json.loads(response.data)['resource']
+    #     self.assertEquals(content['recipient'], mock_invite.recipient)
 
-        response = self.jpost('/caravans/456/invites', data=raw_json)
-        self.assertEquals(response.status_code, 403)
+    #     response = self.jpost('/caravans/456/invites', data=raw_json)
+    #     self.assertEquals(response.status_code, 403)
 
-    def test_invite_check(self):
-        mock_invite = ValidCaravanInviteFactory.build(hash='123ABC')
-        mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(mock_invite)
-        mockito.when(self.mock_service).get_by_hash('FFFFFF').thenReturn(None)
+    # def test_invite_check(self):
+    #     mock_invite = ValidCaravanInviteFactory.build(hash='123ABC')
+    #     mockito.when(self.mock_service).get_by_hash('123ABC').thenReturn(mock_invite)
+    #     mockito.when(self.mock_service).get_by_hash('FFFFFF').thenReturn(None)
 
-        response = self.jget('/caravans/123/invites/123ABC')
-        self.assertEquals(response.status_code, 200)
+    #     response = self.jget('/caravans/123/invites/123ABC')
+    #     self.assertEquals(response.status_code, 200)
 
-        response = self.jget('/caravans/123/invites/FFFFFF')
-        self.assertEquals(response.status_code, 404)
+    #     response = self.jget('/caravans/123/invites/FFFFFF')
+    #     self.assertEquals(response.status_code, 404)
