@@ -5,6 +5,8 @@
   roles:
     - server
     - git-down
+    - certificates
+    - recordings
     - database
     - segue
     - DavidWittman.redis

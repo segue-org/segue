@@ -18,6 +18,8 @@ backup_frequency: 5
 
 storage_dir: /opt/segue/data
 
+project_dir: "{{ inventory_dir }}/.."
+
 call_for_papers_deadline: '2015-04-19 23:59:29'
 online_payment_deadline: '2015-06-30 21:59:59'
 realtime_port: 9001
