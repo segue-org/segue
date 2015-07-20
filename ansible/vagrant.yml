@@ -9,6 +9,7 @@
   sudo: true
   accelerate: true
   roles:
+    - certificates
     - database
     - segue
     - server

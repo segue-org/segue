@@ -20,3 +20,8 @@
                owner=no
                group=no
                mode=no
+
+- name: ensure inkscape is installed
+  tags: certificates
+  apt: pkg=inkscape
+       state=installed
