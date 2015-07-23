@@ -59,7 +59,7 @@ class BoletoFactory(object):
         pdf = BoletoPDF(path)
         pdf.drawBoleto(boleto_data)
         pdf.save()
-        return path
+        return filename
 
     def create(self, payment):
         boleto = BoletoBB(config.BOLETO_TIPO_CONVENIO, None)
