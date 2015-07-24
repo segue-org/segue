@@ -2,6 +2,11 @@ from datetime import datetime
 from sqlalchemy.sql import functions as func
 from segue.core import db
 
+class Prototype():
+    def __init__(self, **kw):
+        for key, value in kw.items():
+            setattr(self, key, value)
+
 class Certificate(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     kind         = db.Column(db.Text)
@@ -15,10 +20,13 @@ class Certificate(db.Model):
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
     account  = db.relationship('Account',  backref=db.backref('certificates', uselist=True))
-    ticket   = db.relationship('Purchase', backref=db.backref('certificate', uselist=False))
+    ticket   = db.relationship('Purchase', backref=db.backref('certificates', uselist=True))
 
-    def is_like(self, other):
-        return self.kind == other.kind and self.ticket == other.ticket and self.account == other.account
+    def is_like(self, prototype):
+        return self.kind == prototype.kind and self.ticket == prototype.ticket and self.account == prototype.account
+
+    def __repr__(self):
+        return "<Cert:{}({}):A{}:PU{}>".format(self.id, self.kind, self.account_id, self.ticket_id)
 
     __tablename__ = 'certificate'
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'certificate' }
@@ -32,5 +40,5 @@ class SpeakerCertificate(Certificate):
     talk_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), name='sc_talk_id')
     talk    = db.relationship('Proposal', backref='certificates')
 
-    def is_like(self, other):
-        return super(SpeakerCertificate, self).is_like(other) and self.talk == other.talk
+    def is_like(self, prototype):
+        return super(SpeakerCertificate, self).is_like(prototype) and self.talk == prototype.talk

@@ -11,7 +11,7 @@ from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification, Recording
 from frontdesk.models import Badge
 from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
-from certificate.models import Certificate
+from certificate.models import Certificate, AttendantCertificate
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -28,5 +28,5 @@ __all__ = [
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
     'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase',
-    'Certificate'
+    'Certificate', 'AttendantCertificate'
 ]

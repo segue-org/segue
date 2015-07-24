@@ -292,3 +292,16 @@ class ValidSlotNotificationFactory(SegueFactory):
     account  = SubFactory(ValidAccountFactory)
     status   = 'pending'
     hash     = _Sequence('C0FFE#{:04d}')
+
+class ValidCertificateFactory(SegueFactory):
+    class Meta:
+        model = Certificate
+    account   = SubFactory(ValidAccountFactory)
+    ticket    = SubFactory(ValidPurchaseFactory, customer=account)
+    language  = 'pt'
+    hash_code = _Sequence('C0FFE#{:04d}')
+
+class ValidAttendantCertificateFactory(ValidCertificateFactory):
+    class Meta:
+        model = AttendantCertificate
+

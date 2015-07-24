@@ -3,7 +3,7 @@ import mockito
 
 from segue.errors import SegueValidationError
 
-from segue.certificate.errors import CertificateCannotBeIssued
+from segue.certificate.errors import CertificateCannotBeIssued, CertificateAlreadyIssued
 from segue.certificate.services import CertificateService
 
 from ..support.factories import *
@@ -44,7 +44,6 @@ class CertificateServiceTestCases(SegueApiTestCase):
         self.assertEquals(len(result), 1)
         self.assertEquals(result[0].kind, 'attendant')
         self.assertEquals(result[0].ticket, purchase)
-        self.assertEquals(result[0].id, None)
 
     def test_issues_cert_for_account_with_paid_purchase(self):
         account = self.create(ValidAccountFactory, certificate_name='Asdrobalgilo')
@@ -91,14 +90,12 @@ class CertificateServiceTestCases(SegueApiTestCase):
         self.assertEquals(result[0].kind, 'speaker')
         self.assertEquals(result[0].ticket, ctx.purchase)
         self.assertEquals(result[0].talk, ctx.prop1)
-        self.assertEquals(result[0].id, None)
 
         self.assertEquals(result[1].kind, 'speaker')
         self.assertEquals(result[1].ticket, ctx.purchase)
         self.assertEquals(result[1].talk, ctx.prop2)
-        self.assertEquals(result[1].id, None)
 
-    def test_issues_certificates_to_speakers_who_presented_but_only_for_presented_talks(self):
+    def test_issues_certificates_to_speakers_but_only_for_presented_talks(self):
         ctx = self.setUpSpeakerScenario()
 
         result = self.service.issue_certificate(ctx.account, 'speaker', talk=ctx.prop1)
@@ -133,3 +130,30 @@ class CertificateServiceTestCases(SegueApiTestCase):
 
         with self.assertRaises(CertificateCannotBeIssued):
             self.service.issue_certificate(account, 'speaker', talk=proposal)
+
+    def test_issued_certificates_can_be_retrieved(self):
+        account = self.create(ValidAccountFactory)
+        certificate = self.create(ValidCertificateFactory, account=account)
+
+        result = self.service.issued_certificates_for(account)
+
+        self.assertEquals(result, [ certificate ])
+
+    def test_cannot_reissue_certificate(self):
+        account = self.create(ValidAccountFactory)
+        purchase = self.create(ValidPurchaseFactory, customer=account, status='paid')
+        certificate = self.create(ValidAttendantCertificateFactory, account=account, ticket=purchase)
+
+        with self.assertRaises(CertificateAlreadyIssued):
+            self.service.issue_certificate(account, 'attendant')
+
+    def test_issued_certs_are_no_longer_listed_as_issuable(self):
+        account = self.create(ValidAccountFactory)
+        purchase = self.create(ValidPurchaseFactory, customer=account, status='paid')
+        certificate = self.create(ValidAttendantCertificateFactory, account=account, ticket=purchase)
+
+        result = self.service.issuable_certificates_for(account)
+
+        self.assertEquals(result, [])
+
+
