@@ -1,5 +1,5 @@
 from account.models  import Account, ResetPassword
-from proposal.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice
+from proposal.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice, SpeakerProduct
 from product.models  import Product, StudentProduct, PromoCodeProduct, ForeignerProduct, ForeignerStudentProduct, CorporateProduct, GovernmentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
 from purchase.pagseguro.models import PagSeguroPayment, PagSeguroTransition
@@ -11,12 +11,13 @@ from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification, Recording
 from frontdesk.models import Badge
 from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
+from certificate.models import Certificate
 
 __all__ = [
     'Account', 'ResetPassword',
-    'ProposalTag', 'Proposal', 'ProposalInvite', 'Track', 'ProponentProduct', 'NonSelectionNotice',
+    'ProposalTag', 'Proposal', 'ProposalInvite', 'Track', 'ProponentProduct', 'NonSelectionNotice', 'SpeakerProduct',
     'Product', 'StudentProduct', 'PromoCodeProduct', 'ForeignerProduct', 'ForeignerStudentProduct', 'CorporateProduct', 'GovernmentProduct',
-    'Buyer', 'Purchase', 'Payment',
+    'Buyer', 'Purchase', 'Payment', 'Transition',
     'PagSeguroPayment',
     'BoletoPayment',
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
@@ -26,5 +27,6 @@ __all__ = [
     'Room', 'Slot', 'Notification', 'CallNotification', 'SlotNotification', 'Recording',
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
-    'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase'
+    'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase',
+    'Certificate'
 ]

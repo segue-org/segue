@@ -6,14 +6,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyNaiveDateTime, FuzzyDecim
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
-from segue.models import Account, ResetPassword
-from segue.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice
-from segue.models import Product, CaravanProduct, StudentProduct
-from segue.models import Purchase, Buyer, Payment, Transition
-from segue.models import PagSeguroPayment, BoletoPayment, PromoCode, PromoCodePayment
-from segue.models import Judge, Match, Tournament
-from segue.models import Room, Slot, CallNotification, SlotNotification
-from segue.caravan.models import Caravan, CaravanRiderPurchase, CaravanInvite
+from segue.models import *
 
 import logging
 logger = logging.getLogger('factory')
@@ -159,6 +152,11 @@ class ValidProponentProductFactory(ValidProductFactory):
     class Meta:
         model = ProponentProduct
     category    = "proponent"
+
+class ValidSpeakerProductFactory(ValidProductFactory):
+    class Meta:
+        model = SpeakerProduct
+    category    = "speaker"
 
 class ValidStudentProductFactory(ValidProductFactory):
     class Meta:

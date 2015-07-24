@@ -80,6 +80,13 @@ class Account(JsonSerializable, db.Model):
     def is_government(self):
         return self.corporate != None and self.corporate.kind == 'government';
 
+    @property
+    def presented_talks(self):
+        return filter(lambda x: x.was_presented, self.all_related_proposals)
+
+    @property
+    def has_presented(self):
+        return len(self.presented_talks) > 0
 
     @property
     def all_related_proposals(self):

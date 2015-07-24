@@ -70,6 +70,12 @@ class Proposal(JsonSerializable, db.Model):
     def is_talk(self):
         return self.status == 'confirmed'
 
+    @property
+    def was_presented(self):
+        slots = self.slots.all()
+        if not slots: return False
+        return any([ x.status == 'confirmed' for x in slots ])
+
     def tagged_as(self, tag_name):
         return tag_name in self.tag_names
 
