@@ -7,15 +7,15 @@
         state=touch
 
 - name: ensure template folder exists
-  file: path={{ app_path }}/segue/document/templates
+  file: path={{ app_path }}/segue/certificates/templates
         owner=www-data
         mode=0777
         state=directory
 
 - name: copy template files to application template folder
   tags: certificates
-  synchronize: src={{ project_dir }}/segue/document/templates/
-               dest={{ app_path }}/segue/document/templates/
+  synchronize: src={{ project_dir }}/segue/certificates/templates/
+               dest={{ app_path }}/segue/certificates/templates/
                rsync_opts=-O
                owner=no
                group=no

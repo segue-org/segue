@@ -14,4 +14,4 @@ migrations/manual/fisl16/s*.sql
 src
 states.cache
 .DS_*
-segue/document/templates/*.svg
+segue/certificate/templates/*.svg
