@@ -28,7 +28,7 @@ def _make_context():
     import segue.models
     return dict(app=app, db=segue.core.db, models=segue.models)
 
-app = segue.Application()
+app = segue.Application(blueprints=False)
 
 migrate = Migrate(app, segue.core.db)
 

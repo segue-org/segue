@@ -14,13 +14,13 @@ class NullApplication(flask.Flask):
         super(NullApplication, self).__init__(__name__)
 
 class Application(flask.Flask):
-    def __init__(self, settings_override=None):
+    def __init__(self, settings_override=None, blueprints=True):
         super(Application, self).__init__(__name__)
         self._load_configs(settings_override)
         self._set_logger()
         self._set_json_encoder()
         self._set_debug()
-        self._register_blueprints()
+        if blueprints: self._register_blueprints()
         self._register_error_handlers()
         self._init_deps()
         self._load_cors()
@@ -37,7 +37,7 @@ class Application(flask.Flask):
         formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
 
         handler = logging.handlers.RotatingFileHandler(self.config['LOGFILE'],
-                                                       maxBytes=100000, backupCount=5, mode="a+")
+                                                       maxBytes=10000000, backupCount=10, mode="a+")
         handler.setLevel(getattr(logging, self.config['LOGLEVEL']))
         handler.setFormatter(formatter)
 
@@ -57,8 +57,10 @@ class Application(flask.Flask):
         self.debug = True
 
     def _register_blueprints(self):
+        print "loading blueprints..."
         for blueprint in api.load_blueprints():
             self.register_blueprint(blueprint)
+        print "blueprints loaded"
 
     def _init_deps(self):
         core.db.init_app(self)
