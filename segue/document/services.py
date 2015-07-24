@@ -32,6 +32,6 @@ class DocumentService(object):
         for path, dirs, files in os.walk(root):
             if not files: continue
             result.extend([ f for f in files if f.startswith(kind) ])
-        return result
+        return sorted(result)
 
 
