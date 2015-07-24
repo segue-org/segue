@@ -12,10 +12,16 @@ class Context(dict):
         self.__dict__.update(a_dict)
 
 class SegueApiTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if hasattr(SegueApiTestCase, 'app'): return
+        SegueApiTestCase.app = segue.Application(settings_override=settings, blueprints=True)
+
     def setUp(self):
         super(SegueApiTestCase, self).setUp()
 
-        self.app = segue.Application(settings_override=settings)
+        self.app = SegueApiTestCase.app
+
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()

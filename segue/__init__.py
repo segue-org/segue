@@ -57,10 +57,8 @@ class Application(flask.Flask):
         self.debug = True
 
     def _register_blueprints(self):
-        print "loading blueprints..."
         for blueprint in api.load_blueprints():
             self.register_blueprint(blueprint)
-        print "blueprints loaded"
 
     def _init_deps(self):
         core.db.init_app(self)
