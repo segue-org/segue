@@ -6,7 +6,8 @@ from werkzeug.exceptions import NotFound
 from segue.errors import SegueValidationError
 from segue.account.services import AccountService
 from segue.account.models import ResetPassword
-from segue.account.errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
+from segue.account.errors import InvalidLogin, CertificateNameAlreadySet, EmailAlreadyInUse
+from segue.account.errors import NotAuthorized, NoSuchAccount, InvalidResetPassword
 
 from ..support.factories import *
 from ..support import SegueApiTestCase, hashie
@@ -18,6 +19,17 @@ class AccountServiceTestCases(SegueApiTestCase):
         self.mock_mailer = mockito.Mock()
         self.mock_hasher = mockito.Mock()
         self.service = AccountService(signer=self.mock_signer, mailer=self.mock_mailer, hasher=self.mock_hasher)
+
+    def test_set_certificate_name(self):
+        account = self.create(ValidAccountFactory)
+
+        self.service.set_certificate_name(account.id, "Dejair", by=account)
+
+        retrieved = self.service.get_one(account.id, by=account)
+        self.assertEquals(retrieved.certificate_name, 'Dejair')
+
+        with self.assertRaises(CertificateNameAlreadySet):
+            self.service.set_certificate_name(account.id, "Joao do Caminhao", by=account)
 
     def test_invalid_account_raises_validation_error(self):
         account = InvalidAccountFactory.build().to_json()

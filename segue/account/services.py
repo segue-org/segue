@@ -13,7 +13,7 @@ from jwt import Signer
 from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
-from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword
+from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
 import schema
 
 class AccountService(object):
@@ -23,6 +23,16 @@ class AccountService(object):
         self.signer = signer or Signer()
         self.hasher = hasher or Hasher()
         self.filters = AccountFilterStrategies()
+
+    def set_certificate_name(self, account_id, new_name, by=None):
+        account = self.get_one(account_id, by, strict=True)
+        if account.certificate_name: raise CertificateNameAlreadySet()
+
+        account.certificate_name = new_name
+        db.session.add(account)
+        db.session.commit()
+
+        return account
 
     def by_range(self, start, end):
         return Account.query.filter(Account.id.between(start, end)).order_by(Account.id)

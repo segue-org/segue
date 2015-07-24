@@ -20,6 +20,11 @@ class InvalidLogin(SegueError):
     def to_json(self):
         return { 'message': 'bad login' }
 
+class CertificateNameAlreadySet(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'cannot change certificate name' }
+
 class EmailAlreadyInUse(SegueFieldError):
     code = 422
 

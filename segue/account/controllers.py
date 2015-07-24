@@ -45,6 +45,13 @@ class AccountController(object):
         data = request.get_json()
         return self.service.login(**data), 200
 
+    @jwt_only
+    @jsoned
+    def set_certificate_name(self, account_id):
+        new_name = request.get_json().get('name',None)
+        if not new_name: flask.abort(400)
+        return self.service.set_certificate_name(account_id, new_name, by=self.current_user), 200
+
     def list_proposals(self, account_id):
         query_string = "?owner_id={}".format(account_id)
         return redirect(url_for('proposals.list') + query_string)
