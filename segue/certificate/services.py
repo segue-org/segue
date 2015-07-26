@@ -41,9 +41,7 @@ class CertificateService(object):
         new_cert = self.factories[kind].create(account=account, **payload)
 
         if self._is_like_any(new_cert, issued_certs): raise CertificateAlreadyIssued()
-
-        is_valid = any([ new_cert.is_like(possible) for possible in issuable_certs ])
-        if not is_valid: raise CertificateCannotBeIssued()
+        if not self._is_like_any(new_cert, issuable_certs): raise CertificateCannotBeIssued()
 
         db.session.add(new_cert)
         db.session.commit()
@@ -54,5 +52,4 @@ class CertificateService(object):
         return Certificate.query.filter(Certificate.account == account).all()
 
     def _is_like_any(self, candidate, issued_certs):
-        print candidate, issued_certs
         return any([ issued.is_like(candidate) for issued in issued_certs ])

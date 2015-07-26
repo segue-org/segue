@@ -7,6 +7,11 @@ class Prototype():
         for key, value in kw.items():
             setattr(self, key, value)
 
+    def is_like(self, cert):
+        if isinstance(cert, Certificate):
+            return cert.is_like(self)
+        return self.__dict__ == cert.__dict__
+
 class Certificate(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     kind         = db.Column(db.Text)
