@@ -1,6 +1,7 @@
-import os.path
+import os
 import mockito
 
+from unittest import skipIf
 from testfixtures import TempDirectory
 
 from segue.document.services import DocumentService
@@ -48,6 +49,7 @@ class DocumentServiceWriterTestCases(SegueApiTestCase):
     def tearDown(self):
         self.tmp_dir.cleanup()
 
+    @skipIf("SNAP_CI" in os.environ, "inkscape is not available in CI")
     def test_svg_to_pdf(self):
         result = self.service.svg_to_pdf('templates/dummy.svg', 'certificate', "ABCD", { 'XONGA': 'bir<osca' })
 
