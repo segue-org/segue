@@ -1,13 +1,13 @@
 """certificate table
 
-Revision ID: 49dd83ecaff7
+Revision ID: 1cad7d4c9a0a
 Revises: e95413a8654
-Create Date: 2015-07-24 03:58:53.756849
+Create Date: 2015-07-26 19:49:13.165366
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '49dd83ecaff7'
+revision = '1cad7d4c9a0a'
 down_revision = 'e95413a8654'
 
 from alembic import op
@@ -19,11 +19,12 @@ def upgrade():
     op.create_table('certificate',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('kind', sa.Text(), nullable=True),
-    sa.Column('name', sa.Text(), nullable=False),
+    sa.Column('name', sa.Text(), nullable=True),
     sa.Column('language', sa.String(length=2), nullable=True),
     sa.Column('hash_code', sa.String(length=10), nullable=True),
     sa.Column('ticket_id', sa.Integer(), nullable=True),
     sa.Column('account_id', sa.Integer(), nullable=True),
+    sa.Column('issue_date', sa.DateTime(), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('last_updated', sa.DateTime(), nullable=True),
     sa.Column('sc_talk_id', sa.Integer(), nullable=True),

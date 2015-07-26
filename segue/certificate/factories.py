@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from segue.factory import Factory
 from segue.hasher import Hasher
+
 from models import Certificate, AttendantCertificate, SpeakerCertificate
 
 class CertificateFactory(Factory):
@@ -10,11 +13,12 @@ class CertificateFactory(Factory):
 
     def create(self, account, language, target_model=Certificate):
         entity = target_model()
-        entity.account   = account
-        entity.ticket    = account.identifier_purchase
-        entity.name      = account.certificate_name
-        entity.language  = language
-        entity.hash_code = self.hasher.generate()
+        entity.account    = account
+        entity.ticket     = account.identifier_purchase
+        entity.name       = account.certificate_name
+        entity.language   = language
+        entity.hash_code  = self.hasher.generate()
+        entity.issue_date = datetime.now()
         return entity
 
 class AttendantCertificateFactory(CertificateFactory):

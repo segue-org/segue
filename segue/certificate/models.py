@@ -20,6 +20,7 @@ class Certificate(db.Model):
     hash_code    = db.Column(db.String(10))
     ticket_id    = db.Column(db.Integer, db.ForeignKey('purchase.id'))
     account_id   = db.Column(db.Integer, db.ForeignKey('account.id'))
+    issue_date   = db.Column(db.DateTime)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
