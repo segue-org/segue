@@ -1,13 +1,14 @@
 from segue.core import db
 from segue.hasher import Hasher
+from segue.document.services import DocumentService
 
 from factories import SpeakerCertificateFactory, AttendantCertificateFactory
 from models import Certificate, AttendantCertificate, SpeakerCertificate, Prototype
 from errors import CertificateCannotBeIssued, CertificateAlreadyIssued
 
 class CertificateService(object):
-    def __init__(self, hasher=None):
-        self.hasher = hasher or Hasher()
+    def __init__(self, documents=None):
+        self.documents = documents or DocumentService()
         self.factories = dict(
             speaker   = SpeakerCertificateFactory(),
             attendant = AttendantCertificateFactory()
@@ -42,6 +43,8 @@ class CertificateService(object):
 
         if self._is_like_any(new_cert, issued_certs): raise CertificateAlreadyIssued()
         if not self._is_like_any(new_cert, issuable_certs): raise CertificateCannotBeIssued()
+
+        self.documents.svg_to_pdf(new_cert.template_file, 'certificate', new_cert.hash_code, new_cert.template_vars)
 
         db.session.add(new_cert)
         db.session.commit()

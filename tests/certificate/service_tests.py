@@ -12,8 +12,8 @@ from ..support import SegueApiTestCase, hashie, Context
 class CertificateServiceTestCases(SegueApiTestCase):
     def setUp(self):
         super(CertificateServiceTestCases, self).setUp()
-        self.mock_hasher = mockito.Mock()
-        self.service = CertificateService(hasher=self.mock_hasher)
+        self.mock_docs = mockito.Mock()
+        self.service = CertificateService(documents=self.mock_docs)
 
     def test_account_with_no_valid_purchase_gets_zero_certs(self):
         account = self.create(ValidAccountFactory)
@@ -55,6 +55,11 @@ class CertificateServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.kind, 'attendant')
         self.assertEquals(result.language, 'pt')
         self.assertEquals(result.name, 'Asdrobalgilo');
+
+        mockito.verify(self.mock_docs).svg_to_pdf(result.template_file, 'certificate', result.hash_code, result.template_vars)
+        self.assertEquals(result.template_file, 'certificate/templates/attendant.svg')
+        self.assertEquals(result.template_vars['NOME'], 'Asdrobalgilo')
+        self.assertEquals(result.template_vars['URL'],  'http://192.168.33.92/{}'.format(result.hash_code))
 
     def test_cannot_issue_speaker_cert_for_attendant(self):
         account = self.create(ValidAccountFactory, certificate_name='Asdrobalgilo')

@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.sql import functions as func
-from segue.core import db
+from segue.core import db, config
 
 class Prototype():
     def __init__(self, **kw):
@@ -28,17 +28,29 @@ class Certificate(db.Model):
     account  = db.relationship('Account',  backref=db.backref('certificates', uselist=True))
     ticket   = db.relationship('Purchase', backref=db.backref('certificates', uselist=True))
 
+    __tablename__ = 'certificate'
+    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'certificate' }
+
     def is_like(self, prototype):
         return self.kind == prototype.kind and self.ticket == prototype.ticket and self.account == prototype.account
 
     def __repr__(self):
         return "<Cert:{}({}):A{}:PU{}>".format(self.id, self.kind, self.account_id, self.ticket_id)
 
-    __tablename__ = 'certificate'
-    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'certificate' }
+    @property
+    def template_vars(self):
+        return { "NOME": self.name, "URL": self.url }
+
+    @property
+    def url(self):
+        return "{}/{}".format(config.CERTIFICATES_URL, self.hash_code)
 
 class AttendantCertificate(Certificate):
     __mapper_args__ = { 'polymorphic_identity': 'attendant' }
+
+    @property
+    def template_file(self):
+        return 'certificate/templates/attendant.svg'
 
 class SpeakerCertificate(Certificate):
     __mapper_args__ = { 'polymorphic_identity': 'speaker' }
@@ -48,3 +60,13 @@ class SpeakerCertificate(Certificate):
 
     def is_like(self, prototype):
         return super(SpeakerCertificate, self).is_like(prototype) and self.talk == prototype.talk
+
+    @property
+    def template_file(self):
+        return 'certificate/templates/speaker-{}.svg'.format(self.language)
+
+    @property
+    def template_vars(self):
+        result = super(SpeakerCertificate, self).template_vars
+        result['PALESTRA'] = self.talk.title
+        return result
