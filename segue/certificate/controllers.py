@@ -32,7 +32,7 @@ class CertificateController(object):
         descriptor = request.get_json().get('descriptor', None) or flask.abort(400)
         kind, id = descriptor.split("-")
 
-        payload = dict(language='pt')
+        payload = dict(language=self.current_user.guessed_language)
         if kind == 'speaker':
             payload['talk'] = self.proposals.get_one(id, strict=True)
 

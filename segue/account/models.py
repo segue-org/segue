@@ -113,6 +113,12 @@ class Account(JsonSerializable, db.Model):
         return self.purchases[-1]
 
     @property
+    def guessed_language(self):
+        if self.is_brazilian: return 'pt'
+        elif self.is_spanish_speaking: return 'es'
+        return 'en'
+
+    @property
     def guessed_category(self):
         purchase = self.identifier_purchase
         if purchase: return purchase.product.category
@@ -151,6 +157,10 @@ class Account(JsonSerializable, db.Model):
     @property
     def is_brazilian(self):
         return re.match(r"bra.*", self.country or '', re.IGNORECASE) != None
+
+    @property
+    def is_spanish_speaking(self):
+        return re.match(r"(Guate|Urug|Col|Venezu|E?uador|Argen|Spa|Esp|Para|Chil|Mexi)", self.country or '', re.IGNORECASE) != None
 
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
