@@ -12,6 +12,7 @@ from schedule.models import Room, Slot, Notification, CallNotification, SlotNoti
 from frontdesk.models import Badge
 from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
 from certificate.models import Certificate, AttendantCertificate
+from survey.models import SurveyAnswer
 
 __all__ = [
     'Account', 'ResetPassword',
@@ -28,5 +29,6 @@ __all__ = [
     'PromoCode', 'PromoCodePayment', 'PromoCodeTransition',
     'Badge',
     'Corporate', 'EmployeeAccount', 'CorporatePurchase', 'EmployeePurchase',
-    'Certificate', 'AttendantCertificate'
+    'Certificate', 'AttendantCertificate',
+    'SurveyAnswer',
 ]

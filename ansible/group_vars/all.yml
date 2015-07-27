@@ -33,3 +33,5 @@ recordings_file_pattern: '^sala(.*?)-.*-?(\d{12}).ogv'
 recordings_rooms: 40t,41a,41b,41c,41d,41e,41f
 
 event_dates: "2015-07-08,2015-07-09,2015-07-10,2015-07-11"
+
+default_survey: 'fisl16_survey'
