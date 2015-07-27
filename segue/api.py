@@ -5,6 +5,7 @@ import frontdesk
 
 def load_blueprints():
     from document import DocumentBlueprint
+    from certificate import CertificateBlueprint
     from judge import JudgeBlueprint, MatchBlueprint
     from purchase import PurchaseBlueprint, PaymentBlueprint
     from account import AccountBlueprint, SessionBlueprint
@@ -31,6 +32,7 @@ def load_blueprints():
         SlotBlueprint(),
         TalkBlueprint(),
         NotificationBlueprint(),
+        CertificateBlueprint(),
     ]
     blueprints += admin.load_blueprints()
     blueprints += frontdesk.load_blueprints()
