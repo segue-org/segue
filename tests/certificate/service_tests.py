@@ -57,7 +57,7 @@ class CertificateServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.name, 'Asdrobalgilo');
 
         mockito.verify(self.mock_docs).svg_to_pdf(result.template_file, 'certificate', result.hash_code, result.template_vars)
-        self.assertEquals(result.template_file, 'certificate/templates/attendant.svg')
+        self.assertEquals(result.template_file, 'certificate/templates/attendant-pt.svg')
         self.assertEquals(result.template_vars['NOME'], 'Asdrobalgilo')
         self.assertEquals(result.template_vars['URL'],  'http://192.168.33.92/{}'.format(result.hash_code))
 
