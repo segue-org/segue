@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  ServerName  certs.{{ master_host }}
+  ServerAlias certs.{{ ansible_eth0.ipv4.address }}.xip.io
+
+  ProxyPassMatch ^/([0-9A-F]*)$ http://localhost/api/documents/certificate-$1.pdf
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+</VirtualHost>

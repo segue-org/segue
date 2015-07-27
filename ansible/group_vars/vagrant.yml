@@ -9,6 +9,7 @@ jwt_secret: sshh
 frontend_url: http://localhost:9000
 backend_url: http://192.168.33.91
 certificates_url: http://192.168.33.92
+master_host: 192.168.33.91
 
 debugging: True
 
