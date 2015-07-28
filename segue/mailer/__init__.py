@@ -128,3 +128,11 @@ class MailerService(object):
         )
         message.to(person.name, person.email)
         return mailer.send(message.build())
+
+    def certificates_available(self, account, certificates):
+        if not certificates: return
+        message = self.message_factory.from_template('certificates/available')
+        message.given(account=account)
+        message.to(account.name, account.email)
+        return mailer.send(message.build())
+

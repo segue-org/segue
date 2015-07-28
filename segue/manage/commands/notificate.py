@@ -7,7 +7,42 @@ from segue.errors import SegueError
 from segue.account.services import AccountService
 from segue.proposal.services import ProposalService, NonSelectionService
 from segue.schedule.services import NotificationService, SlotService
+from segue.certificate.services import CertificateService
+from segue.mailer import MailerService
 from support import *;
+
+def certificates(start=0, end=sys.maxint):
+    init_command()
+
+    accounts     = AccountService().by_range(int(start), int(end)).all()
+    certificates = CertificateService()
+    mailer       = MailerService()
+
+    skipped = 0
+    sent    = 0
+
+    for account in accounts:
+        print "{}{}{} - account owned by {}{}{}...".format(
+                F.RED, account.id, F.RESET,
+                F.RED, account.email, F.RESET
+        ),
+
+        available_certs = certificates.issuable_certificates_for(account, exclude_issued=True)
+
+        if not available_certs:
+            print "has {}0{} certs, {}skipping{}".format(F.RED, F.RESET, F.RED, F.RESET)
+            skipped += 1
+            continue
+
+        print "has certs = {}{}{}, {}notifying{}".format(F.RED, available_certs, F.RESET, F.GREEN, F.RESET)
+        mailer.certificates_available(account, available_certs)
+        sent += 1
+
+    print "============== RESULTS ==============="
+    print "start: {}{}{}, end: {}{}{}".format(F.GREEN, start, F.RESET, F.GREEN, end, F.RESET)
+    print "accounts scanned: {}{}{}".format(F.GREEN, len(accounts), F.RESET)
+    print "         skipped: {}{}{}".format(F.GREEN, skipped,       F.RESET)
+    print "      sent email: {}{}{}".format(F.GREEN, sent,          F.RESET)
 
 def non_selection(start=0, end=sys.maxint):
     init_command()

@@ -1,0 +1,28 @@
+---
+
+template: available_certificates
+language: pt
+subject: "fisl16 - certificado de participação disponível"
+
+body: |
+
+    Olá {account.name}!
+
+    O seu certificado de participação no FISL está
+    disponível para emissão em nosso sistema. Para
+    emiti-lo, por favor acesse o sistema de
+    inscrições utilizando seu e-mail e senha, usando
+    a URL abaixo:
+
+        {frontend_url}
+
+    Caso você não lembre ou não saiba sua senha,
+    por favor utilize o processo de recuperação
+    de senhas, através da URL abaixo
+
+        {frontend_url}/#/forgot/
+
+    Atenciosamente,
+
+    --
+    Associação Software Livre.Org

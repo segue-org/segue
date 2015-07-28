@@ -18,6 +18,11 @@ class Prototype():
             return "speaker-{}".format(self.talk.id)
         return self.kind
 
+    def __repr__(self):
+        talk_id = self.talk.id if hasattr(self,'talk') else None
+
+        return "<CertProto:({}):A{}:PU{}:T{}>".format(self.kind, self.account.id, self.ticket.id, talk_id)
+
 class Certificate(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     kind         = db.Column(db.Text)
