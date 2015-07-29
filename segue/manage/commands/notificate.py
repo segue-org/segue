@@ -30,8 +30,12 @@ def certificates(start=0, end=sys.maxint):
         available_certs = certificates.issuable_certificates_for(account, exclude_issued=True)
 
         if not available_certs:
-            print "has {}0{} certs, {}skipping{}".format(F.RED, F.RESET, F.RED, F.RESET)
+            print "has {}0{} pending certs, {}skipping{}".format(F.RED, F.RESET, F.RED, F.RESET)
             skipped += 1
+            continue
+
+        if not account.email:
+            print "{}this account has no email{}, skipping".format(F.RED, F.RESET)
             continue
 
         print "has certs = {}{}{}, {}notifying{}".format(F.RED, available_certs, F.RESET, F.GREEN, F.RESET)
