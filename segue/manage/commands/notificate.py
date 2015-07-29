@@ -24,7 +24,7 @@ def certificates(start=0, end=sys.maxint):
     for account in accounts:
         print "{}{}{} - account owned by {}{}{}...".format(
                 F.RED, account.id, F.RESET,
-                F.RED, account.email, F.RESET
+                F.RED, u(account.email), F.RESET
         ),
 
         available_certs = certificates.issuable_certificates_for(account, exclude_issued=True)
