@@ -35,3 +35,6 @@ config = Config()
 logger = Logger()
 
 jwt_required = flask_jwt.jwt_required
+
+def u(value):
+    return (value or '').encode("utf-8")

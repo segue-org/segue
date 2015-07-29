@@ -5,7 +5,7 @@ from sqlalchemy.sql import functions as func
 from sqlalchemy.dialects import postgresql
 
 from ..json import JsonSerializable
-from ..core import db, logger
+from ..core import db, logger, u
 from .serializers import *
 
 from segue.account.errors import NoSuchAccount, AccountAlreadyHasPurchase
@@ -45,6 +45,9 @@ class Proposal(JsonSerializable, db.Model):
         if self.owner.id == alleged.id: return True
         if alleged.role == 'admin': return True
         return False
+
+    def __repr__(self):
+        return "<Proposal({},{}):O{}:'{}'>".format(self.id, self.status, self.owner_id, u(self.title[:10]))
 
     @property
     def related_emails(self):
@@ -95,6 +98,9 @@ class ProposalInvite(JsonSerializable, db.Model):
         backref=db.backref('proposal_invites', uselist=True),
         primaryjoin='Account.email == ProposalInvite.recipient',
         foreign_keys='Account.email')
+
+    def __repr__(self):
+        return "<PropInvite({},{},{})>".format(self.proposal_id, self.recipient, self.status)
 
     @property
     def accepted(self):

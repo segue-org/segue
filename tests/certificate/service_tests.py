@@ -127,10 +127,23 @@ class CertificateServiceTestCases(SegueApiTestCase):
 
         self.assertEquals(len(result), 0)
 
-    def test_does_not_issue_to_noshow_speakers(self):
+    def test_account_of_speakers_with_normal_tickets_still_get_speaker_certificates(self):
         account = self.create(ValidAccountFactory)
         product = self.create(ValidSpeakerProductFactory)
         purchase = self.create(ValidPurchaseFactory, customer=account, product=product, status='paid')
+        proposal = self.create(ValidProposalFactory, status='confirmed', owner=account)
+        slot = self.create(ValidSlotFactory, talk=proposal, status='confirmed')
+
+        result = self.service.issuable_certificates_for(account)
+
+        self.assertEquals(len(result), 1)
+        self.assertEquals(result[0].kind, 'speaker')
+        self.assertEquals(result[0].talk, proposal)
+
+
+    def test_does_not_issue_to_noshow_speakers(self):
+        account = self.create(ValidAccountFactory)
+        purchase = self.create(ValidPurchaseFactory, customer=account, status='paid')
         proposal = self.create(ValidProposalFactory, status='confirmed', owner=account)
 
         with self.assertRaises(CertificateCannotBeIssued):
