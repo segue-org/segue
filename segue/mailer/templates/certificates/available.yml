@@ -14,7 +14,7 @@ body: |
     inscrições utilizando seu e-mail e senha, usando
     a URL abaixo:
 
-        {frontend_url}
+        {frontend_url}#/certificate/
 
     Caso você não lembre ou não saiba sua senha, ou
     caso a sua conta tenha sido criada por terceiros,
