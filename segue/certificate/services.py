@@ -21,10 +21,12 @@ class CertificateService(object):
 
         issued_certs = self.issued_certificates_for(account)
 
-        if ticket.category != 'speaker':
-            candidates = [ Prototype(kind='attendant', account=account, ticket=ticket) ]
-        else:
+        if account.presented_talks:
             candidates = [ Prototype(kind='speaker', account=account, ticket=ticket, talk=talk) for talk in account.presented_talks ]
+        elif ticket.category != 'speaker':
+            candidates = [ Prototype(kind='attendant', account=account, ticket=ticket) ]
+        else: # speakers who did not present their talks
+            candidates = []
 
         if exclude_issued:
             return filter(lambda x: not self._is_like_any(x, issued_certs), candidates)
