@@ -16,11 +16,12 @@ body: |
 
         {frontend_url}
 
-    Caso você não lembre ou não saiba sua senha,
+    Caso você não lembre ou não saiba sua senha, ou
+    caso a sua conta tenha sido criada por terceiros,
     por favor utilize o processo de recuperação
     de senhas, através da URL abaixo
 
-        {frontend_url}/#/forgot/
+        {frontend_url}/#/forgot/{account.email}
 
     Atenciosamente,
 
