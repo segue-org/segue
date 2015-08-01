@@ -6,6 +6,7 @@ import codecs
 
 from support import *
 
+from segue.proposal.services import ProposalService
 from segue.account.services import AccountService
 from segue.schedule.services import SlotService
 
@@ -40,3 +41,25 @@ def list_talks(room_id=None, outfile=None, day=None):
             for coauthor in slot.talk.coauthor_accounts:
                 coauthor_row = slot_fields + [ u(coauthor.name), coauthor.email ]
                 output.writerow(coauthor_row)
+
+def list_proposals(start=0, end=sys.maxint, outfile='/dev/stdout'):
+
+    proposals = ProposalService().by_range(int(start), int(end))
+
+    with codecs.open(outfile,'wb') as csvfile:
+        output = csv.writer(csvfile, quoting=csv.QUOTE_NONNUMERIC)
+        output.writerow("id,title,player,rejected,approved,by_public,invited,presented,noshow".split(','))
+
+        for proposal in proposals:
+            approved = proposal.tagged_as('approved'),
+            marked   = proposal.tagged_as('marked') or proposal.tagged_as('marked-2'),
+
+            line = [ proposal.id, u(proposal.title) ]
+            flags = [
+                proposal.tagged_as('player'),
+                proposal.tagged_as('rejected'),
+                marked and not approved,
+                proposal.is_talk and not marked and not approved,
+                proposal.was_presented
+            ]
+            output.writerow(line + [ int(v) for v in flags ])

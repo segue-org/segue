@@ -85,6 +85,9 @@ class ProposalService(object):
         db.session.commit()
         return proposal
 
+    def by_range(self, start, end):
+        return Proposal.query.filter(Proposal.id.between(start, end)).order_by(Proposal.id).all()
+
     def get_one(self, proposal_id, strict=False):
         proposal = Proposal.query.get(proposal_id)
         if proposal: return proposal
