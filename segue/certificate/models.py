@@ -67,6 +67,13 @@ class AttendantCertificate(Certificate):
     def template_file(self):
         return 'certificate/templates/attendant-{}.svg'.format(self.language)
 
+class VolunteerCertificate(Certificate):
+    __mapper_args__ = { 'polymorphic_identity': 'volunteer' }
+
+    @property
+    def template_file(self):
+        return 'certificate/templates/volunteer.svg'
+
 class SpeakerCertificate(Certificate):
     __mapper_args__ = { 'polymorphic_identity': 'speaker' }
 

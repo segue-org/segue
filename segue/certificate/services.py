@@ -23,6 +23,8 @@ class CertificateService(object):
 
         if account.presented_talks:
             candidates = [ Prototype(kind='speaker', account=account, ticket=ticket, talk=talk) for talk in account.presented_talks ]
+        elif ticket.category == 'volunteer':
+            candidates = [ Prototype(kind='volunteer', account=account, ticket=ticket) ]
         elif ticket.category != 'speaker':
             candidates = [ Prototype(kind='attendant', account=account, ticket=ticket) ]
         else: # speakers who did not present their talks
