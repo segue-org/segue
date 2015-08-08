@@ -2,7 +2,7 @@ from segue.core import db
 from segue.hasher import Hasher
 from segue.document.services import DocumentService
 
-from factories import SpeakerCertificateFactory, AttendantCertificateFactory
+from factories import SpeakerCertificateFactory, AttendantCertificateFactory, VolunteerCertificateFactory
 from models import Certificate, AttendantCertificate, SpeakerCertificate, Prototype
 from errors import CertificateCannotBeIssued, CertificateAlreadyIssued
 
@@ -11,7 +11,8 @@ class CertificateService(object):
         self.documents = documents or DocumentService()
         self.factories = dict(
             speaker   = SpeakerCertificateFactory(),
-            attendant = AttendantCertificateFactory()
+            attendant = AttendantCertificateFactory(),
+            volunteer = VolunteerCertificateFactory(),
         )
 
     def issuable_certificates_for(self, account, exclude_issued=True):

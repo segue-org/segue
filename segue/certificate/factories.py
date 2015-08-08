@@ -3,7 +3,7 @@ from datetime import datetime
 from segue.factory import Factory
 from segue.hasher import Hasher
 
-from models import Certificate, AttendantCertificate, SpeakerCertificate
+from models import Certificate, AttendantCertificate, SpeakerCertificate, VolunteerCertificate
 
 class CertificateFactory(Factory):
     model = Certificate
@@ -26,6 +26,12 @@ class AttendantCertificateFactory(CertificateFactory):
 
     def create(self, account, language='pt', **payload):
         return super(AttendantCertificateFactory, self).create(account, language, target_model=AttendantCertificate)
+
+class VolunteerCertificateFactory(CertificateFactory):
+    model = VolunteerCertificate
+
+    def create(self, account, language='pt', **payload):
+        return super(VolunteerCertificateFactory, self).create(account, language, target_model=VolunteerCertificate)
 
 class SpeakerCertificateFactory(CertificateFactory):
     model = SpeakerCertificate
