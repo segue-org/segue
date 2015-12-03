@@ -1,18 +1,13 @@
 ---
 
 - hosts: vagrant
-  sudo: True
+  sudo: true
   roles:
     - accelerate
-
-- hosts: vagrant
-  sudo: true
-  accelerate: true
-  roles:
+    - server
     - certificates
     - database
     - segue
-    - server
     - DavidWittman.redis
 
   vars_files:
