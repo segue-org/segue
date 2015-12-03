@@ -1,7 +1,14 @@
 ---
 
-- postgresql_user: name={{ dbuser }}
+- name: setup postgres default cluster
+  sudo: yes
+  sudo_user: root
+  shell: "pg_createcluster --start -e UTF-8 9.3 main"
+
+- name: setting up postgres user and password
+  postgresql_user: name={{ dbuser }}
                    password={{ dbpass }}
 
-- postgresql_db: name={{ dbname }}
+- name: setting up db owner
+  postgresql_db: name={{ dbname }}
                  owner={{ dbuser }}
