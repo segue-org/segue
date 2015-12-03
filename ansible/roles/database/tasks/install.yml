@@ -3,8 +3,10 @@
 - apt: update_cache=yes
        cache_valid_time=3600
 
+- shell: "locale-gen pt_BR.UTF-8"
+
 - lineinfile: dest="/etc/profile.d/set_lc_all.sh"
-              line='export LC_ALL="en_US.utf-8"'
+              line='export LC_ALL="en_US.UTF-8"'
               create=yes
               state=present
 
