@@ -1,9 +1,14 @@
 ---
 
-- name: setup postgres default cluster
+- name: check if dbs are created
+  shell: "psql $dbname -c 'select 1'"
+  register: db_setup
+  ignore_errors: yes
+- name: setup postgres cluster to default to utf8
   sudo: yes
-  sudo_user: root
-  shell: "pg_createcluster --start -e UTF-8 9.3 main"
+  sudo_user: postgres
+  shell: "pg_dropcluster --stop 9.3 main && pg_createcluster --start -e UTF-8 9.3 main"
+  when: db_setup.rc != 0 # verify if the database already exists. If so, do nothing
 
 - name: setting up postgres user and password
   postgresql_user: name={{ dbuser }}
