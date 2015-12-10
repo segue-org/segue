@@ -138,7 +138,7 @@ class ValidProductFactory(SegueFactory):
         model = Product
     kind        = "public"
     category    = "normal"
-    sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2015,12,1,0,0,0))
+    sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2025,12,1,0,0,0))
     public      = True
     price       = FuzzyDecimal(70, 400, 2)
     description = "ingresso fisl16 - lote 1 - muggles"
